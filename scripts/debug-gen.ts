@@ -1,0 +1,11 @@
+import { generateMap, setGenLog } from "../src/core/map/generate";
+import { createWorld } from "../src/core/sim/state";
+const seed = process.argv[2] ?? "pace-1";
+let t = performance.now();
+setGenLog((stage) => { console.log(stage, (performance.now() - t) | 0, "ms"); t = performance.now(); });
+console.log("generating", seed);
+const map = generateMap(seed, { size: 512 });
+console.log("map", (performance.now() - t) | 0, "ms; villages", map.villages.length);
+t = performance.now();
+const w = createWorld(seed, map, 0);
+console.log("world", (performance.now() - t) | 0, "ms; sheep", w.sheep.length);
