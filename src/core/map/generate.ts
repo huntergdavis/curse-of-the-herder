@@ -212,6 +212,8 @@ export function generateMap(seed: string, opts: GenerateOptions = {}): GameMap {
   genLog?.("villages");
   // --- 5. Roads from the pen to each village (reuse existing roads) ------
   const roadBias = (x: number, y: number, base: number): number => {
+    const dd = deco[idx(x, y)];
+    if (dd === Deco.Fence || dd === Deco.PenGround) return Infinity;
     const t = terrain[idx(x, y)];
     if (t === Terrain.Road || t === Terrain.Bridge) return 0.25;
     if (t === Terrain.Water) return 9; // bridges are possible but pricey

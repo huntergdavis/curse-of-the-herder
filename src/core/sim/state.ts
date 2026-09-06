@@ -83,11 +83,11 @@ export interface FlockOptions {
 }
 
 export const DEFAULT_RINGS = [
-  { min: 25, max: 55, count: 14 },
-  { min: 70, max: 110, count: 14 },
-  { min: 130, max: 180, count: 12 },
-  { min: 190, max: 250, count: 12 },
-  { min: 260, max: 330, count: 8 },
+  { min: 28, max: 62, count: 14 },
+  { min: 80, max: 125, count: 14 },
+  { min: 150, max: 205, count: 12 },
+  { min: 220, max: 285, count: 12 },
+  { min: 300, max: 380, count: 8 },
 ];
 
 export function createWorld(seed: string, map: GameMap, wallMs: number, opts: FlockOptions = {}): WorldState {

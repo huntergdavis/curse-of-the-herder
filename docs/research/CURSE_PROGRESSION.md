@@ -22,12 +22,13 @@ value** (like The Grind 2's `level = f(xp)`), computed from an "erudition"
 score, never stored independently:
 
 ```
-erudition = 100 * booksRead + 20 * sheepPenned + 3 * hoursElapsed
-level     = clamp(floor(sqrt(erudition / 30)), 0, 12)
+erudition = 100 * booksRead + 8 * sheepPenned + 3 * hoursElapsed
+level     = clamp(floor(erudition / 240), 0, 12)
 ```
 
-Books dominate. A herder who never finds a book still levels slowly from
-penning sheep and the passing of hours, so the arc always completes.
+Books dominate: 24 books over the day is one level every ~45 minutes. A
+herder who never finds a book still reaches level 2 from sheep and hours
+alone, which is why libraries are placed on his likely routes.
 
 | Lvl | Name | Register | Sample (calm) | Sample (furious) |
 | --- | --- | --- | --- | --- |

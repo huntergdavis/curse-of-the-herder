@@ -8,12 +8,16 @@ export const LEVEL_NAMES: readonly string[] = [
   "The Baroque", "Verse", "Unhinged Laureate",
 ];
 
+/** Books dominate; sheep and hours give a slow floor so a bookless day still climbs a little. */
 export function erudition(booksRead: number, sheepPenned: number, hoursElapsed: number): number {
-  return 100 * booksRead + 20 * sheepPenned + 3 * hoursElapsed;
+  return 100 * booksRead + 8 * sheepPenned + 3 * hoursElapsed;
 }
 
+/** Linear in erudition: with ~24 books over the day this is roughly one level per 45 minutes. */
+export const ERUDITION_PER_LEVEL = 240;
+
 export function levelFor(eruditionScore: number): number {
-  return Math.max(0, Math.min(MAX_LEVEL, Math.floor(Math.sqrt(Math.max(0, eruditionScore) / 30))));
+  return Math.max(0, Math.min(MAX_LEVEL, Math.floor(Math.max(0, eruditionScore) / ERUDITION_PER_LEVEL)));
 }
 
 export type FilthBand = 0 | 1 | 2 | 3 | 4;
@@ -42,10 +46,10 @@ export const FRUSTRATION = {
   duskPerMinute: 0.2,
   walkOfShame: 3,
   repeatEscape: 12,
-  penned: -15,
+  penned: -8,
   book: -10,
   breather: -5,
-  decayPerMinute: -1,
+  decayPerMinute: -0.5,
 } as const;
 
 export function clampFrustration(v: number): number {

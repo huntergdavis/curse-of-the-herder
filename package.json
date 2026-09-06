@@ -13,6 +13,7 @@
     "pace": "tsx scripts/pace.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "tsx": "^4.23.13",
     "typescript": "^5.9.2",
     "vite": "^7.1.5",

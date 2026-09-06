@@ -1,197 +1,253 @@
-import { mulberry32 } from "./core/rng";
+import { generateMap, type GameMap } from "./core/map/generate";
+import { LEVEL_NAMES, erudition, levelFor } from "./core/progression";
+import { nextIdleCurseTicks, speakForEvent, speakIdle } from "./core/lang/speech";
+import { createWorld, dayHour, hoursElapsed, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
+import { step } from "./core/sim/step";
+import { repository } from "./persist/db";
+import { Bubbles } from "./render/bubbles";
+import { Camera } from "./render/camera";
+import { Minimap } from "./render/minimap";
+import { Renderer } from "./render/renderer";
 
-// Pre-alpha teaser. Everything here is throwaway scaffolding so the Pages
-// site has a heartbeat; the real architecture is described in PLAN.md.
+const params = new URLSearchParams(location.search);
+/** Simulation ticks per real 250 ms. `?fast=60` runs the day in nine minutes. */
+const FAST = Math.max(1, Math.min(600, Number(params.get("fast") ?? 1) || 1));
+const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 512) || 512));
+const TICK_MS = TICK_SECONDS * 1000;
+const MAX_CATCH_UP_TICKS = 4 * TICKS_PER_HOUR;
+const SAVE_EVERY_MS = 10_000;
 
-const TILE = 24;
-const W = 64;
-const H = 40;
+const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
+const canvas = $<HTMLCanvasElement>("game");
+const overlay = $<HTMLDivElement>("overlay");
+const overlayCard = $<HTMLDivElement>("overlay-card");
 
-type Terrain = "water" | "sand" | "grass" | "farm" | "forest" | "rock" | "snow";
-const COLORS: Record<Terrain, string> = {
-  water: "#3d6fa3",
-  sand: "#d9c98a",
-  grass: "#6fa54a",
-  farm: "#b89b4b",
-  forest: "#3d7a3a",
-  rock: "#8a8578",
-  snow: "#eef0f2",
-};
+interface Session {
+  world: WorldState;
+  map: GameMap;
+  renderer: Renderer;
+  minimap: Minimap;
+  camera: Camera;
+  bubbles: Bubbles;
+  nextIdleCurseTick: number;
+  lastSaveMs: number;
+  seenEvents: number;
+}
 
-// Value noise: smooth-ish random terrain, good enough for a teaser.
-function makeNoise(seed: number, scale: number): (x: number, y: number) => number {
-  const r = mulberry32(seed);
-  const gw = Math.ceil(W / scale) + 2;
-  const gh = Math.ceil(H / scale) + 2;
-  const grid = Array.from({ length: gw * gh }, () => r());
-  const at = (gx: number, gy: number): number => grid[gy * gw + gx] ?? 0;
-  const smooth = (t: number): number => t * t * (3 - 2 * t);
-  return (x, y) => {
-    const fx = x / scale;
-    const fy = y / scale;
-    const x0 = Math.floor(fx);
-    const y0 = Math.floor(fy);
-    const tx = smooth(fx - x0);
-    const ty = smooth(fy - y0);
-    const a = at(x0, y0);
-    const b = at(x0 + 1, y0);
-    const c = at(x0, y0 + 1);
-    const d = at(x0 + 1, y0 + 1);
-    return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+let session: Session | null = null;
+let paused = false;
+let lastFrameMs = performance.now();
+
+function randomSeed(): string {
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function showOverlay(html: string): void {
+  overlayCard.innerHTML = html;
+  overlay.hidden = false;
+}
+
+function hideOverlay(): void {
+  overlay.hidden = true;
+}
+
+async function startSession(world: WorldState): Promise<void> {
+  showOverlay(`<h1>${world.name}</h1><p>Laying out the pasture…</p>`);
+  await new Promise((r) => setTimeout(r, 30)); // let the overlay paint
+  const map = generateMap(world.seed, { size: world.size });
+  const renderer = session?.renderer ?? new Renderer(canvas, map);
+  renderer.setMap(map);
+  const camera = new Camera(world.herder.x, world.herder.y);
+  session = {
+    world,
+    map,
+    renderer,
+    minimap: new Minimap(map, 160),
+    camera,
+    bubbles: new Bubbles(),
+    nextIdleCurseTick: world.tick + nextIdleCurseTicks(world),
+    lastSaveMs: performance.now(),
+    seenEvents: world.events.length,
   };
+  repository.setActiveId(world.id);
+  await refreshLoadList();
+  hideOverlay();
+  updateHud(true);
 }
 
-const seed = (Date.now() / 60000) | 0;
-const elevation = makeNoise(seed, 9);
-const moisture = makeNoise(seed * 31 + 7, 6);
-
-function terrainAt(x: number, y: number): Terrain {
-  const e = elevation(x, y);
-  const m = moisture(x, y);
-  if (e < 0.32) return "water";
-  if (e < 0.37) return "sand";
-  if (e > 0.82) return "snow";
-  if (e > 0.7) return "rock";
-  if (m > 0.62) return "forest";
-  if (m < 0.35) return "farm";
-  return "grass";
+async function newHerder(): Promise<void> {
+  const seed = params.get("seed") && !session ? params.get("seed")! : randomSeed();
+  const map = generateMap(seed, { size: BOARD_SIZE });
+  const world = createWorld(seed, map, Date.now());
+  await repository.save(world);
+  await startSession(world);
 }
 
-const map: Terrain[] = [];
-for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) map.push(terrainAt(x, y));
-const walkable = (x: number, y: number): boolean => {
-  if (x < 0 || y < 0 || x >= W || y >= H) return false;
-  const t = map[y * W + x];
-  return t !== "water" && t !== "snow";
-};
-
-const pen = { x: W >> 1, y: H >> 1 };
-const r = mulberry32(seed ^ 0xbeef);
-const sheep: { x: number; y: number; home: boolean }[] = [];
-while (sheep.length < 14) {
-  const x = (r() * W) | 0;
-  const y = (r() * H) | 0;
-  if (walkable(x, y) && Math.hypot(x - pen.x, y - pen.y) > 8) sheep.push({ x, y, home: false });
-}
-
-const herder = { x: pen.x, y: pen.y + 2, carrying: null as null | (typeof sheep)[number] };
-
-// Tier 0 vocabulary: the herder starts the day barely verbal.
-const GRUNTS = ["Baa.", "No.", "Sheep!", "Ugh.", "Why.", "Mud.", "Hill!", "Again?!", "Legs.", "Hmph.", "Wool!", "Bah."];
-let bubble = { text: "", until: 0 };
-function curse(now: number): void {
-  bubble = { text: GRUNTS[(r() * GRUNTS.length) | 0] ?? "Ugh.", until: now + 2200 };
-}
-
-// Greedy step toward a target, sidestepping unwalkable tiles.
-function stepToward(tx: number, ty: number): void {
-  const dx = Math.sign(tx - herder.x);
-  const dy = Math.sign(ty - herder.y);
-  const options = [
-    [dx, 0],
-    [0, dy],
-    [dx, dy],
-    [dy, dx],
-    [-dy, dx],
-    [dy, -dx],
-  ] as const;
-  for (const [ox, oy] of options) {
-    if ((ox || oy) && walkable(herder.x + ox, herder.y + oy)) {
-      herder.x += ox;
-      herder.y += oy;
-      return;
-    }
+async function refreshLoadList(): Promise<void> {
+  const sel = $<HTMLSelectElement>("sel-load");
+  const list = await repository.list();
+  sel.innerHTML = '<option value="">Load…</option>';
+  for (const h of list) {
+    const opt = document.createElement("option");
+    opt.value = h.id;
+    opt.textContent = `${h.name} · ${h.penned}/${h.total}${h.finished ? " · retired" : ""}`;
+    if (session && h.id === session.world.id) opt.selected = true;
+    sel.appendChild(opt);
   }
 }
 
-const canvas = document.getElementById("game") as HTMLCanvasElement;
-const ctx = canvas.getContext("2d")!;
-const versionEl = document.getElementById("version");
-if (versionEl) versionEl.textContent = `v${__APP_VERSION__}`;
-
-function resize(): void {
-  canvas.width = W * TILE;
-  canvas.height = H * TILE;
+function fmtClock(hour: number): string {
+  const h = Math.floor(hour);
+  const m = Math.floor((hour - h) * 60);
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
-resize();
 
-let lastStep = 0;
-function tick(now: number): void {
-  if (now - lastStep > 140) {
-    lastStep = now;
-    const target = herder.carrying ? pen : sheep.find((s) => !s.home);
-    if (target) {
-      stepToward(target.x, target.y);
-      if (herder.carrying) {
-        herder.carrying.x = herder.x;
-        herder.carrying.y = herder.y;
-        if (herder.x === pen.x && herder.y === pen.y) {
-          herder.carrying.home = true;
-          herder.carrying = null;
+let lastHud = "";
+function updateHud(force = false): void {
+  if (!session) return;
+  const w = session.world;
+  const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
+  const key = `${w.tick >> 2}|${w.sheepPenned}|${level}|${w.frustration | 0}|${paused}`;
+  if (!force && key === lastHud) return;
+  lastHud = key;
+  $("hud-name").textContent = w.name;
+  $("hud-clock").textContent = fmtClock(dayHour(w));
+  $("hud-flock").textContent = `${w.sheepPenned} / ${w.sheep.length}`;
+  $("hud-level").textContent = `${level} · ${LEVEL_NAMES[level] ?? ""}`;
+  $("hud-books").textContent = String(w.booksRead);
+  $("hud-frust").textContent = String(Math.round(w.frustration));
+  $<HTMLDivElement>("meter-fill").style.width = `${w.frustration}%`;
+  $("hud-mode").textContent = paused ? "Paused" : FAST > 1 ? `×${FAST}` : "";
+  $("btn-pause").textContent = paused ? "Resume" : "Pause";
+}
+
+function handleEvents(s: Session, nowMs: number): void {
+  const w = s.world;
+  // Events ring is capped; only react to ones we have not seen.
+  const fresh = w.events.slice(Math.max(0, w.events.length - Math.max(0, w.events.length - s.seenEvents)));
+  s.seenEvents = w.events.length;
+  for (const e of fresh) {
+    const u = speakForEvent(w, e);
+    if (u) say(s, u.text, u.heat, u.seconds, nowMs);
+    if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
+    if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
+    if (e.kind === "finished") onFinished(s);
+  }
+}
+
+function say(s: Session, text: string, heat: number, seconds: number, nowMs: number): void {
+  s.bubbles.say(text, heat, seconds, nowMs);
+  s.world.totalCurses++;
+  $("line-text").textContent = text;
+}
+
+function onFinished(s: Session): void {
+  const w = s.world;
+  showOverlay(
+    `<h1>${w.name}</h1><p>penned the last of ${w.sheep.length} sheep at ${fmtClock(dayHour(w))} and was retired to the Hall of Herders.</p>` +
+      `<p class="epitaph">"${s.bubbles.herderLine()?.text ?? "..."}"</p><p>Curses uttered: ${w.totalCurses}. A new herder wakes at dawn.</p>`,
+  );
+  void repository.save(w);
+  window.setTimeout(() => void newHerder(), 60_000);
+}
+
+function frame(nowMs: number): void {
+  requestAnimationFrame(frame);
+  const s = session;
+  if (!s) return;
+  const dt = Math.min(0.1, (nowMs - lastFrameMs) / 1000);
+  lastFrameMs = nowMs;
+  const w = s.world;
+
+  if (!paused && !w.finished) {
+    const wall = Date.now();
+    let due = Math.floor(((wall - w.lastWallMs) / TICK_MS) * FAST);
+    if (due > 0) {
+      const catchingUp = due > 40;
+      due = Math.min(due, MAX_CATCH_UP_TICKS);
+      // Budget per frame so a big catch-up does not freeze the tab.
+      const budget = catchingUp ? 1500 : due;
+      const run = Math.min(due, budget);
+      for (let i = 0; i < run; i++) {
+        step(w, s.map);
+        if (w.tick >= s.nextIdleCurseTick && !catchingUp) {
+          const u = speakIdle(w);
+          say(s, u.text, u.heat, u.seconds, nowMs);
+          s.nextIdleCurseTick = w.tick + nextIdleCurseTicks(w);
         }
-      } else if (herder.x === target.x && herder.y === target.y) {
-        herder.carrying = target as (typeof sheep)[number];
-        curse(now);
+        if (w.finished) break;
       }
-      if (r() < 0.02) curse(now);
+      if (w.tick >= s.nextIdleCurseTick) s.nextIdleCurseTick = w.tick + nextIdleCurseTicks(w);
+      w.lastWallMs += Math.round((run / FAST) * TICK_MS);
+      if (run >= due || w.finished) w.lastWallMs = wall;
+      handleEvents(s, nowMs);
     }
+    if (nowMs - s.lastSaveMs > SAVE_EVERY_MS) {
+      s.lastSaveMs = nowMs;
+      void repository.save(w);
+    }
+  } else {
+    w.lastWallMs = Date.now();
   }
-  draw(now);
-  requestAnimationFrame(tick);
+
+  const h = w.herder;
+  // Lead the camera a little toward where he is going.
+  const next = h.path[Math.min(4, h.path.length - 1)];
+  const lx = next ? (next.x - h.x) * 0.25 : 0;
+  const ly = next ? (next.y - h.y) * 0.25 : 0;
+  s.camera.follow(h.x + lx, h.y + ly, dt);
+  s.bubbles.prune(nowMs);
+  if (!document.hidden) {
+    s.renderer.draw(w, s.camera, s.bubbles, nowMs);
+    if ((nowMs | 0) % 4 === 0) s.minimap.draw($<HTMLCanvasElement>("minimap"), w);
+  }
+  updateHud();
 }
 
-function draw(now: number): void {
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      ctx.fillStyle = COLORS[map[y * W + x] ?? "grass"];
-      ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+async function boot(): Promise<void> {
+  window.addEventListener("resize", () => session?.renderer.resize());
+  $("btn-pause").addEventListener("click", () => {
+    paused = !paused;
+    updateHud(true);
+  });
+  $("btn-new").addEventListener("click", () => void newHerder());
+  $<HTMLSelectElement>("sel-load").addEventListener("change", async (e) => {
+    const id = (e.target as HTMLSelectElement).value;
+    if (!id) return;
+    if (session) await repository.save(session.world);
+    const w = await repository.load(id);
+    if (w) await startSession(w);
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === " ") {
+      paused = !paused;
+      updateHud(true);
+    } else if (e.key.toLowerCase() === "n") void newHerder();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && session) session.renderer.resize();
+  });
+  window.addEventListener("beforeunload", () => {
+    if (session) void repository.save(session.world);
+  });
+
+  const active = repository.getActiveId();
+  let world: WorldState | null = null;
+  if (active && !params.get("seed") && params.get("new") === null) {
+    try {
+      world = await repository.load(active);
+    } catch (err) {
+      console.warn("Could not load active herder; starting fresh.", err);
     }
   }
-  // Pen
-  ctx.strokeStyle = "#5a3b1e";
-  ctx.lineWidth = 3;
-  ctx.strokeRect((pen.x - 1) * TILE + 2, (pen.y - 1) * TILE + 2, TILE * 3 - 4, TILE * 3 - 4);
-  // Sheep
-  for (const s of sheep) {
-    if (s === herder.carrying) continue;
-    ctx.fillStyle = "#f4f1e6";
-    ctx.beginPath();
-    ctx.ellipse(s.x * TILE + TILE / 2, s.y * TILE + TILE / 2, TILE * 0.38, TILE * 0.3, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#2b2b2b";
-    ctx.fillRect(s.x * TILE + TILE * 0.62, s.y * TILE + TILE * 0.38, TILE * 0.2, TILE * 0.2);
+  if (world && !world.finished) {
+    if (world.size !== BOARD_SIZE && params.has("size")) world = null;
   }
-  // Herder
-  ctx.fillStyle = "#7a3b2e";
-  ctx.fillRect(herder.x * TILE + 6, herder.y * TILE + 4, TILE - 12, TILE - 6);
-  ctx.fillStyle = "#e8b98a";
-  ctx.fillRect(herder.x * TILE + 8, herder.y * TILE + 1, TILE - 16, 7);
-  if (herder.carrying) {
-    ctx.fillStyle = "#f4f1e6";
-    ctx.beginPath();
-    ctx.ellipse(herder.x * TILE + TILE / 2, herder.y * TILE - 4, TILE * 0.35, TILE * 0.25, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  // Speech bubble
-  if (now < bubble.until && bubble.text) {
-    ctx.font = "bold 16px Georgia, serif";
-    const w = ctx.measureText(bubble.text).width + 16;
-    const bx = Math.min(Math.max(herder.x * TILE + TILE / 2 - w / 2, 4), canvas.width - w - 4);
-    const by = Math.max(herder.y * TILE - 34, 4);
-    ctx.fillStyle = "#fffdf5";
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(bx, by, w, 24, 6);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#222";
-    ctx.fillText(bubble.text, bx + 8, by + 17);
-  }
-  const home = sheep.filter((s) => s.home).length;
-  ctx.font = "14px Georgia, serif";
-  ctx.fillStyle = "#fffdf5";
-  ctx.fillText(`Flock: ${home}/${sheep.length}   Level 0: Grunting   Seed ${seed}`, 8, 18);
+  if (world && !world.finished) await startSession(world);
+  else await newHerder();
+  requestAnimationFrame(frame);
 }
 
-requestAnimationFrame(tick);
+void boot();

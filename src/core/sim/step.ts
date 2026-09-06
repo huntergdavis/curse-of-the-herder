@@ -5,7 +5,7 @@ import { FRUSTRATION, clampFrustration } from "../progression";
 import { keyedUnit } from "../rng";
 import { MAX_EVENTS, TICK_SECONDS, type SheepState, type WorldEvent, type WorldState } from "./state";
 
-export const HERDER_BASE_SPEED = 1.5; // tiles per second on grass
+export const HERDER_BASE_SPEED = 1.1; // tiles per second on grass (tuned by scripts/pace.ts)
 const CARRY_FACTOR = 0.8;
 const FLEE_RADIUS = 2.5;
 const MAX_FLEES = 3;
@@ -173,7 +173,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
     h.lastTileY = ty;
     if (h.carrying >= 0) {
       h.carryOdometer += 1;
-      if (h.carryOdometer >= 40) {
+      if (h.carryOdometer >= 25) {
         h.carryOdometer = 0;
         addFrustration(w, FRUSTRATION.perFortyTilesCarrying);
       }

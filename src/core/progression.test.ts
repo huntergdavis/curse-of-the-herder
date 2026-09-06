@@ -4,12 +4,16 @@ import { curseIntervalSeconds, erudition, filthCeiling, levelFor } from "./progr
 describe("progression", () => {
   it("levels rise with books and cap at 12", () => {
     expect(levelFor(0)).toBe(0);
-    expect(levelFor(erudition(1, 0, 0))).toBe(1);
-    expect(levelFor(erudition(6, 20, 4))).toBeGreaterThanOrEqual(5);
+    expect(levelFor(erudition(3, 0, 0))).toBe(1);
+    expect(levelFor(erudition(12, 30, 4))).toBeGreaterThanOrEqual(5);
+    expect(levelFor(erudition(24, 60, 9))).toBe(12);
     expect(levelFor(erudition(40, 60, 9))).toBe(12);
   });
-  it("a herder who never finds a book still ends the day above level 5", () => {
-    expect(levelFor(erudition(0, 60, 9))).toBeGreaterThanOrEqual(5);
+  it("a herder who never finds a book still ends the day at level 2", () => {
+    expect(levelFor(erudition(0, 60, 9))).toBe(2);
+  });
+  it("seven sheep and no books is still level 0", () => {
+    expect(levelFor(erudition(0, 7, 0.2))).toBe(0);
   });
   it("filth ceiling follows frustration bands", () => {
     expect(filthCeiling(0)).toBe(0);
