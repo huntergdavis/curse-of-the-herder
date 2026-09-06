@@ -1,9 +1,9 @@
 import type { GameMap } from "../map/generate";
 import { findPath } from "../map/path";
 import { Deco, TERRAIN_SPEED, Terrain, isWalkable } from "../map/terrain";
-import { FRUSTRATION, clampFrustration } from "../progression";
+import { FRUSTRATION, clampFrustration, frustrationBaseline, frustrationDrift } from "../progression";
 import { keyedUnit } from "../rng";
-import { MAX_EVENTS, TICK_SECONDS, type SheepState, type WorldEvent, type WorldState } from "./state";
+import { MAX_EVENTS, TICK_SECONDS, TICKS_PER_HOUR, type SheepState, type WorldEvent, type WorldState } from "./state";
 
 export const HERDER_BASE_SPEED = 1.1; // tiles per second on grass (tuned by scripts/pace.ts)
 const CARRY_FACTOR = 0.8;
@@ -257,7 +257,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
 /** Advance the world by one tick. Mutates and returns the same object. */
 export function step(w: WorldState, map: GameMap): WorldState {
   w.tick++;
-  addFrustration(w, FRUSTRATION.decayPerMinute * TICK_SECONDS / 60);
+  w.frustration = clampFrustration(frustrationDrift(w.frustration, frustrationBaseline(w.tick / TICKS_PER_HOUR), TICK_SECONDS / 60));
   stepSheep(w, map);
   stepHerder(w, map);
   return w;

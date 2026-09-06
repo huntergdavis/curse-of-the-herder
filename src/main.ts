@@ -1,6 +1,7 @@
 import { generateMap, type GameMap } from "./core/map/generate";
 import { LEVEL_NAMES, erudition, levelFor } from "./core/progression";
-import { nextIdleCurseTicks, speakForEvent, speakIdle } from "./core/lang/speech";
+import { nextIdleCurseTicks, speakEpitaph, speakForEvent, speakIdle } from "./core/lang/speech";
+import type { Band } from "./core/lang/types";
 import { createWorld, dayHour, hoursElapsed, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
 import { step } from "./core/sim/step";
 import { repository } from "./persist/db";
@@ -16,6 +17,9 @@ const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 512
 const TICK_MS = TICK_SECONDS * 1000;
 const MAX_CATCH_UP_TICKS = 4 * TICKS_PER_HOUR;
 const SAVE_EVERY_MS = 10_000;
+/** `?clean=1` caps filth at F1 for shared displays; `?filth=max` removes the frustration gate for testing. */
+const BAND_CAP: Band = params.get("clean") ? 1 : 4;
+const FILTH_MAX = params.get("filth") === "max";
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const canvas = $<HTMLCanvasElement>("game");
@@ -32,6 +36,7 @@ interface Session {
   nextIdleCurseTick: number;
   lastSaveMs: number;
   seenEvents: number;
+  recent: string[];
 }
 
 let session: Session | null = null;
@@ -70,6 +75,7 @@ async function startSession(world: WorldState): Promise<void> {
     nextIdleCurseTick: world.tick + nextIdleCurseTicks(world),
     lastSaveMs: performance.now(),
     seenEvents: world.events.length,
+    recent: [],
   };
   repository.setActiveId(world.id);
   await refreshLoadList();
@@ -129,7 +135,8 @@ function handleEvents(s: Session, nowMs: number): void {
   const fresh = w.events.slice(Math.max(0, w.events.length - Math.max(0, w.events.length - s.seenEvents)));
   s.seenEvents = w.events.length;
   for (const e of fresh) {
-    const u = speakForEvent(w, e);
+    if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
+    const u = speakForEvent(w, s.map, e, s.recent, BAND_CAP);
     if (u) say(s, u.text, u.heat, u.seconds, nowMs);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
@@ -140,14 +147,18 @@ function handleEvents(s: Session, nowMs: number): void {
 function say(s: Session, text: string, heat: number, seconds: number, nowMs: number): void {
   s.bubbles.say(text, heat, seconds, nowMs);
   s.world.totalCurses++;
+  s.recent.push(text);
+  if (s.recent.length > 32) s.recent.shift();
   $("line-text").textContent = text;
 }
 
 function onFinished(s: Session): void {
   const w = s.world;
+  const epitaph = speakEpitaph(w, s.map, s.recent, BAND_CAP);
+  say(s, epitaph.text, 1, 30, performance.now());
   showOverlay(
     `<h1>${w.name}</h1><p>penned the last of ${w.sheep.length} sheep at ${fmtClock(dayHour(w))} and was retired to the Hall of Herders.</p>` +
-      `<p class="epitaph">"${s.bubbles.herderLine()?.text ?? "..."}"</p><p>Curses uttered: ${w.totalCurses}. A new herder wakes at dawn.</p>`,
+      `<p class="epitaph">"${epitaph.text}"</p><p>Curses uttered: ${w.totalCurses}. A new herder wakes at dawn.</p>`,
   );
   void repository.save(w);
   window.setTimeout(() => void newHerder(), 60_000);
@@ -173,8 +184,9 @@ function frame(nowMs: number): void {
       for (let i = 0; i < run; i++) {
         step(w, s.map);
         if (w.tick >= s.nextIdleCurseTick && !catchingUp) {
-          const u = speakIdle(w);
-          say(s, u.text, u.heat, u.seconds, nowMs);
+          if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
+          const u = speakIdle(w, s.map, s.recent, BAND_CAP);
+          if (u) say(s, u.text, u.heat, u.seconds, nowMs);
           s.nextIdleCurseTick = w.tick + nextIdleCurseTicks(w);
         }
         if (w.finished) break;

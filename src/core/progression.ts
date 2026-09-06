@@ -55,3 +55,18 @@ export const FRUSTRATION = {
 export function clampFrustration(v: number): number {
   return Math.max(0, Math.min(100, v));
 }
+
+/**
+ * The floor the meter drifts toward. A fresh herder is calm; by mid-afternoon
+ * he is simmering even when nothing is going wrong. Hours are sim hours since
+ * the day began.
+ */
+export function frustrationBaseline(hoursElapsed: number): number {
+  return Math.max(0, Math.min(72, (hoursElapsed - 0.75) * 11));
+}
+
+/** Per-tick drift toward the baseline: slow relief above it, steady simmer below it. */
+export function frustrationDrift(current: number, baseline: number, dtMinutes: number): number {
+  if (current > baseline) return Math.max(baseline, current + FRUSTRATION.decayPerMinute * dtMinutes);
+  return Math.min(baseline, current + 1.2 * dtMinutes);
+}

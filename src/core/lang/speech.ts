@@ -1,64 +1,132 @@
-// Placeholder mouth for the herder until the grammar engine lands (Phase 2).
-// Tier 0/1 only: single words and two-word grunts, chosen deterministically.
+// The herder's mouth: builds a generation context from the world and asks
+// the grammar for a line. Deterministic given (seed, tick, event).
 
-import { keyedUnit } from "../rng";
-import { levelFor, erudition, filthCeiling, curseIntervalSeconds } from "../progression";
-import { hoursElapsed, type WorldEvent, type WorldState } from "../sim/state";
+import { CORE_PACKS } from "../../data/lexicon/core-packs";
+import { NON_TERMINALS, RULES } from "../../data/grammar/tiers-0-4";
+import { Terrain } from "../map/terrain";
+import type { GameMap } from "../map/generate";
 import { sheepName } from "../names";
+import { curseIntervalSeconds, erudition, filthCeiling, levelFor } from "../progression";
+import { keyedUnit } from "../rng";
+import { hoursElapsed, type WorldEvent, type WorldState } from "../sim/state";
+import { Grammar } from "./grammar";
+import type { Band, Context, RuleEvent } from "./types";
 
 export interface Utterance {
   text: string;
   /** 0..1 how hot the delivery is (bubble styling). */
   heat: number;
-  /** Seconds to hold the bubble. */
   seconds: number;
+  ruleId: string;
 }
 
-const IDLE_0 = ["Sheep.", "Ugh.", "Hmph.", "Why.", "Legs.", "Wool.", "Hill.", "Mud.", "Bah.", "Far.", "Again.", "No."];
-const IDLE_1 = ["Bad sheep.", "Stupid hill.", "Wet grass.", "Long day.", "Sore back.", "More sheep.", "Not again.", "Heavy sheep.", "Cold wind.", "Too far."];
-const PENNED = ["Good.", "One.", "Stay.", "There.", "Sit.", "Done. One.", "In. Stay in."];
-const CAUGHT = ["Got you.", "Mine.", "Come.", "Up we go.", "Heavy.", "Hnngh."];
-const FLEE = ["NO.", "Hey!", "Wait!", "Stop!", "Come BACK.", "Sheep! No!"];
-const REPEAT = ["YOU. AGAIN.", "Not you.", "Oh no. Not you.", "I know you."];
-const ABSURD = ["Why. Up. There.", "How.", "HOW.", "Roof. Why roof.", "Why here?!", "Rocks. Really."];
-const MUTTER_DUSK = ["Dark soon.", "Sun low.", "Still sheep.", "Tired."];
+const packs = CORE_PACKS.filter((p) => p.reviewedAt);
+export const grammar = new Grammar(packs, RULES, NON_TERMINALS);
 
-function pick(list: readonly string[], w: WorldState, purpose: string, salt: number): string {
-  return list[Math.floor(keyedUnit(w.seed, purpose, salt, w.tick) * list.length)] ?? list[0] ?? "Ugh.";
+const SIGNATURE_WORDS = ["turnip", "bucket", "parsnip", "cabbage", "sock", "thistle", "puddle", "trough", "wheelbarrow", "stile", "haystack", "pebble"];
+
+export function signatureWord(seed: string): string {
+  return SIGNATURE_WORDS[Math.floor(keyedUnit(seed, "signature") * SIGNATURE_WORDS.length)] ?? "turnip";
 }
 
-export function speakForEvent(w: WorldState, e: WorldEvent): Utterance | null {
-  const heat = Math.min(1, w.frustration / 100 + 0.1);
-  switch (e.kind) {
-    case "penned":
-      return { text: pick(PENNED, w, "penned", e.sheepId), heat: heat * 0.4, seconds: 2.5 };
-    case "caught":
-      return { text: pick(CAUGHT, w, "caught", e.sheepId), heat: heat * 0.6, seconds: 2.5 };
-    case "flee":
-      return { text: pick(FLEE, w, "flee", e.sheepId), heat: Math.max(0.5, heat), seconds: 3 };
-    case "repeatEscape": {
-      const name = sheepName(w.seed, e.sheepId);
-      const line = pick(REPEAT, w, "repeat", e.sheepId);
-      return { text: keyedUnit(w.seed, "name-it", e.sheepId) < 0.6 ? `${name}. ${line}` : line, heat: Math.max(0.7, heat), seconds: 3.5 };
-    }
-    case "absurd":
-      return { text: pick(ABSURD, w, "absurd", e.sheepId), heat: Math.max(0.6, heat), seconds: 3.5 };
-    case "finished":
-      return { text: "...All of them. All of you. In.", heat: 1, seconds: 8 };
-    default:
-      return null;
+function terrainNoun(map: GameMap, x: number, y: number, rnd: number): string {
+  const t = map.terrain[Math.round(y) * map.size + Math.round(x)];
+  switch (t) {
+    case Terrain.Mud: return rnd < 0.5 ? "mud" : "bog";
+    case Terrain.Rock: return rnd < 0.5 ? "rock" : "scree";
+    case Terrain.Forest: return rnd < 0.5 ? "bramble" : "wood";
+    case Terrain.Farm: return "furrow";
+    case Terrain.Sand: return "sand";
+    case Terrain.Water: case Terrain.Bridge: return "river";
+    case Terrain.Road: return "road";
+    default: return rnd < 0.5 ? "hill" : rnd < 0.8 ? "field" : "slope";
   }
 }
 
-export function speakIdle(w: WorldState): Utterance {
+function pickTarget(w: WorldState, map: GameMap, e: WorldEvent | null): Context["target"] {
+  const h = w.herder;
+  const sheepTarget = (id: number): Context["target"] => {
+    const s = w.sheep[id];
+    return { kind: "sheep", noun: "sheep", name: s?.named ? sheepName(w.seed, id) : null, plural: false };
+  };
+  if (e && e.sheepId >= 0) return sheepTarget(e.sheepId);
+  const r = keyedUnit(w.seed, "target", w.tick);
+  if (r < 0.45 && h.targetSheep >= 0) return sheepTarget(h.targetSheep);
+  if (r < 0.8) return { kind: "terrain", noun: terrainNoun(map, h.x, h.y, keyedUnit(w.seed, "terrain-noun", w.tick)), name: null, plural: false };
+  if (r < 0.9) return { kind: "day", noun: "day", name: null, plural: false };
+  return { kind: "curse", noun: "curse", name: null, plural: false };
+}
+
+export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, recent: string[], bandCap: Band = 4): Context {
   const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
-  const band = filthCeiling(w.frustration);
-  const hour = 9 + hoursElapsed(w);
-  const list = hour > 16.5 && keyedUnit(w.seed, "dusk", w.tick) < 0.4 ? MUTTER_DUSK : level >= 1 ? IDLE_1 : IDLE_0;
-  let text = pick(list, w, "idle", level);
-  if (band >= 2) text = text.toUpperCase();
-  if (band >= 3) text = text.replace(/\.$/, "!");
-  return { text, heat: w.frustration / 100, seconds: 2.5 + text.length * 0.05 };
+  const band = Math.min(bandCap, filthCeiling(w.frustration)) as Band;
+  const nearest = map.villages.reduce<{ name: string; d: number }>((best, v) => {
+    const d = Math.hypot(v.x - w.herder.x, v.y - w.herder.y);
+    return d < best.d ? { name: v.name, d } : best;
+  }, { name: "the village", d: Infinity });
+  return {
+    seed: w.seed,
+    tick: w.tick,
+    level,
+    band,
+    heat: w.frustration / 100,
+    hour: 9 + hoursElapsed(w),
+    target: pickTarget(w, map, e),
+    registers: [],
+    signatureWord: signatureWord(w.seed),
+    sheepRemaining: w.sheep.length - w.sheepPenned,
+    sheepPenned: w.sheepPenned,
+    booksRead: w.booksRead,
+    recent,
+    knownPacks: [],
+    villageName: nearest.name,
+  };
+}
+
+const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
+  flee: "flee",
+  caught: "caught",
+  penned: "penned",
+  absurd: "absurd",
+  repeatEscape: "repeatEscape",
+  finished: "finished",
+  book: "book",
+};
+
+function holdSeconds(text: string, heat: number): number {
+  const words = text.split(/\s+/).length;
+  return Math.min(14, Math.max(2.2, 1.6 + words * 0.42 + heat * 0.5));
+}
+
+export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent: string[], bandCap: Band = 4): Utterance | null {
+  const ev = EVENT_MAP[e.kind];
+  if (!ev) return null;
+  const ctx = buildContext(w, map, e, recent, bandCap);
+  // Events run hotter than the meter says: something just happened.
+  const bump: Partial<Record<RuleEvent, number>> = { flee: 0.25, repeatEscape: 0.4, absurd: 0.3, penned: -0.2, finished: 0.5 };
+  ctx.heat = Math.max(0, Math.min(1, ctx.heat + (bump[ev] ?? 0)));
+  const r = grammar.generate(ev, ctx, e.sheepId);
+  if (!r) return null;
+  return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
+}
+
+export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap: Band = 4): Utterance | null {
+  const ctx = buildContext(w, map, null, recent, bandCap);
+  const hour = ctx.hour;
+  let ev: RuleEvent = "idle";
+  const u = keyedUnit(w.seed, "idle-kind", w.tick);
+  if (hour >= 16.5 && u < 0.3) ev = "dusk";
+  const r = grammar.generate(ev, ctx);
+  if (!r) return null;
+  return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
+}
+
+export function speakEpitaph(w: WorldState, map: GameMap, recent: string[], bandCap: Band = 4): Utterance {
+  const ctx = buildContext(w, map, null, recent, bandCap);
+  ctx.heat = 1;
+  ctx.band = Math.min(bandCap, 4) as Band;
+  const r = grammar.generate("epitaph", ctx) ?? { text: "Sheep.", ruleId: "fallback", tier: 0 };
+  return { text: r.text, heat: 1, seconds: 30, ruleId: r.ruleId };
 }
 
 export function nextIdleCurseTicks(w: WorldState): number {

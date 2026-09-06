@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { curseIntervalSeconds, erudition, filthCeiling, levelFor } from "./progression";
+import { curseIntervalSeconds, erudition, filthCeiling, frustrationBaseline, frustrationDrift, levelFor } from "./progression";
 
 describe("progression", () => {
   it("levels rise with books and cap at 12", () => {
@@ -24,5 +24,13 @@ describe("progression", () => {
     expect(curseIntervalSeconds(0, 0)).toBeGreaterThan(90);
     expect(curseIntervalSeconds(12, 100)).toBeGreaterThanOrEqual(5);
     expect(curseIntervalSeconds(12, 100)).toBeLessThan(curseIntervalSeconds(0, 0));
+  });
+  it("frustration baseline rises through the day and the meter drifts toward it", () => {
+    expect(frustrationBaseline(0)).toBe(0);
+    expect(frustrationBaseline(4)).toBeGreaterThan(30);
+    expect(frustrationBaseline(9)).toBe(72);
+    expect(frustrationDrift(80, 40, 10)).toBe(75);
+    expect(frustrationDrift(10, 40, 10)).toBe(22);
+    expect(frustrationDrift(39.9, 40, 10)).toBe(40);
   });
 });
