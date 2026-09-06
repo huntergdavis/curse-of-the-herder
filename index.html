@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Curse of the Herder: a no-input browser screensaver. A cursed herder gathers his flock across a vast tile map over a 9-hour day, swearing ever more eloquently as he goes." />
+    <title>Curse of the Herder</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #1b2a1f; overflow: hidden; font-family: Georgia, "Times New Roman", serif; }
+      canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
+      #banner { position: fixed; left: 0; right: 0; bottom: 0; padding: 8px 14px; color: #e9e2c8; background: rgba(20, 30, 22, 0.75); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; }
+      #banner a { color: #ffd37a; }
+    </style>
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="banner">
+      <span><strong>Curse of the Herder</strong> &mdash; pre-alpha teaser. The real game is being built; see the <a href="https://github.com/huntergdavis/curse-of-the-herder">plan and backlog</a>.</span>
+      <span id="version"></span>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
