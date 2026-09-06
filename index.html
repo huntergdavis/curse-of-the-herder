@@ -33,6 +33,9 @@
       #minimap { width: 160px; height: 160px; border-radius: 6px; image-rendering: auto; }
       #line { left: 12px; bottom: 12px; max-width: 46vw; font-family: var(--hand-font); font-size: 16px; opacity: 0.9; }
       #line .label { font-family: var(--hud-font); font-size: 12px; opacity: 0.6; display: block; }
+      #toast { left: 50%; top: 14px; transform: translateX(-50%); font-size: 15px; background: #fff3c4; animation: drop 0.4s ease-out; }
+      #toast[hidden] { display: none; }
+      @keyframes drop { from { transform: translate(-50%, -30px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
       #overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(43, 38, 32, 0.55); color: var(--paper); font-size: 22px; text-align: center; padding: 24px; }
       #overlay[hidden] { display: none; }
       #overlay .card { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 16px; padding: 24px 32px; max-width: 520px; box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
@@ -62,6 +65,7 @@
     </nav>
     <div id="minimap-wrap" class="panel"><canvas id="minimap" width="160" height="160"></canvas></div>
     <div id="line" class="panel" aria-live="polite"><span class="label">Last heard</span><span id="line-text">…</span></div>
+    <div id="toast" class="panel" hidden></div>
     <div id="overlay"><div class="card" id="overlay-card"><h1>Curse of the Herder</h1><p>Waking the herder and laying out the pasture…</p></div></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

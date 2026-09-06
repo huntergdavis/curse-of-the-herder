@@ -157,30 +157,40 @@ export class ChunkCache {
     ctx.strokeStyle = INK;
     switch (d) {
       case Deco.Tree: {
-        const cxp = px + T * 0.5;
+        const cxp = px + T * (0.35 + u * 0.3);
         const base = py + T * 0.85;
+        const size = 0.8 + ((u * 7) % 1) * 0.45;
         ctx.fillStyle = "#6b4a2b";
-        ctx.fillRect(cxp - T * 0.07, base - T * 0.3, T * 0.14, T * 0.3);
-        ctx.fillStyle = u < 0.5 ? "#3f8a3a" : "#4b9a40";
+        ctx.fillRect(cxp - T * 0.07, base - T * 0.3 * size, T * 0.14, T * 0.3 * size);
+        const greens = ["#3f8a3a", "#4b9a40", "#357a38", "#5aa34a", "#2f7a44"];
+        ctx.fillStyle = greens[Math.floor(u * 5) % 5]!;
         ctx.beginPath();
-        ctx.arc(cxp, base - T * 0.5, T * 0.32, 0, Math.PI * 2);
+        ctx.arc(cxp, base - T * 0.5 * size, T * 0.32 * size, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "rgba(255,255,255,0.18)";
         ctx.beginPath();
-        ctx.arc(cxp - T * 0.1, base - T * 0.6, T * 0.14, 0, Math.PI * 2);
+        ctx.arc(cxp - T * 0.1 * size, base - T * 0.6 * size, T * 0.14 * size, 0, Math.PI * 2);
         ctx.fill();
         break;
       }
       case Deco.Tree2: {
-        const cxp = px + T * 0.5;
+        const cxp = px + T * (0.35 + ((u * 13) % 1) * 0.3);
         const base = py + T * 0.9;
+        const size = 0.8 + ((u * 3) % 1) * 0.5;
         ctx.fillStyle = "#6b4a2b";
         ctx.fillRect(cxp - T * 0.06, base - T * 0.2, T * 0.12, T * 0.2);
-        ctx.fillStyle = "#2f6f3a";
+        ctx.fillStyle = u < 0.5 ? "#2f6f3a" : "#3a7d46";
         ctx.beginPath();
-        ctx.moveTo(cxp - T * 0.3, base - T * 0.15);
-        ctx.lineTo(cxp, base - T * 0.85);
-        ctx.lineTo(cxp + T * 0.3, base - T * 0.15);
+        ctx.moveTo(cxp - T * 0.3 * size, base - T * 0.15);
+        ctx.lineTo(cxp, base - T * 0.85 * size);
+        ctx.lineTo(cxp + T * 0.3 * size, base - T * 0.15);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "rgba(0,0,0,0.12)";
+        ctx.beginPath();
+        ctx.moveTo(cxp, base - T * 0.15);
+        ctx.lineTo(cxp, base - T * 0.85 * size);
+        ctx.lineTo(cxp + T * 0.3 * size, base - T * 0.15);
         ctx.closePath();
         ctx.fill();
         break;

@@ -89,6 +89,9 @@ export interface HerderPose {
   /** 0..1, raises arms / tilts hat as he loses it. */
   fury: number;
   resting: boolean;
+  /** Sitting with a book. */
+  reading?: boolean;
+  bookColour?: string;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -97,6 +100,27 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(flip, 1);
+  if (p.reading || p.resting) {
+    // Sitting: everything drops by a third of a tile, legs fold forward.
+    ctx.translate(0, T * 0.05);
+    ctx.lineWidth = Math.max(1, T * 0.05);
+    ctx.strokeStyle = INK;
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, T * 0.34, T * 0.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#3b3a4a";
+    ctx.lineWidth = Math.max(2, T * 0.12);
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.06, -T * 0.3);
+    ctx.lineTo(T * 0.3, -T * 0.3);
+    ctx.lineTo(T * 0.34, -T * 0.02);
+    ctx.moveTo(T * 0.06, -T * 0.3);
+    ctx.lineTo(T * 0.38, -T * 0.28);
+    ctx.lineTo(T * 0.42, -T * 0.02);
+    ctx.stroke();
+    ctx.translate(0, T * 0.35);
+  }
   ctx.lineWidth = Math.max(1, T * 0.05);
   ctx.strokeStyle = INK;
   const stride = p.walking ? Math.sin(p.phase * Math.PI * 2) : 0;
@@ -130,7 +154,35 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.strokeStyle = "#e8b98a";
   ctx.lineWidth = Math.max(2, T * 0.1);
   ctx.beginPath();
-  if (p.carrying) {
+  if (p.reading) {
+    ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(-T * 0.12, -T * 0.62 - bob);
+    ctx.moveTo(T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(T * 0.3, -T * 0.62 - bob);
+    ctx.stroke();
+    // The book, held open.
+    ctx.fillStyle = p.bookColour ?? "#c94f4f";
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, T * 0.04);
+    ctx.beginPath();
+    ctx.roundRect(-T * 0.14, -T * 0.78 - bob, T * 0.44, T * 0.28, T * 0.03);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#fffdf5";
+    ctx.fillRect(-T * 0.1, -T * 0.75 - bob, T * 0.17, T * 0.22);
+    ctx.fillRect(T * 0.09, -T * 0.75 - bob, T * 0.17, T * 0.22);
+    ctx.strokeStyle = "rgba(43,38,32,0.4)";
+    ctx.beginPath();
+    for (let k = 0; k < 3; k++) {
+      ctx.moveTo(-T * 0.08, -T * (0.71 - k * 0.06) - bob);
+      ctx.lineTo(T * 0.05, -T * (0.71 - k * 0.06) - bob);
+      ctx.moveTo(T * 0.11, -T * (0.71 - k * 0.06) - bob);
+      ctx.lineTo(T * 0.24, -T * (0.71 - k * 0.06) - bob);
+    }
+    ctx.stroke();
+    ctx.strokeStyle = INK;
+    ctx.beginPath();
+  } else if (p.carrying) {
     ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
     ctx.lineTo(-T * 0.28, -T * 1.2 - bob);
     ctx.moveTo(T * 0.2, -T * 0.85 - bob);
@@ -149,8 +201,8 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(T * 0.3 + stride * T * 0.06, -T * 0.5 - bob);
   }
   ctx.stroke();
-  // Crook (in the front hand when not carrying)
-  if (!p.carrying) {
+  // Crook (in the front hand when not carrying); leans on the ground while sitting.
+  if (!p.carrying && !p.reading) {
     ctx.strokeStyle = "#8a6238";
     ctx.lineWidth = Math.max(1.5, T * 0.06);
     ctx.beginPath();

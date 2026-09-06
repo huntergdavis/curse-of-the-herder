@@ -3,6 +3,8 @@
 
 import { CORE_PACKS } from "../../data/lexicon/core-packs";
 import { NON_TERMINALS, RULES } from "../../data/grammar/tiers-0-4";
+import { NON_TERMINALS_5_8, RULES_5_8 } from "../../data/grammar/tiers-5-8";
+import { PACKS_5_8 } from "../../data/lexicon/packs-5-8";
 import { Terrain } from "../map/terrain";
 import type { GameMap } from "../map/generate";
 import { sheepName } from "../names";
@@ -20,8 +22,8 @@ export interface Utterance {
   ruleId: string;
 }
 
-const packs = CORE_PACKS.filter((p) => p.reviewedAt);
-export const grammar = new Grammar(packs, RULES, NON_TERMINALS);
+const packs = [...CORE_PACKS, ...PACKS_5_8].filter((p) => p.reviewedAt);
+export const grammar = new Grammar(packs, [...RULES, ...RULES_5_8], [...NON_TERMINALS, ...NON_TERMINALS_5_8]);
 
 const SIGNATURE_WORDS = ["turnip", "bucket", "parsnip", "cabbage", "sock", "thistle", "puddle", "trough", "wheelbarrow", "stile", "haystack", "pebble"];
 
@@ -72,13 +74,13 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
     heat: w.frustration / 100,
     hour: 9 + hoursElapsed(w),
     target: pickTarget(w, map, e),
-    registers: [],
+    registers: w.registers.filter((r) => r.untilTick > w.tick).map((r) => r.reg),
     signatureWord: signatureWord(w.seed),
     sheepRemaining: w.sheep.length - w.sheepPenned,
     sheepPenned: w.sheepPenned,
     booksRead: w.booksRead,
     recent,
-    knownPacks: [],
+    knownPacks: w.knownPacks,
     villageName: nearest.name,
   };
 }
@@ -91,6 +93,9 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   repeatEscape: "repeatEscape",
   finished: "finished",
   book: "book",
+  walkOfShame: "walkOfShame",
+  breather: "breather",
+  rain: "rain",
 };
 
 function holdSeconds(text: string, heat: number): number {

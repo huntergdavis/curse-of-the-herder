@@ -29,6 +29,8 @@ describe("morphology", () => {
     expect(numberWord(42)).toBe("forty-two");
     expect(ordinalWord(3)).toBe("third");
     expect(ordinalWord(20)).toBe("twentieth");
+    expect(ordinalWord(45)).toBe("forty-fifth");
+    expect(ordinalWord(31)).toBe("thirty-first");
   });
   it("tidies sentences", () => {
     expect(tidySentence("this   is a hill , sheep")).toBe("This is a hill, sheep.")

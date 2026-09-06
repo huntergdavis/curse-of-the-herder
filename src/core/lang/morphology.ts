@@ -152,6 +152,7 @@ export function numberWord(n: number): string {
 export function ordinalWord(n: number): string {
   const special: Record<number, string> = { 1: "first", 2: "second", 3: "third", 5: "fifth", 8: "eighth", 9: "ninth", 12: "twelfth" };
   if (special[n]) return special[n]!;
+  if (n > 20 && n < 100 && n % 10 !== 0) return TENS[Math.floor(n / 10)]! + "-" + ordinalWord(n % 10);
   const w = numberWord(n);
   if (w.endsWith("y")) return w.slice(0, -1) + "ieth";
   return w + "th";

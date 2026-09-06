@@ -1,4 +1,4 @@
-import { assertWorld, type WorldState } from "../core/sim/state";
+import { assertWorld, upgradeWorld, type WorldState } from "../core/sim/state";
 
 const DB_NAME = "curse-of-the-herder";
 const DB_VERSION = 1;
@@ -52,14 +52,14 @@ export const repository = {
   async load(id: string): Promise<WorldState | null> {
     const w = await tx<unknown>("herders", "readonly", (s) => s.get(id));
     if (!w) return null;
-    assertWorld(w);
-    return w;
+    return upgradeWorld(w);
   },
   async list(): Promise<HerderSummary[]> {
     const all = await tx<unknown[]>("herders", "readonly", (s) => s.getAll());
     const out: HerderSummary[] = [];
     for (const w of all) {
       try {
+        upgradeWorld(w);
         assertWorld(w);
         out.push({ id: w.id, name: w.name, penned: w.sheepPenned, total: w.sheep.length, tick: w.tick, finished: w.finished });
       } catch {

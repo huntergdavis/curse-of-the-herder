@@ -1,10 +1,11 @@
 import { generateMap, isPlaceable, type GameMap } from "../map/generate";
 import { Terrain } from "../map/terrain";
 import { herderName } from "../names";
+import { BOOKS } from "../../data/books";
 import { mulberry32 } from "../rng";
 import { fnv1a } from "../rng";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const TICK_SECONDS = 0.25;
 export const TICKS_PER_HOUR = 3600 / TICK_SECONDS;
 export const DAY_START_HOUR = 9;
@@ -28,7 +29,20 @@ export interface SheepState {
   named: boolean;
 }
 
-export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done";
+export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading";
+
+export interface LibraryState {
+  x: number;
+  y: number;
+  bookId: string;
+  taken: boolean;
+}
+
+export interface ReadingState {
+  bookId: string;
+  startTick: number;
+  untilTick: number;
+}
 
 export interface HerderState {
   x: number;
@@ -44,12 +58,18 @@ export interface HerderState {
   approachCount: number;
   lastTileX: number;
   lastTileY: number;
+  targetLibrary: number;
+  /** Tiles walked since he last stood in the pen. */
+  tripTiles: number;
 }
 
 export interface WorldEvent {
+  /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
+  seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops";
   sheepId: number;
+  bookId?: string;
 }
 
 export interface WorldState {
@@ -73,6 +93,21 @@ export interface WorldState {
   events: WorldEvent[];
   finished: boolean;
   finishedTick: number;
+  eventCount: number;
+  /** Sum of pen distances of all sheep at creation, for the speed governor. */
+  totalWork: number;
+  libraries: LibraryState[];
+  /** Lexicon packs unlocked by reading, regardless of level. */
+  knownPacks: string[];
+  /** Registers weighted up until a tick (after reading a book). */
+  registers: { reg: string; untilTick: number }[];
+  reading: ReadingState | null;
+  lastReadTick: number;
+  /** Rain until this tick (0 = dry). */
+  rainUntilTick: number;
+  nextWeatherTick: number;
+  lastShameTick: number;
+  lastBreatherTick: number;
 }
 
 export const MAX_EVENTS = 16;
@@ -162,6 +197,8 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
       approachCount: 0,
       lastTileX: map.pen.x,
       lastTileY: map.pen.y + 3,
+      targetLibrary: -1,
+      tripTiles: 0,
     },
     sheep,
     frustration: 0,
@@ -169,10 +206,37 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     sheepPenned: 0,
     totalCurses: 0,
     speedScale: 1,
-    events: [{ tick: 0, kind: "started", sheepId: -1 }],
+    events: [{ seq: 0, tick: 0, kind: "started", sheepId: -1 }],
     finished: false,
     finishedTick: -1,
+    eventCount: 1,
+    totalWork: sheep.reduce((a, s) => a + map.penDistance[s.y * map.size + s.x]!, 0),
+    libraries: assignBooks(map, rnd),
+    knownPacks: [],
+    registers: [],
+    reading: null,
+    lastReadTick: -100000,
+    rainUntilTick: 0,
+    nextWeatherTick: 4 * TICKS_PER_HOUR * 0.6,
+    lastShameTick: -100000,
+    lastBreatherTick: -100000,
   };
+}
+
+/** Books are handed out in catalogue order along the distance-sorted libraries, with a little shuffle. */
+function assignBooks(map: GameMap, rnd: () => number): LibraryState[] {
+  const ordered = [...BOOKS].sort((a, b) => a.when - b.when);
+  const out: LibraryState[] = [];
+  const count = map.libraries.length;
+  void rnd;
+  for (let k = 0; k < count; k++) {
+    const lib = map.libraries[k]!;
+    // Catalogue order along the distance-sorted libraries; when there are more
+    // libraries than books, mid-catalogue books repeat evenly (bonus reading).
+    const bi = count <= 1 ? ordered.length - 1 : Math.round((k / (count - 1)) * (ordered.length - 1));
+    out.push({ x: lib.x, y: lib.y, bookId: ordered[bi]!.id, taken: false });
+  }
+  return out;
 }
 
 export function mapForWorld(world: WorldState): GameMap {
@@ -183,14 +247,43 @@ export function dayHour(world: WorldState): number {
   return DAY_START_HOUR + world.tick / TICKS_PER_HOUR;
 }
 
+export function isRaining(world: WorldState): boolean {
+  return world.rainUntilTick > world.tick;
+}
+
 export function hoursElapsed(world: WorldState): number {
   return world.tick / TICKS_PER_HOUR;
 }
 
 /** Throws on a structurally invalid state; used after load and in tests. */
+/** Upgrade older saves in place, then validate. */
+export function upgradeWorld(w: unknown): WorldState {
+  const o = w as Record<string, unknown>;
+  if (o && o["schemaVersion"] === 1) {
+    o["libraries"] = [];
+    o["knownPacks"] = [];
+    o["registers"] = [];
+    o["reading"] = null;
+    o["eventCount"] = Array.isArray(o["events"]) ? (o["events"] as unknown[]).length : 0;
+    (o["events"] as { seq?: number }[]).forEach((e, i) => { e.seq = i; });
+    o["totalWork"] = 0;
+    o["lastReadTick"] = -100000;
+    o["rainUntilTick"] = 0;
+    o["nextWeatherTick"] = 0;
+    o["lastShameTick"] = -100000;
+    o["lastBreatherTick"] = -100000;
+    (o["herder"] as Record<string, unknown>)["targetLibrary"] = -1;
+    (o["herder"] as Record<string, unknown>)["tripTiles"] = 0;
+    o["schemaVersion"] = 2;
+  }
+  assertWorld(o);
+  return o;
+}
+
 export function assertWorld(w: unknown): asserts w is WorldState {
   const o = w as Partial<WorldState>;
   if (!o || o.schemaVersion !== SCHEMA_VERSION) throw new TypeError("bad schemaVersion");
+  if (!Array.isArray(o.libraries) || !Array.isArray(o.knownPacks) || !Array.isArray(o.registers)) throw new TypeError("bad library state");
   if (typeof o.seed !== "string" || !o.seed) throw new TypeError("bad seed");
   if (typeof o.size !== "number" || o.size < 64 || o.size > 2048) throw new TypeError("bad size");
   if (typeof o.tick !== "number" || o.tick < 0) throw new TypeError("bad tick");

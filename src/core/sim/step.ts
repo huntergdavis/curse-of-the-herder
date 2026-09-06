@@ -4,15 +4,28 @@ import { Deco, TERRAIN_SPEED, Terrain, isWalkable } from "../map/terrain";
 import { FRUSTRATION, clampFrustration, frustrationBaseline, frustrationDrift } from "../progression";
 import { keyedUnit } from "../rng";
 import { MAX_EVENTS, TICK_SECONDS, TICKS_PER_HOUR, type SheepState, type WorldEvent, type WorldState } from "./state";
+import { BOOKS, BOOK_BY_ID } from "../../data/books";
 
 export const HERDER_BASE_SPEED = 1.1; // tiles per second on grass (tuned by scripts/pace.ts)
 const CARRY_FACTOR = 0.8;
 const FLEE_RADIUS = 2.5;
 const MAX_FLEES = 3;
 const SEE_RADIUS = 12;
+const LIBRARY_DETOUR = 12; // tiles from the herder himself
+const LIBRARY_PATH_DETOUR = 9; // tiles from any point on his planned route
+const GOVERNOR_PERIOD = 2400; // ticks (10 sim minutes)
+const DAY_TICKS = 9 * 3600 * 4;
+const READ_TICKS_MIN = 240; // 60 s
+const READ_TICKS_MAX = 480; // 120 s
+const REGISTER_TICKS = 2400; // 10 min of talking like the book
+const READ_COOLDOWN = 9 * 60 * 4; // no second book within 9 sim minutes
+const SHAME_RADIUS = 4;
+const SHAME_COOLDOWN = 15 * 60 * 4;
+const BREATHER_TICKS = 80; // 20 s sit-down
+const BREATHER_COOLDOWN = 25 * 60 * 4;
 
-function pushEvent(w: WorldState, e: WorldEvent): void {
-  w.events.push(e);
+function pushEvent(w: WorldState, e: Omit<WorldEvent, "seq">): void {
+  w.events.push({ ...e, seq: w.eventCount++ });
   if (w.events.length > MAX_EVENTS) w.events.splice(0, w.events.length - MAX_EVENTS);
 }
 
@@ -133,6 +146,137 @@ function stepSheep(w: WorldState, map: GameMap): void {
   }
 }
 
+/** Nearest untaken library within detour range of the herder, or -1. */
+function nearbyLibrary(w: WorldState): number {
+  const h = w.herder;
+  let best = -1;
+  let bestD = LIBRARY_DETOUR;
+  for (let i = 0; i < w.libraries.length; i++) {
+    const l = w.libraries[i]!;
+    if (l.taken) continue;
+    const d = Math.hypot(l.x - h.x, l.y - h.y);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+/** An untaken library close to the planned route (sampled), or -1. */
+function libraryAlongPath(w: WorldState): number {
+  const path = w.herder.path;
+  for (let i = 0; i < w.libraries.length; i++) {
+    const l = w.libraries[i]!;
+    if (l.taken) continue;
+    for (let k = 0; k < path.length; k += 4) {
+      const p = path[k]!;
+      if (Math.abs(p.x - l.x) <= LIBRARY_PATH_DETOUR && Math.abs(p.y - l.y) <= LIBRARY_PATH_DETOUR) return i;
+    }
+  }
+  return -1;
+}
+
+function goToLibrary(w: WorldState, map: GameMap, lib: number): boolean {
+  const h = w.herder;
+  const l = w.libraries[lib]!;
+  for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1]] as const) {
+    if (planPath(w, map, l.x + dx, l.y + dy)) {
+      h.targetLibrary = lib;
+      h.mode = "toLibrary";
+      return true;
+    }
+  }
+  l.taken = true; // unreachable box: forget it
+  return false;
+}
+
+/**
+ * Steer the finish toward the nine-hour mark. Work done is the share of
+ * total pen-distance already carried home; if that is ahead of the clock,
+ * slow the herder (never above 1.0: a lingering herder reads as tired).
+ */
+function govern(w: WorldState): void {
+  if (w.tick % GOVERNOR_PERIOD !== 0 || w.totalWork <= 0) return;
+  let done = 0;
+  for (const s of w.sheep) if (s.mode === "penned") done += s.homeX >= 0 ? 1 : 0;
+  const workFrac = w.sheepPenned === 0 ? 0 : done / w.sheep.length;
+  const timeFrac = w.tick / DAY_TICKS;
+  const ahead = workFrac - timeFrac;
+  const target = ahead > 0.02 ? Math.max(0.55, 1 - ahead * 2.2) : 1;
+  // Hysteresis: move a third of the way each period.
+  w.speedScale += (target - w.speedScale) / 3;
+}
+
+/** Books come in catalogue order no matter which box he opens; extras are bonus re-reads. */
+function nextBookId(w: WorldState): string {
+  const read = new Set(w.libraries.filter((l) => l.taken).map((l) => l.bookId));
+  const ordered = [...BOOKS].sort((a, b) => a.when - b.when);
+  const remainingBoxes = w.libraries.filter((l) => !l.taken).length;
+  const unread = ordered.filter((b) => !read.has(b.id));
+  // Save "Notes on the Curse" for the very last box.
+  const notes = unread.find((b) => b.id === "notes");
+  const pool = remainingBoxes > 1 && notes && unread.length > 1 ? unread.filter((b) => b.id !== "notes") : unread;
+  if (pool.length > 0) return pool[0]!.id;
+  const bonus = ordered.filter((b) => b.pack && b.id !== "notes");
+  return bonus[Math.floor(keyedUnit(w.seed, "bonus-book", w.tick) * bonus.length)]?.id ?? ordered[0]!.id;
+}
+
+function startReading(w: WorldState, libIndex: number): void {
+  const h = w.herder;
+  const lib = w.libraries[libIndex]!;
+  lib.bookId = nextBookId(w);
+  const len = READ_TICKS_MIN + Math.floor(keyedUnit(w.seed, "read-len", libIndex) * (READ_TICKS_MAX - READ_TICKS_MIN));
+  w.reading = { bookId: lib.bookId, startTick: w.tick, untilTick: w.tick + len };
+  h.mode = "reading";
+  h.path = [];
+  pushEvent(w, { tick: w.tick, kind: "bookFound", sheepId: -1, bookId: lib.bookId });
+}
+
+function finishReading(w: WorldState): void {
+  const h = w.herder;
+  const r = w.reading;
+  if (r) {
+    const lib = w.libraries[h.targetLibrary];
+    if (lib) lib.taken = true;
+    const book = BOOK_BY_ID.get(r.bookId);
+    w.booksRead++;
+    addFrustration(w, FRUSTRATION.book);
+    if (book?.pack && !w.knownPacks.includes(book.pack)) w.knownPacks.push(book.pack);
+    if (book?.register) {
+      w.registers = w.registers.filter((x) => x.reg !== book.register);
+      w.registers.push({ reg: book.register, untilTick: w.tick + REGISTER_TICKS });
+    }
+    pushEvent(w, { tick: w.tick, kind: "book", sheepId: -1, bookId: r.bookId });
+  }
+  w.reading = null;
+  w.lastReadTick = w.tick;
+  h.targetLibrary = -1;
+  h.mode = "idle";
+}
+
+function readingAllowed(w: WorldState): boolean {
+  if (w.tick - w.lastReadTick > READ_COOLDOWN) return true;
+  // The last box is always worth it.
+  return w.libraries.filter((l) => !l.taken).length <= 1;
+}
+
+function stepWeather(w: WorldState): void {
+  if (w.rainUntilTick && w.tick >= w.rainUntilTick) {
+    w.rainUntilTick = 0;
+    pushEvent(w, { tick: w.tick, kind: "rainStops", sheepId: -1 });
+  }
+  if (w.tick >= w.nextWeatherTick) {
+    const u = keyedUnit(w.seed, "weather", w.tick);
+    if (u < 0.45 && !w.rainUntilTick) {
+      w.rainUntilTick = w.tick + 8 * 60 * 4 + Math.floor(keyedUnit(w.seed, "rain-len", w.tick) * 14 * 60 * 4);
+      pushEvent(w, { tick: w.tick, kind: "rain", sheepId: -1 });
+    }
+    w.nextWeatherTick = w.tick + 30 * 60 * 4 + Math.floor(keyedUnit(w.seed, "weather-gap", w.tick) * 50 * 60 * 4);
+  }
+  if (w.rainUntilTick && w.tick % 4 === 0) addFrustration(w, FRUSTRATION.rainPerMinute / 60);
+}
+
 function stepHerder(w: WorldState, map: GameMap): void {
   const h = w.herder;
   if (h.mode === "done") return;
@@ -140,7 +284,23 @@ function stepHerder(w: WorldState, map: GameMap): void {
     if (w.tick >= h.restUntilTick) h.mode = "idle";
     return;
   }
+  if (h.mode === "reading") {
+    if (!w.reading || w.tick >= w.reading.untilTick) finishReading(w);
+    return;
+  }
   if (h.mode === "idle") {
+    // A breather when he is fuming and empty-handed.
+    if (w.frustration >= 60 && w.tick - w.lastBreatherTick > BREATHER_COOLDOWN && keyedUnit(w.seed, "breather", w.tick) < 0.5) {
+      w.lastBreatherTick = w.tick;
+      h.mode = "resting";
+      h.restUntilTick = w.tick + BREATHER_TICKS;
+      addFrustration(w, FRUSTRATION.breather);
+      pushEvent(w, { tick: w.tick, kind: "breather", sheepId: -1 });
+      return;
+    }
+    // A book within reach beats a sheep; he is not carrying anything.
+    const lib = readingAllowed(w) ? nearbyLibrary(w) : -1;
+    if (lib >= 0 && goToLibrary(w, map, lib)) return;
     const target = chooseTarget(w, map);
     if (!target) {
       h.mode = "done";
@@ -158,11 +318,15 @@ function stepHerder(w: WorldState, map: GameMap): void {
     h.targetSheep = target.id;
     h.approachCount = 0;
     h.mode = "toSheep";
+    // Is there a library near the route? Read first, then fetch the sheep.
+    const onWay = readingAllowed(w) ? libraryAlongPath(w) : -1;
+    if (onWay >= 0 && goToLibrary(w, map, onWay)) return;
   }
 
   const tile = tileAt(map, h.x, h.y);
   const terrainSpeed = TERRAIN_SPEED[tile] ?? 1;
-  const speed = HERDER_BASE_SPEED * (terrainSpeed || 0.4) * (h.carrying >= 0 ? CARRY_FACTOR : 1) * w.speedScale * (1 + (w.frustration >= 80 ? 0.1 : 0));
+  const rainFactor = w.rainUntilTick > w.tick ? 0.85 : 1;
+  const speed = HERDER_BASE_SPEED * (terrainSpeed || 0.4) * (h.carrying >= 0 ? CARRY_FACTOR : 1) * w.speedScale * rainFactor * (1 + (w.frustration >= 80 ? 0.1 : 0));
   const moved = walk(w, speed * TICK_SECONDS);
 
   // Frustration from carrying over distance and rough ground.
@@ -171,6 +335,13 @@ function stepHerder(w: WorldState, map: GameMap): void {
   if (tx !== h.lastTileX || ty !== h.lastTileY) {
     h.lastTileX = tx;
     h.lastTileY = ty;
+    // The walk of shame: past the pen with nothing to show for it.
+    h.tripTiles++;
+    if (h.carrying < 0 && h.mode === "toSheep" && h.tripTiles > 30 && w.tick - w.lastShameTick > SHAME_COOLDOWN && Math.hypot(tx - map.pen.x, ty - map.pen.y) <= SHAME_RADIUS && h.path.length > 12) {
+      w.lastShameTick = w.tick;
+      addFrustration(w, FRUSTRATION.walkOfShame);
+      pushEvent(w, { tick: w.tick, kind: "walkOfShame", sheepId: -1 });
+    }
     if (h.carrying >= 0) {
       h.carryOdometer += 1;
       if (h.carryOdometer >= 25) {
@@ -181,6 +352,19 @@ function stepHerder(w: WorldState, map: GameMap): void {
       // Spec says +2 per rough tile; tuned to +0.5 so a long bog does not pin the meter.
       if (t === Terrain.Mud || t === Terrain.Rock) addFrustration(w, FRUSTRATION.roughTile * 0.25);
     }
+  }
+
+  if (h.mode === "toLibrary") {
+    const lib = w.libraries[h.targetLibrary];
+    if (!lib || lib.taken) {
+      h.mode = "idle";
+      return;
+    }
+    if (h.path.length === 0) {
+      if (Math.hypot(lib.x - h.x, lib.y - h.y) <= 1.6) startReading(w, h.targetLibrary);
+      else h.mode = "idle";
+    }
+    return;
   }
 
   if (h.mode === "toSheep") {
@@ -244,6 +428,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
         pushEvent(w, { tick: w.tick, kind: "penned", sheepId: s.id });
       }
       h.carrying = -1;
+      h.tripTiles = 0;
       addFrustration(w, FRUSTRATION.penned);
       h.mode = "resting";
       h.restUntilTick = w.tick + 8; // two seconds to catch his breath
@@ -258,6 +443,9 @@ function stepHerder(w: WorldState, map: GameMap): void {
 export function step(w: WorldState, map: GameMap): WorldState {
   w.tick++;
   w.frustration = clampFrustration(frustrationDrift(w.frustration, frustrationBaseline(w.tick / TICKS_PER_HOUR), TICK_SECONDS / 60));
+  if (w.registers.length && w.tick % 40 === 0) w.registers = w.registers.filter((r) => r.untilTick > w.tick);
+  stepWeather(w);
+  govern(w);
   stepSheep(w, map);
   stepHerder(w, map);
   return w;

@@ -5,6 +5,8 @@ import type { Band } from "./core/lang/types";
 import { createWorld, dayHour, hoursElapsed, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
 import { step } from "./core/sim/step";
 import { repository } from "./persist/db";
+import { BOOK_BY_ID } from "./data/books";
+import { grammar, buildContext } from "./core/lang/speech";
 import { Bubbles } from "./render/bubbles";
 import { Camera } from "./render/camera";
 import { Minimap } from "./render/minimap";
@@ -35,8 +37,11 @@ interface Session {
   bubbles: Bubbles;
   nextIdleCurseTick: number;
   lastSaveMs: number;
-  seenEvents: number;
+  /** Highest event seq already reacted to. */
+  seenSeq: number;
   recent: string[];
+  /** Which excerpt of the current book is showing. */
+  excerptShown: number;
 }
 
 let session: Session | null = null;
@@ -74,8 +79,9 @@ async function startSession(world: WorldState): Promise<void> {
     bubbles: new Bubbles(),
     nextIdleCurseTick: world.tick + nextIdleCurseTicks(world),
     lastSaveMs: performance.now(),
-    seenEvents: world.events.length,
+    seenSeq: world.eventCount - 1,
     recent: [],
+    excerptShown: -1,
   };
   repository.setActiveId(world.id);
   await refreshLoadList();
@@ -131,17 +137,52 @@ function updateHud(force = false): void {
 
 function handleEvents(s: Session, nowMs: number): void {
   const w = s.world;
-  // Events ring is capped; only react to ones we have not seen.
-  const fresh = w.events.slice(Math.max(0, w.events.length - Math.max(0, w.events.length - s.seenEvents)));
-  s.seenEvents = w.events.length;
+  const fresh = w.events.filter((e) => e.seq > s.seenSeq);
+  if (fresh.length) s.seenSeq = fresh[fresh.length - 1]!.seq;
   for (const e of fresh) {
     if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
     const u = speakForEvent(w, s.map, e, s.recent, BAND_CAP);
     if (u) say(s, u.text, u.heat, u.seconds, nowMs);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
+    if (e.kind === "bookFound") {
+      s.excerptShown = -1;
+      const b = e.bookId ? BOOK_BY_ID.get(e.bookId) : undefined;
+      if (b) toast(`Found: <em>${b.title}</em>`);
+    }
+    if (e.kind === "book") {
+      const b = e.bookId ? BOOK_BY_ID.get(e.bookId) : undefined;
+      if (b) toast(`Read <em>${b.title}</em>. Vocabulary: ${grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP))} words.`);
+    }
     if (e.kind === "finished") onFinished(s);
   }
+}
+
+/** While reading, show the book's excerpts one after another in a calm bubble. */
+function showExcerpts(s: Session, nowMs: number): void {
+  const w = s.world;
+  if (w.herder.mode !== "reading" || !w.reading) return;
+  const b = BOOK_BY_ID.get(w.reading.bookId);
+  if (!b) return;
+  const span = w.reading.untilTick - w.reading.startTick;
+  const idx = Math.min(b.excerpts.length - 1, Math.floor(((w.tick - w.reading.startTick) / span) * b.excerpts.length));
+  if (idx !== s.excerptShown) {
+    s.excerptShown = idx;
+    const text = `“${b.excerpts[idx] ?? ""}”`;
+    s.bubbles.say(text, 0, (span / b.excerpts.length) * TICK_SECONDS / FAST + 0.5, nowMs);
+    $("line-text").textContent = text;
+  }
+}
+
+let toastTimer = 0;
+function toast(html: string): void {
+  const el = $("toast");
+  el.innerHTML = html;
+  el.hidden = false;
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    el.hidden = true;
+  }, 6000);
 }
 
 function say(s: Session, text: string, heat: number, seconds: number, nowMs: number): void {
@@ -195,6 +236,7 @@ function frame(nowMs: number): void {
       w.lastWallMs += Math.round((run / FAST) * TICK_MS);
       if (run >= due || w.finished) w.lastWallMs = wall;
       handleEvents(s, nowMs);
+      showExcerpts(s, nowMs);
     }
     if (nowMs - s.lastSaveMs > SAVE_EVERY_MS) {
       s.lastSaveMs = nowMs;
@@ -209,7 +251,9 @@ function frame(nowMs: number): void {
   const next = h.path[Math.min(4, h.path.length - 1)];
   const lx = next ? (next.x - h.x) * 0.25 : 0;
   const ly = next ? (next.y - h.y) * 0.25 : 0;
-  s.camera.follow(h.x + lx, h.y + ly, dt);
+  // At high fast-forward the herder outruns an eased camera; scale the easing and snap if he gets away.
+  s.camera.follow(h.x + lx, h.y + ly, dt * Math.min(FAST, 12));
+  if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) > 8) s.camera.snap(h.x, h.y);
   s.bubbles.prune(nowMs);
   if (!document.hidden) {
     s.renderer.draw(w, s.camera, s.bubbles, nowMs);

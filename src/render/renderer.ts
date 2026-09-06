@@ -1,5 +1,7 @@
 import type { GameMap } from "../core/map/generate";
-import { dayHour, type WorldState } from "../core/sim/state";
+import { dayHour, isRaining, type WorldState } from "../core/sim/state";
+import { BOOK_BY_ID } from "../data/books";
+import { Deco } from "../core/map/terrain";
 import type { Bubbles } from "./bubbles";
 import type { Camera } from "./camera";
 import { CHUNK, ChunkCache } from "./chunks";
@@ -110,6 +112,46 @@ export class Renderer {
       drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, b.text);
     }
 
+    // Emptied libraries get a little "read" tag so the map remembers.
+    for (const l of world.libraries) {
+      if (!l.taken) continue;
+      if (Math.abs(l.x - cam.x) * T > W / 2 + T || Math.abs(l.y - cam.y) * T > H / 2 + T) continue;
+      const book = BOOK_BY_ID.get(l.bookId);
+      ctx.fillStyle = "#fffdf5";
+      ctx.strokeStyle = "#2b2620";
+      ctx.lineWidth = Math.max(1, T * 0.04);
+      ctx.beginPath();
+      ctx.roundRect(sx(l.x) + T * 0.62, sy(l.y) - T * 0.05, T * 0.34, T * 0.22, T * 0.04);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = book?.colour ?? "#c94f4f";
+      ctx.fillRect(sx(l.x) + T * 0.67, sy(l.y) + T * 0.0, T * 0.1, T * 0.12);
+      ctx.fillStyle = "#2b2620";
+      ctx.font = `${Math.max(8, T * 0.16)}px sans-serif`;
+      ctx.fillText("✓", sx(l.x) + T * 0.8, sy(l.y) + T * 0.12);
+    }
+    void Deco;
+
+    // Rain: diagonal streaks, deterministic per frame bucket so they scroll.
+    if (isRaining(world)) {
+      ctx.strokeStyle = "rgba(200, 220, 255, 0.35)";
+      ctx.lineWidth = Math.max(1, T * 0.03);
+      ctx.beginPath();
+      const drops = Math.floor((W * H) / (T * T) * 0.6);
+      const t = nowMs / 1000;
+      for (let i = 0; i < drops; i++) {
+        const seedX = (i * 7919) % 10007;
+        const seedY = (i * 104729) % 10009;
+        const x = ((seedX / 10007) * W + t * T * 3) % W;
+        const y = ((seedY / 10009) * H + t * T * 12 + i) % H;
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - T * 0.18, y + T * 0.6);
+      }
+      ctx.stroke();
+      ctx.fillStyle = "rgba(60, 70, 110, 0.18)";
+      ctx.fillRect(0, 0, W, H);
+    }
+
     // Day tint over the world, under the bubble.
     const tint = dayTint(dayHour(world));
     if (!tint.endsWith("0)") && !tint.endsWith("0.000)")) {
@@ -127,6 +169,7 @@ export class Renderer {
   private drawHerder(world: WorldState, sx: (x: number) => number, sy: (y: number) => number, T: number, phase: number, nowMs: number): void {
     const h = world.herder;
     const walking = h.mode === "toSheep" || h.mode === "toPen";
+    const reading = h.mode === "reading" && world.reading;
     drawHerder(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95), T, {
       facing: h.facing,
       walking,
@@ -134,6 +177,8 @@ export class Renderer {
       phase: walking ? (nowMs / 420) % 1 : phase,
       fury: world.frustration / 100,
       resting: h.mode === "resting",
+      reading: !!reading,
+      bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",
     });
     if (h.carrying >= 0) {
       drawSheep(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) - T * 1.35, T * 0.8, "carried", h.facing === 2 ? 0 : 2, phase, world.sheep[h.carrying]?.named ?? false);
