@@ -241,6 +241,7 @@ export function generateMap(seed: string, opts: GenerateOptions = {}): GameMap {
     for (let x = 0; x < n; x++) {
       const i = idx(x, y);
       if (deco[i] !== Deco.None) continue;
+      if (Math.max(Math.abs(x - pen.x), Math.abs(y - pen.y)) <= 3) continue; // keep the pen and gate clear
       const t = terrain[i];
       const u = keyedUnit(seed, "deco", x, y);
       if (t === Terrain.Forest) deco[i] = u < 0.55 ? Deco.Tree : u < 0.9 ? Deco.Tree2 : u < 0.95 ? Deco.Stump : Deco.None;
