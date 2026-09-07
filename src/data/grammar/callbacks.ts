@@ -61,9 +61,17 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
   // The dog. He has a dog. The dog has never once helped.
-  ...R(1, "idle", ["#dog.cap#. Help. #dog.cap#!", "Good dog, #dog#. Useless dog."]),
+  ...R(1, "idle", ["#dog.cap#. Help. #dog.cap#!", "Good dog, #dog#. Useless dog.", "#dog.cap#. Sheep. That way. ...No.", "Sit, #dog#. Good. That is all you do."], { weight: 0.6 }),
+  ...R(3, "idle", [
+    "#dog.cap# has the eyes of a working dog and the schedule of a cat.",
+    "Somewhere there is a dog that herds sheep. I have #dog#, who herds shade.",
+    "#dog.cap# looked at the sheep, looked at me, and lay down. I respect the decision. I resent it.",
+    "I asked #dog# to go left. #dog.cap# went to sleep. That is a kind of left.",
+  ], { weight: 0.7 }),
   ...R(2, "idle", [
     "#dog.cap# is watching a butterfly. There are #remaining# sheep out and #dog# is watching a butterfly.",
+    "#dog.cap#, that is a sheep. No, THAT. The white one. All of them are white. Never mind.",
+    "The dog is supervising. The dog is very good at supervising.",
     "I have a sheepdog. His name is #dog#. Look at him. LOOK at him.",
     "#dog.cap#, fetch the sheep. #dog.cap#. #dog.cap#. ...Fine. Fetch nothing. You are good at that.",
     "The dog has lain down. The dog has read the situation correctly.",
