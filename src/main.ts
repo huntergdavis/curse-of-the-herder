@@ -2,7 +2,7 @@ import { generateMap, type GameMap } from "./core/map/generate";
 import { LEVEL_NAMES, erudition, levelFor } from "./core/progression";
 import { nextIdleCurseTicks, speakEpitaph, speakForEvent, speakIdle } from "./core/lang/speech";
 import type { Band } from "./core/lang/types";
-import { createWorld, dayHour, hoursElapsed, mapForWorld, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
+import { createWorld, dayHour, hoursElapsed, mapForWorld, upgradeWorld, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
 import { step } from "./core/sim/step";
 import { repository } from "./persist/db";
 import { BOOK_BY_ID } from "./data/books";
@@ -20,8 +20,10 @@ const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 512
 const TICK_MS = TICK_SECONDS * 1000;
 const MAX_CATCH_UP_TICKS = 4 * TICKS_PER_HOUR;
 const SAVE_EVERY_MS = 10_000;
-/** `?clean=1` caps filth at F1 for shared displays; `?filth=max` removes the frustration gate for testing. */
-const BAND_CAP: Band = params.get("clean") ? 1 : 4;
+/** `?clean=1` caps filth at F1 for shared displays; the toolbar setting persists; `?filth=max` removes the frustration gate for testing. */
+let BAND_CAP: Band = params.get("clean") ? 1 : (Number(repository.getSetting("band", "4")) as Band);
+/** `?books=N` starts a new herder as if he had already read N books (skip ahead). */
+const START_BOOKS = Math.max(0, Math.min(30, Number(params.get("books") ?? 0) || 0));
 const FILTH_MAX = params.get("filth") === "max";
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -100,8 +102,42 @@ async function newHerder(): Promise<void> {
   const seed = params.get("seed") && !session ? params.get("seed")! : randomSeed();
   const map = generateMap(seed, { size: BOARD_SIZE });
   const world = createWorld(seed, map, Date.now());
+  if (START_BOOKS > 0) world.booksRead = START_BOOKS;
   await repository.save(world);
   await startSession(world);
+}
+
+async function exportJson(): Promise<void> {
+  const hall = await repository.hall();
+  const payload = { format: "curse-of-the-herder-export", version: 1, exportedAt: new Date().toISOString(), herder: session?.world ?? null, hall };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `curse-of-the-herder-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+async function importJson(file: File): Promise<void> {
+  try {
+    const data = JSON.parse(await file.text()) as { format?: string; herder?: unknown; hall?: HallRecord[] };
+    if (data.format !== "curse-of-the-herder-export") throw new Error("not an export file");
+    let inducted = 0;
+    for (const r of data.hall ?? []) {
+      if (r && r.schemaVersion === 1 && typeof r.id === "string") {
+        await repository.induct(r);
+        inducted++;
+      }
+    }
+    if (data.herder) {
+      const w = upgradeWorld(data.herder);
+      await repository.save(w);
+      await startSession(w);
+    }
+    toast(`Imported ${inducted} Hall record${inducted === 1 ? "" : "s"}${data.herder ? " and a herder" : ""}.`);
+  } catch (err) {
+    toast(`Could not import: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 async function refreshLoadList(): Promise<void> {
@@ -331,6 +367,18 @@ async function boot(): Promise<void> {
   $("btn-hall").addEventListener("click", () => void showHall());
   $("btn-hall-close").addEventListener("click", () => {
     $<HTMLElement>("hall").hidden = true;
+  });
+  const selLang = $<HTMLSelectElement>("sel-lang");
+  selLang.value = String(BAND_CAP);
+  selLang.addEventListener("change", () => {
+    BAND_CAP = Number(selLang.value) as Band;
+    repository.setSetting("band", selLang.value);
+    toast(BAND_CAP === 4 ? "Full language. He will say what he says." : BAND_CAP === 2 ? "Mild: damns and bloodies, nothing stronger." : "Clean: minced oaths only.");
+  });
+  $("btn-export").addEventListener("click", () => void exportJson());
+  $<HTMLInputElement>("inp-import").addEventListener("change", (e) => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    if (f) void importJson(f);
   });
   const selEnd = $<HTMLSelectElement>("sel-end");
   selEnd.value = repository.getSetting("end", "loop");

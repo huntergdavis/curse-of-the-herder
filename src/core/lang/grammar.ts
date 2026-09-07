@@ -119,6 +119,8 @@ export class Grammar {
 
   private expand(template: string, ctx: Context, rnd: () => number, depth: number, bandCap: Band): string | null {
     if (depth > MAX_DEPTH) return null;
+    // Number agreement: "one #insult.pl# have" reads wrong when one sheep is left.
+    if (ctx.sheepRemaining === 1 && template.includes("#remaining#")) template = singularAfterRemaining(template);
     let failed = false;
     const out = template.replace(SLOT, (_m, gateKind: string | undefined, gateNum: string | undefined, symbol: string, mods: string) => {
       let cap = bandCap;
@@ -173,6 +175,19 @@ export class Grammar {
     }
     return t;
   }
+}
+
+/** Rewrite the clause after #remaining# for a count of one: drop .pl and fix common verbs. */
+function singularAfterRemaining(template: string): string {
+  const i = template.indexOf("#remaining#");
+  const head = template.slice(0, i);
+  let tail = template.slice(i);
+  const clauseEnd = tail.search(/[.!?;]|$/);
+  let clause = tail.slice(0, clauseEnd);
+  const rest = tail.slice(clauseEnd);
+  clause = clause.replace(/\.pl#/g, "#").replace(/\bare\b/, "is").replace(/\bhave\b/, "has").replace(/\bwere\b/, "was").replace(/\bremain\b/, "remains").replace(/\bdo not\b/, "does not");
+  tail = clause + rest;
+  return head + tail;
 }
 
 function pickIndex(weights: number[], rnd: () => number): number {
@@ -269,7 +284,7 @@ function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string 
     case "penned":
       return numberWord(ctx.sheepPenned);
     case "nth":
-      return ordinalWord(ctx.sheepPenned + 1);
+      return ordinalWord(Math.max(1, ctx.sheepPenned));
     case "books":
       return numberWord(ctx.booksRead);
     case "sig":

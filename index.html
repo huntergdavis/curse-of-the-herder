@@ -28,7 +28,8 @@
       #meter > div { height: 100%; width: 0%; background: linear-gradient(90deg, #f2c14e, #e8743a, #c94f4f); transition: width 0.6s; }
       #toolbar { top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; }
       button, select { font: inherit; font-size: 14px; background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
-      button:hover { background: #fff3c4; }
+      button:hover, .filebtn:hover { background: #fff3c4; }
+      .filebtn { font: inherit; font-size: 14px; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
       #minimap-wrap { right: 12px; bottom: 12px; padding: 6px; line-height: 0; }
       #minimap { width: 160px; height: 160px; border-radius: 6px; image-rendering: auto; }
       #line { left: 12px; bottom: 12px; max-width: 46vw; font-family: var(--hand-font); font-size: 16px; opacity: 0.9; }
@@ -80,6 +81,13 @@
       <button id="btn-new" title="Start a new herder (N)">New herder</button>
       <select id="sel-load" title="Load a herder in progress"><option value="">Load…</option></select>
       <button id="btn-hall" title="Hall of Herders (H)">Hall</button>
+      <select id="sel-lang" title="How strong the language may get">
+        <option value="4">Language: full</option>
+        <option value="2">Language: mild</option>
+        <option value="1">Language: clean</option>
+      </select>
+      <button id="btn-export" title="Download this herder and the Hall as JSON">Export</button>
+      <label class="filebtn" title="Import a JSON export"><input id="inp-import" type="file" accept="application/json" hidden />Import</label>
       <select id="sel-end" title="What happens when the last sheep is penned">
         <option value="loop">Then: new herder</option>
         <option value="hall">Then: show the Hall</option>
