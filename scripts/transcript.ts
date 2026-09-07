@@ -15,6 +15,8 @@ const filth = args.get("filth"); // "max" pins frustration high
 const map = generateMap(seed, { size: 512 });
 const w = createWorld(seed, map, 0);
 const recent: string[] = [];
+const recentRules: string[] = [];
+const mem = { lines: recent, rules: recentRules };
 let nextIdle = nextIdleCurseTicks(w);
 let seenSeq = w.eventCount - 1;
 const clock = (): string => {
@@ -22,10 +24,14 @@ const clock = (): string => {
   return `${String(Math.floor(h)).padStart(2, "0")}:${String(Math.floor((h % 1) * 60)).padStart(2, "0")}`;
 };
 const lvl = (): string => `L${levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)))}`;
-const say = (kind: string, text: string): void => {
+const say = (kind: string, text: string, ruleId?: string): void => {
   console.log(`${clock()} ${lvl()} f${String(Math.round(w.frustration)).padStart(3)} [${kind.padEnd(12)}] ${text}`);
   recent.push(text);
   if (recent.length > 32) recent.shift();
+  if (ruleId) {
+    recentRules.push(ruleId);
+    if (recentRules.length > 12) recentRules.shift();
+  }
 };
 console.log(`# ${w.name} — seed ${seed} — ${w.sheep.length} sheep — ${w.libraries.length} libraries`);
 while (!w.finished && w.tick < hours * 1.5 * TICKS_PER_HOUR) {
@@ -35,15 +41,15 @@ while (!w.finished && w.tick < hours * 1.5 * TICKS_PER_HOUR) {
   if (fresh.length) seenSeq = fresh[fresh.length - 1]!.seq;
   for (const e of fresh) {
     if (e.kind === "book") say("book", `(finished "${e.bookId}", books ${w.booksRead}) → ${LEVEL_NAMES[levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)))]}`);
-    const u = speakForEvent(w, map, e, recent);
-    if (u) say(e.kind, u.text);
+    const u = speakForEvent(w, map, e, mem);
+    if (u) say(e.kind, u.text, u.ruleId);
   }
   if (w.tick >= nextIdle) {
-    const u = speakIdle(w, map, recent);
-    if (u) say("idle", u.text);
+    const u = speakIdle(w, map, mem);
+    if (u) say("idle", u.text, u.ruleId);
     nextIdle = w.tick + nextIdleCurseTicks(w);
   }
 }
-const ep = speakEpitaph(w, map, recent);
+const ep = speakEpitaph(w, map, mem);
 console.log(`\nEPITAPH: ${ep.text}`);
 console.log(`finished=${w.finished} at ${clock()}, penned ${w.sheepPenned}/${w.sheep.length}, lines ${recent.length}+`);

@@ -88,6 +88,11 @@ export const CALLBACK_RULES: Rule[] = [
     "If I served you, #vocative#, they would send you back. They would send ME back.",
     "This #target# is #adj# as #simile#, and I have eaten worse, and I did not enjoy that either.",
     "Consider the sheep: #adj#, #adj#, and best avoided after eight.",
+    "Sheep: #adj#, #adj#, and impossible to season.",
+    "I have carried #penned# of you and not one was fit for the table. Or the field. Or anywhere.",
+    "#target.cap#, you are #adj#. You are the #insult# at the bottom of the pot.",
+    "Boil a sheep for a day and you get a #adj# #insult#. Do not boil a sheep. I have looked into it.",
+    "You are what happens when the cook gives up, #vocative#.",
   ], { reg: ["culinary"] }),
   ...R(5, "caught", ["Got you, you #adj# #insult#. You will not improve with cooking."], { reg: ["culinary"] }),
   // A sheep on a boulder. A black sheep. Counting.

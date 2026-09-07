@@ -60,6 +60,16 @@ entries and modifiers, the distinct-output space is in the billions; the
 practical measure is **repeat rate**, tested as "no identical sentence
 twice in a simulated 9-hour day at p > 0.999".
 
+## Variety controls (implemented)
+
+- **Recent-line filter**: a line identical (ignoring case and punctuation) to
+  one of the last 32 is regenerated.
+- **Rule recency**: a rule used in the last 12 lines is weighted ×0.12, so a
+  register's small set of shapes cannot dominate the ten minutes after a book.
+- **Tier fade**: rules three or more tiers below the current level are rare.
+- **Register weighting**: entries and rules tagged with an active register ×3;
+  foreign and rhyme-pack words ×0.25–0.3 outside their register window.
+
 ## Agreement and morphology (the unglamorous part that makes it read well)
 
 - **a/an**: by phoneme, not letter (`an hour`, `a ewe`, `a unicorn`).

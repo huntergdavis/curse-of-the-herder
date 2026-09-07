@@ -67,7 +67,14 @@ function pickTarget(w: WorldState, map: GameMap, e: WorldEvent | null): Context[
   return { kind: "curse", noun: "curse", name: null, plural: false };
 }
 
-export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, recent: string[], bandCap: Band = 4): Context {
+/** The caller's memory of recent rule ids (kept outside the grammar so generation stays pure). */
+export interface RecentMemory {
+  lines: string[];
+  rules: string[];
+}
+
+export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, recent: string[] | RecentMemory, bandCap: Band = 4): Context {
+  const mem: RecentMemory = Array.isArray(recent) ? { lines: recent, rules: [] } : recent;
   const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
   const band = Math.min(bandCap, filthCeiling(w.frustration)) as Band;
   const nearest = map.villages.reduce<{ name: string; d: number }>((best, v) => {
@@ -87,7 +94,8 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
     sheepRemaining: w.sheep.length - w.sheepPenned,
     sheepPenned: w.sheepPenned,
     booksRead: w.booksRead,
-    recent,
+    recent: mem.lines,
+    recentRules: mem.rules,
     knownPacks: w.knownPacks,
     villageName: nearest.name,
     stats: w.stats,
@@ -137,7 +145,7 @@ function holdSeconds(text: string, heat: number): number {
   return Math.min(14, Math.max(2.2, 1.6 + words * 0.42 + heat * 0.5));
 }
 
-export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent: string[], bandCap: Band = 4): Utterance | null {
+export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent: string[] | RecentMemory, bandCap: Band = 4): Utterance | null {
   let ev = EVENT_MAP[e.kind];
   if (!ev) return null;
   // Catching a sheep off a roof gets its own material.
@@ -160,7 +168,7 @@ function targetLabel(ctx: Context): string {
   return ctx.target.name ?? (ctx.target.kind === "sheep" ? "the sheep" : ctx.target.kind === "terrain" ? `the ${ctx.target.noun}` : ctx.target.kind === "day" ? "the day" : ctx.target.kind === "curse" ? "the Curse" : ctx.target.noun);
 }
 
-export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap: Band = 4): Utterance | null {
+export function speakIdle(w: WorldState, map: GameMap, recent: string[] | RecentMemory, bandCap: Band = 4): Utterance | null {
   const ctx = buildContext(w, map, null, recent, bandCap);
   const hour = ctx.hour;
   let ev: RuleEvent = "idle";
@@ -174,7 +182,7 @@ export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap
   return out;
 }
 
-export function speakEpitaph(w: WorldState, map: GameMap, recent: string[], bandCap: Band = 4): Utterance {
+export function speakEpitaph(w: WorldState, map: GameMap, recent: string[] | RecentMemory, bandCap: Band = 4): Utterance {
   const ctx = buildContext(w, map, null, recent, bandCap);
   ctx.heat = 1;
   ctx.band = Math.min(bandCap, 4) as Band;

@@ -147,6 +147,7 @@ export class Grammar {
       const gap = ctx.level - r.tier;
       w *= gap <= 0 ? 3 : gap === 1 ? 2 : gap === 2 ? 1 : gap === 3 ? 0.5 : 0.15;
       if (r.reg && ctx.registers.length && r.reg.some((x) => ctx.registers.includes(x))) w *= 3;
+      if (ctx.recentRules?.includes(r.id)) w *= 0.12;
       return w;
     });
     return rules[pickIndex(weights, rnd)]!;

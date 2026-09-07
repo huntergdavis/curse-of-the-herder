@@ -61,6 +61,7 @@ interface Session {
   /** Highest event seq already reacted to. */
   seenSeq: number;
   recent: string[];
+  recentRules: string[];
   /** Which excerpt of the current book is showing. */
   excerptShown: number;
   /** Lines waiting to be delivered after the current bubble (flyting, quotations). */
@@ -121,6 +122,7 @@ async function startSession(world: WorldState): Promise<void> {
     lastSaveMs: performance.now(),
     seenSeq: world.eventCount - 1,
     recent: [],
+    recentRules: [],
     excerptShown: -1,
     queue: [],
     lastBook: null,
@@ -246,7 +248,7 @@ function handleEvents(s: Session, nowMs: number): void {
   if (fresh.length) s.seenSeq = fresh[fresh.length - 1]!.seq;
   for (const e of fresh) {
     if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
-    const u = speakForEvent(w, s.map, e, s.recent, BAND_CAP);
+    const u = speakForEvent(w, s.map, e, { lines: s.recent, rules: s.recentRules }, BAND_CAP);
     if (u) say(s, u.text, u.heat, u.seconds, nowMs, false, u);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "repeatEscape" && w.sheep[e.sheepId]?.flees === 2) toast(`That one has earned a name. It is <strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> now.`);
@@ -283,7 +285,7 @@ function handleEvents(s: Session, nowMs: number): void {
         const salts = [101, 202];
         let at = nowMs + u.seconds * 1000 + 400;
         for (const salt of salts) {
-          const line = speakForEvent(w, s.map, { ...e, kind: "repeatEscape", seq: e.seq * 10 + salt }, s.recent, BAND_CAP);
+          const line = speakForEvent(w, s.map, { ...e, kind: "repeatEscape", seq: e.seq * 10 + salt }, { lines: s.recent, rules: s.recentRules }, BAND_CAP);
           if (!line) continue;
           s.queue.push({ text: line.text, heat: Math.min(1, line.heat + (salt === 101 ? 0.15 : 0.3)), seconds: line.seconds, sheepId: e.sheepId, emote: salt === 101 ? "!" : "?!", atMs: at });
           at += line.seconds * 1000 + 400;
@@ -384,10 +386,16 @@ function tallyUse(w: WorldState, used: string[] | undefined, at: string | undefi
   }
 }
 
-function say(s: Session, text: string, heat: number, seconds: number, nowMs: number, force = false, u?: { used?: string[]; targetLabel?: string }): void {
+function say(s: Session, text: string, heat: number, seconds: number, nowMs: number, force = false, u?: { used?: string[]; targetLabel?: string; ruleId?: string }): void {
   if (!force && FAST > 1 && nowMs - lastSayMs < MIN_SAY_GAP_MS) return;
   lastSayMs = nowMs;
-  if (u) tallyUse(s.world, u.used, u.targetLabel);
+  if (u) {
+    tallyUse(s.world, u.used, u.targetLabel);
+    if (u.ruleId) {
+      s.recentRules.push(u.ruleId);
+      if (s.recentRules.length > 12) s.recentRules.shift();
+    }
+  }
   // Villagers within earshot are scandalised by strong language.
   if (heat > 0.55) s.renderer.scandalise(s.world.herder.x, s.world.herder.y, nowMs);
   s.bubbles.say(text, heat, seconds, nowMs);
@@ -427,7 +435,7 @@ function onFinished(s: Session): void {
   if (s.endHandled) return;
   s.endHandled = true;
   const w = s.world;
-  const epitaph = speakEpitaph(w, s.map, s.recent, BAND_CAP);
+  const epitaph = speakEpitaph(w, s.map, { lines: s.recent, rules: s.recentRules }, BAND_CAP);
   say(s, epitaph.text, 1, END_FADE_MS / 1000, performance.now(), true);
   s.finishedAtMs = performance.now();
   const vocabulary = grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP));
@@ -503,7 +511,7 @@ function frame(nowMs: number): void {
         step(w, s.map);
         if (w.tick >= s.nextIdleCurseTick && !catchingUp) {
           if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
-          const u = speakIdle(w, s.map, s.recent, BAND_CAP);
+          const u = speakIdle(w, s.map, { lines: s.recent, rules: s.recentRules }, BAND_CAP);
           if (u) {
             say(s, u.text, u.heat, u.seconds, nowMs, false, u);
             // The addressed sheep has nothing to say for itself.

@@ -87,6 +87,8 @@ export interface Context {
   booksRead: number;
   /** Recent lines to avoid repeating. */
   recent: string[];
+  /** Ids of the rules behind recent lines; the caller keeps this so generation stays a pure function of the context. */
+  recentRules?: string[];
   /** Words the herder has learned from books, in addition to level-unlocked packs. */
   knownPacks: string[];
   villageName: string;
