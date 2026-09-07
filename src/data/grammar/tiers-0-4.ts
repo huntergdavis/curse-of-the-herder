@@ -137,7 +137,7 @@ export const RULES: Rule[] = [
   ...R(2, "idle", [
     "This #target# is #adj#.", "I do not like #noun.pl#.", "My #bodypart# are #adj#.", "This is #adj_noun.a#.", "Why is there #noun.a# in my #bodypart#?",
     "#remaining.cap# sheep left. #interj.cap#.", "I want to sit down.", "Every #target# is #adj#. Every one.", "There is #noun# in my boot.",
-    "Who put this #target# here?", "#vocative.cap#, you are #adj#.", "You are #insult_np.a#.", "I have carried #penned# sheep and my #bodypart# know it.", "There is a #noun# in my boot and #abstract# in my heart.",
+    "Who put this #target# here?", "#vocative.cap#, you are #adj#.", "You are #insult_np.a#.", "I have carried #penned# sheep and my #bodypart# know it.",
     "The #target# is #adj# and I am #adj#.", "#terrain_gripe#", "I am a herder. I herd. I do not #verb#. And yet.", "#clause.cap#.",
     "#clause.cap# and #clause#.", "#exclaim# #clause.cap#.", "Nobody told me about the #noun.pl#.", "I did not sign up for #noun#.",
     "#interj.cap#. #clause.cap#.", "This #sig# is the only #sig# I trust.", "I will remember this #target#.",
@@ -178,6 +178,7 @@ export const RULES: Rule[] = [
     "#remaining.cap# sheep, #time#, and a #target# like #simile#.", "Every #target# I meet is #adj#. Every one. That is not how #noun.pl# work.",
     "There is a word for this #target#, and the word is #insult#.", "I would rather carry #simile# than this #target#.",
     "I have seen #simile# move with more purpose than this #target#.", "#clause.cap#; that is all. That is the whole of it.",
+    "There is a #noun# in my boot and #abstract# in my heart.",
   ]),
   ...R(3, "flee", [
     "You run like #simile#!", "Come back, you #insult_np#!", "You #adj#, #adj# #insult#!", "#vocative.cap#, you have the loyalty of #simile#.",

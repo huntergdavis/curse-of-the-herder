@@ -25,7 +25,8 @@ export class Grammar {
     this.lexicon = [];
     for (const p of packs) {
       for (const e of p.entries) {
-        const entry: LexEntry = { ...e, level: e.level ?? p.level };
+        // An entry is never known before its pack; entries may only raise the bar.
+        const entry: LexEntry = { ...e, level: Math.max(e.level ?? 0, p.level) };
         this.lexicon.push(entry);
         this.packOf.set(entry, p.id);
         const list = this.byPos.get(entry.pos) ?? [];
