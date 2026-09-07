@@ -139,6 +139,14 @@ it. Leave it running a minute; a healthy machine shows draw times well
 under the frame interval. It works in any browser; Chrome also shows the
 heap.
 
+## Dreamcast port
+
+A port to the Sega Dreamcast lives in its own repository:
+[curse-of-the-herder-dreamcast](https://github.com/huntergdavis/curse-of-the-herder-dreamcast).
+Its Pages site runs the disc image in a browser-based Dreamcast emulator so
+you can try it before downloading. The web game stays the source of truth for
+words, books and behaviour; the port generates its data from this repository.
+
 ## Documents
 
 - `CHANGELOG.md` — what shipped in each release (1.0.0 on 2026-09-07).
