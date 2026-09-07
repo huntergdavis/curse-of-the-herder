@@ -506,7 +506,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
       }
       h.carrying = -1;
       h.tripTiles = 0;
-      addFrustration(w, FRUSTRATION.penned);
+      // Relief scales with how wound up he is; the morning's easy sheep barely register.
+      addFrustration(w, -Math.max(2, Math.abs(FRUSTRATION.penned) * (w.frustration / 40)));
       h.mode = "resting";
       h.restUntilTick = w.tick + 8; // two seconds to catch his breath
     } else if (h.path.length === 0) {

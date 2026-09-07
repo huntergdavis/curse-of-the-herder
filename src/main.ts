@@ -16,8 +16,11 @@ import { Minimap } from "./render/minimap";
 import { Renderer } from "./render/renderer";
 
 const params = new URLSearchParams(location.search);
-/** Simulation ticks per real 250 ms. `?fast=60` runs the day in nine minutes. */
-const FAST = Math.max(1, Math.min(600, Number(params.get("fast") ?? 1) || 1));
+/** Simulation ticks per real 250 ms. `?fast=60` runs the day sixty times faster; the menu can change it live. */
+let FAST = Math.max(1, Math.min(600, Number(params.get("fast") ?? repository.getSetting("speed", "1")) || 1));
+/** At high speed, lines would flash by; keep at least this much real time between bubbles. */
+const MIN_SAY_GAP_MS = 1400;
+let lastSayMs = -1e9;
 const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 512) || 512));
 const TICK_MS = TICK_SECONDS * 1000;
 const SAVE_EVERY_MS = 10_000;
@@ -316,7 +319,9 @@ function toast(html: string): void {
   }, 6000);
 }
 
-function say(s: Session, text: string, heat: number, seconds: number, nowMs: number): void {
+function say(s: Session, text: string, heat: number, seconds: number, nowMs: number, force = false): void {
+  if (!force && FAST > 1 && nowMs - lastSayMs < MIN_SAY_GAP_MS) return;
+  lastSayMs = nowMs;
   s.bubbles.say(text, heat, seconds, nowMs);
   s.world.totalCurses++;
   s.recent.push(text);
@@ -351,7 +356,7 @@ function onFinished(s: Session): void {
   s.endHandled = true;
   const w = s.world;
   const epitaph = speakEpitaph(w, s.map, s.recent, BAND_CAP);
-  say(s, epitaph.text, 1, END_FADE_MS / 1000, performance.now());
+  say(s, epitaph.text, 1, END_FADE_MS / 1000, performance.now(), true);
   s.finishedAtMs = performance.now();
   const vocabulary = grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP));
   const record = makeHallRecord(w, epitaph.text, vocabulary, signatureWord(w.seed), (id) => grammar.packEntries(id));
@@ -529,6 +534,15 @@ async function boot(): Promise<void> {
   $("btn-hall").addEventListener("click", () => {
     toggleMenu(false);
     void showHall();
+  });
+  const selSpeed = $<HTMLSelectElement>("sel-speed");
+  selSpeed.value = [1, 2, 5, 10, 20, 50, 100].includes(FAST) ? String(FAST) : "1";
+  selSpeed.addEventListener("change", () => {
+    FAST = Number(selSpeed.value) || 1;
+    repository.setSetting("speed", String(FAST));
+    if (session) session.world.lastWallMs = Date.now();
+    updateHud(true);
+    toast(FAST === 1 ? "Real time. A day is a day." : `${FAST}× speed: a day takes about ${Math.round((9 * 60) / FAST)} minutes.`);
   });
   const selFps = $<HTMLSelectElement>("sel-fps");
   selFps.value = String(FPS_CAP === 60 || FPS_CAP === 30 || FPS_CAP === 15 ? FPS_CAP : 60);
