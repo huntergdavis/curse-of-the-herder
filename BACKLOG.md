@@ -93,38 +93,33 @@ long soak.
 - Mid-afternoon he stops at a village well for a drink ("Cold, honest, and utterly without alcohol, like everything else in my life"), once a day
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
-## P0 — Language polish
+## P0 — Must be right for a screensaver that runs all day
 
-- [ ] Read a full simulated day as a script (`npx tsx scripts/transcript.ts`) once per release and cut the 10% weakest templates.
-- [ ] Template audit to match the lexicon audit: slots like "I am #adj#" should draw adjectives that apply to a person (add a `self` target facet).
-- [ ] Per-register heat rules (Hemingway exempt already; verse should keep its own punctuation).
-- [ ] Flyting as a real duel: the sheep's emotes should escalate (…, !, ?!) and the herder should react to them.
+- [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (fix deployed 2026-09-07).
+- [ ] Frame time on real hardware via `?stats=1` (frame ms, draw ms, heap) at 1× and 100×.
+- [ ] Memorial stone text stays on the stone: fixed with a measured wrap and clip; glance at it when a second herder wakes.
 
-## P1 — Runtime robustness (Phase 4 leftovers)
+## P1 — Things a viewer will notice
 
-- [ ] Simulation in a Web Worker. Decision: not planned. At 1× the sim is negligible on the main thread; a long catch-up is budgeted at 1,500 ticks per frame and janks for a few seconds once. Revisit only if a real device shows the sim itself (not rendering) on the profile.
-- [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak. (Weekly soak exists and passes.)
-- [ ] Frame time on a real GPU browser (`?stats=1` shows frame interval, draw ms, heap): headless software rendering at 1080p measures ~167 ms/frame regardless of effects (fog +50 ms, wind +33 ms), i.e. the base full-screen passes dominate; effects are cheap. Measure on hardware with `node scripts/frame-time.mjs`; if a laptop struggles, the Eco frame-rate setting is the lever, and the fog gradient could become a cached image.
-- [ ] Auto-update via version.json poll and a service worker.
-
-## P1 — Presentation
-
+- [ ] Read a full simulated day as a script (`npx tsx scripts/transcript.ts`) once per release and cut the weakest templates.
+- [ ] Template audit: `self` target facet so "I am #adj#" only draws adjectives that fit a person.
+- [ ] Flyting as a real duel: escalating sheep emotes and the herder reacting (the "…" indicator is gone; needs a new shape).
+- [ ] Tombstone rises beside the pen in the world during the end fade (it is on the card today).
 - [ ] Sheep walk animation while wandering; flee dash.
-- [ ] Tombstone rises beside the pen in the world (not only on the card).
-- [ ] Pen fills with sleeping sheep in rows; night sky with stars during the fade.
-- [ ] Export/Import of a herder and of the Hall as JSON.
-- [ ] Settings panel (speed governor toggle, band cap, FPS mode).
+- [ ] The minimap is hidden on narrow phones; decide whether phones get the look-around.
 
-## P2 — Polish
+## P2 — Nice to have
 
-- [ ] Auto-update (`version.json` poll, SW cache name check script).
-- [ ] Workday FPS mode; heap slope test nightly; weekly true 9-hour soak.
-- Sound: decided, never. It is a silent screensaver.
-- [ ] Settings panel, keyboard shortcuts (space pause, N new, H hall).
-- [ ] Flyting duel beat (herder vs. named sheep, alternating lines).
+- [ ] Keyboard shortcuts (space pause, N new, H hall).
 - [ ] README screenshots and a 20 s GIF of a late-day rant.
-- [ ] `?size=1000` board option; ring radii scale.
-- [ ] Boundary-check script once `core/` stabilises.
+- [ ] A second Jerome-style book for levels 7–8.
+
+## Decided
+
+- Sound: never. It is a silent screensaver.
+- Web Worker sim: not planned (the sim is negligible at 1×; catch-up is budgeted).
+- Service worker: not planned unless offline use matters. It would add offline loading and controlled rollout at the cost of a second update path, stale-cache bugs and harder debugging; the version.json poll already reloads a running tab.
+- The P3 list was removed on 2026-09-07.
 
 ## Research backlog index
 

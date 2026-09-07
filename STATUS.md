@@ -38,29 +38,31 @@ One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:
 - **Looking around.** The minimap shows the viewport as a reticle; click or hold-and-drag on it to look anywhere on the island, and the view glides back to the herder two seconds after release. Covered by a Playwright test.
 - `scratch/` is ignored by git.
 
-## Backlog remaining
+## Backlog (re-cut 2026-09-07 after the bug-report round)
 
 ```
- P0  Language
-     [ ] Cut the weakest 10% of templates each release from a transcript read (ongoing; three passes done today)
-     [ ] `self` target facet so "I am #adj#" only draws adjectives that fit a person
-     [ ] Flyting as a real duel: escalating sheep emotes, herder reacting to them
- P1  Runtime
-     [ ] Frame time on a real GPU browser: open the site with `?stats=1` and read the overlay
-     [ ] Service worker for offline / update (version.json poll exists)
-     [ ] Web Worker sim — decided: not planned
- P1  Presentation
-     [ ] Tombstone rising in the world beside the pen during the fade (exists on the card)
+ P0  Must be right for a screensaver that runs all day
+     [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (the fix is deployed)
+     [ ] Frame time on real hardware: open with ?stats=1, note frame ms at 1x and 100x (Orion is fine; Chrome also shows heap)
+     [ ] Memorial stone text stays on the stone (fixed; verified headless — a glance in the real thing when a second herder wakes)
+ P1  Things a viewer will notice
+     [ ] Language: cut the weakest templates from a transcript read each release; `self` target facet for "I am #adj#"
+     [ ] Flyting as a real duel (escalating sheep emotes, herder reacting) — the "..." indicator is gone, so this needs a new shape
+     [ ] Tombstone rising in the world beside the pen during the end fade (it is on the card today)
      [ ] Sheep walk animation while wandering; flee dash
- P2  Polish
-     Sound: never (decided 2026-09-07)
+     [ ] Minimap is hidden on narrow phones: decide whether phones get the look-around
+ P2  Nice to have
      [ ] Keyboard shortcuts (space pause, N new, H hall)
      [ ] README screenshots and a 20 s GIF
-     [ ] A second Jerome-style book for variety at levels 7–8
- Verify on hardware (cannot be done headless)
-     [ ] Confirm the sea-over-island fix on the retina laptop that showed it (a whole day, then a second herder)
-     [ ] Frame-time measurement: `?stats=1` on the MacBook Air, a minute at 1× and at 100×
+     [ ] A second Jerome-style book for levels 7–8
+ Decided
+     Sound: never.   P3 list: removed.   Web Worker sim: not planned.
+     Service worker: not planned unless offline use matters (see below).
 ```
+
+### The service worker, explained
+
+A service worker would let the site load with no network (offline cache), open instantly from cache, and let us control when a new build takes over. The costs: a second update path competing with the version.json poll that already reloads a running tab, cache-invalidation bugs where a viewer is stuck on a stale build, and harder debugging. For a screensaver that runs on a connected machine and already self-updates, it buys almost nothing. Recommendation: drop it.
 
 ## How to check things
 
