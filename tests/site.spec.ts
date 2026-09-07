@@ -27,3 +27,18 @@ test("the Hall opens and closes", async ({ page }) => {
   await page.keyboard.press("Escape");
   await expect(page.locator("#hall")).toBeHidden();
 });
+
+test("a whole compressed day ends with every sheep penned and a Hall record", async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("?fast=600&new=1");
+  await expect(page.locator("#overlay")).toBeHidden({ timeout: 60_000 });
+  // The end card appears about 24 s after the last sheep; a day at 600x is ~55 s.
+  await expect(page.locator("#overlay")).toBeVisible({ timeout: 200_000 });
+  await expect(page.locator("#hud-flock")).toHaveText(/^60 \/ 60$/);
+  await expect(page.locator("#overlay .stone .ep")).not.toBeEmpty();
+  await page.click("#btn-hall");
+  await expect(page.locator("#hall-grid .hall-card")).toHaveCount(1);
+  expect(errors).toEqual([]);
+});

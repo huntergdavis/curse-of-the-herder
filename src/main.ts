@@ -399,7 +399,22 @@ window.setInterval(() => {
   }
 }, 5000);
 
+/** Hide the chrome after ten quiet seconds; any mouse or key brings it back. */
+function installQuietMode(): void {
+  let timer = 0;
+  const wake = (): void => {
+    document.body.classList.remove("quiet");
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      if ($<HTMLElement>("hall").hidden && overlay.hidden) document.body.classList.add("quiet");
+    }, 10_000);
+  };
+  for (const ev of ["mousemove", "mousedown", "keydown", "touchstart", "wheel"]) window.addEventListener(ev, wake, { passive: true });
+  wake();
+}
+
 async function boot(): Promise<void> {
+  installQuietMode();
   window.addEventListener("resize", () => session?.renderer.resize());
   $("btn-pause").addEventListener("click", () => {
     paused = !paused;

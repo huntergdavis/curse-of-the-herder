@@ -35,7 +35,11 @@ Useful URL parameters: `?fast=60` runs the day sixty times faster
 `?seed=word` fixes the board, `?clean=1` caps the language at minced
 oaths for shared screens, `?filth=max` removes the frustration gate.
 
-Keys: space pauses, N starts a new herder, H opens the Hall.
+Keys: space pauses, N starts a new herder, H opens the Hall. The toolbar
+fades after ten quiet seconds; move the mouse to bring it back. The
+Language selector (full / mild / clean) and the end-of-day behaviour
+(new herder / show the Hall / stop) persist in the browser. Export
+downloads the current herder and the Hall as JSON; Import restores them.
 
 ## How it works
 

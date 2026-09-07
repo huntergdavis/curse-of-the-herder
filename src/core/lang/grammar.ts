@@ -83,8 +83,8 @@ export class Grammar {
       const raw = this.expand(rule.template, ctx, rnd, 0, 4);
       if (raw === null) continue;
       let text = tidySentence(raw);
-      // Deadpan registers keep their full stops no matter how hot he is.
-      if (!(rule.reg?.includes("hemingway"))) text = this.applyHeat(text, ctx, rnd);
+      // Deadpan and metrical registers keep their own punctuation no matter how hot he is.
+      if (!rule.reg?.some((r) => r === "hemingway" || r === "verse")) text = this.applyHeat(text, ctx, rnd);
       if (rule.maxChars && text.length > rule.maxChars) continue;
       if (text.length > 240) continue;
       if (ctx.recent.includes(text)) continue;
