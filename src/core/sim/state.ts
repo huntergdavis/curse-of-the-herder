@@ -123,6 +123,8 @@ export interface WorldState {
   lastRantTick: number;
   /** Fog until this tick (0 = clear). */
   fogUntilTick: number;
+  /** Books finished today, in order. */
+  readingList: { bookId: string; tick: number }[];
 }
 
 export const MAX_EVENTS = 16;
@@ -231,7 +233,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
       tripTiles: 0,
     },
     sheep,
-    frustration: 0,
+    frustration: 12,
     booksRead: 0,
     sheepPenned: 0,
     totalCurses: 0,
@@ -255,6 +257,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     stats: { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 },
     lastRantTick: -100000,
     fogUntilTick: 0,
+    readingList: [],
   };
 }
 
@@ -352,6 +355,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["lastBookPassTick"] !== "number") o["lastBookPassTick"] = -100000;
     if (typeof o["lastRantTick"] !== "number") o["lastRantTick"] = -100000;
     if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
+    if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["stats"]) o["stats"] = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
     for (const sh of (o["sheep"] as Record<string, unknown>[]) ?? []) {
       if (typeof sh["tx"] !== "number") { sh["tx"] = sh["x"]; sh["ty"] = sh["y"]; sh["speed"] = 0; }

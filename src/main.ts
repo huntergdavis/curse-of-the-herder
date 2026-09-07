@@ -333,6 +333,14 @@ function stoneHtml(r: { name: string; epitaph: string; finishedClock: string; in
   return `<div class="stone"><div class="rip">HERE LIES</div><div class="who">${escapeHtml(r.name)}</div><div class="ep">“${escapeHtml(r.epitaph)}”</div><div class="when">retired ${r.finishedClock}, ${date.toLocaleDateString()}</div></div><div class="grass-strip"></div>`;
 }
 
+function readingHtml(r: HallRecord, compact = false): string {
+  if (!r.reading?.length) return "";
+  const items = r.reading
+    .map((b) => `<li><span class="rl-title">${escapeHtml(b.title)}</span> <span class="rl-when">${b.clock}</span>${b.taught.length ? `<span class="rl-taught">taught him ${b.taught.map(escapeHtml).join(", ")}</span>` : ""}</li>`)
+    .join("");
+  return `<details class="reading" ${compact ? "" : "open"}><summary>Reading list (${r.reading.length} book${r.reading.length === 1 ? "" : "s"})</summary><ol>${items}</ol></details>`;
+}
+
 function escapeHtml(t: string): string {
   return t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] ?? c);
 }
@@ -346,7 +354,7 @@ function onFinished(s: Session): void {
   say(s, epitaph.text, 1, END_FADE_MS / 1000, performance.now());
   s.finishedAtMs = performance.now();
   const vocabulary = grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP));
-  const record = makeHallRecord(w, epitaph.text, vocabulary, signatureWord(w.seed));
+  const record = makeHallRecord(w, epitaph.text, vocabulary, signatureWord(w.seed), (id) => grammar.packEntries(id));
   void repository.save(w);
   void repository.induct(record);
   window.setTimeout(() => showEndCard(record), END_FADE_MS);
@@ -360,6 +368,7 @@ function showEndCard(r: HallRecord): void {
       stoneHtml(r) +
       `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}</p>` +
       (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +
+      readingHtml(r, true) +
       `<p>${next}</p>`,
   );
   if (mode === "loop") window.setTimeout(() => void newHerder(), END_HOLD_MS);
@@ -376,6 +385,7 @@ async function showHall(): Promise<void> {
       (r) =>
         `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd></dl>` +
         (r.longestLine ? `<div class="longest">“${escapeHtml(r.longestLine)}”</div>` : "") +
+        readingHtml(r, true) +
         `</article>`,
     )
     .join("");
@@ -484,7 +494,7 @@ function installQuietMode(): void {
     document.body.classList.remove("quiet");
     window.clearTimeout(timer);
     timer = window.setTimeout(() => {
-      if ($<HTMLElement>("hall").hidden && overlay.hidden) document.body.classList.add("quiet");
+      if ($<HTMLElement>("hall").hidden && overlay.hidden && $<HTMLElement>("menu").hidden) document.body.classList.add("quiet");
     }, 10_000);
   };
   for (const ev of ["mousemove", "mousedown", "keydown", "touchstart", "wheel"]) window.addEventListener(ev, wake, { passive: true });
@@ -505,8 +515,27 @@ async function boot(): Promise<void> {
     paused = !paused;
     updateHud(true);
   });
-  $("btn-new").addEventListener("click", () => void newHerder());
-  $("btn-hall").addEventListener("click", () => void showHall());
+  const menu = $<HTMLElement>("menu");
+  const toggleMenu = (show?: boolean): void => {
+    menu.hidden = show === undefined ? !menu.hidden : !show;
+    if (!menu.hidden) void refreshLoadList();
+  };
+  $("btn-menu").addEventListener("click", () => toggleMenu());
+  $("btn-menu-close").addEventListener("click", () => toggleMenu(false));
+  $("btn-new").addEventListener("click", () => {
+    toggleMenu(false);
+    void newHerder();
+  });
+  $("btn-hall").addEventListener("click", () => {
+    toggleMenu(false);
+    void showHall();
+  });
+  const selFps = $<HTMLSelectElement>("sel-fps");
+  selFps.value = String(FPS_CAP === 60 || FPS_CAP === 30 || FPS_CAP === 15 ? FPS_CAP : 60);
+  selFps.addEventListener("change", () => {
+    repository.setSetting("fps", selFps.value);
+    toast("Frame rate applies after the next reload.");
+  });
   $("btn-hall-close").addEventListener("click", () => {
     $<HTMLElement>("hall").hidden = true;
   });
@@ -537,11 +566,15 @@ async function boot(): Promise<void> {
       paused = !paused;
       updateHud(true);
     } else if (e.key.toLowerCase() === "n") void newHerder();
+    else if (e.key.toLowerCase() === "m") toggleMenu();
     else if (e.key.toLowerCase() === "h") {
       const hall = $<HTMLElement>("hall");
       if (hall.hidden) void showHall();
       else hall.hidden = true;
-    } else if (e.key === "Escape") $<HTMLElement>("hall").hidden = true;
+    } else if (e.key === "Escape") {
+      $<HTMLElement>("hall").hidden = true;
+      toggleMenu(false);
+    }
   });
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && session) session.renderer.resize();

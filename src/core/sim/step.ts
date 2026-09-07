@@ -278,6 +278,7 @@ function finishReading(w: WorldState): void {
     const book = BOOK_BY_ID.get(r.bookId);
     w.booksRead++;
     w.stats.books++;
+    w.readingList.push({ bookId: r.bookId, tick: w.tick });
     addFrustration(w, FRUSTRATION.book);
     if (book?.pack && !w.knownPacks.includes(book.pack)) w.knownPacks.push(book.pack);
     if (book?.register) {

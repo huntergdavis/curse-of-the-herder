@@ -23,18 +23,18 @@ export function levelFor(eruditionScore: number): number {
 export type FilthBand = 0 | 1 | 2 | 3 | 4;
 
 export function filthCeiling(frustration: number): FilthBand {
-  if (frustration < 20) return 0;
-  if (frustration < 40) return 1;
-  if (frustration < 60) return 2;
-  if (frustration < 80) return 3;
+  if (frustration < 8) return 0;
+  if (frustration < 22) return 1;
+  if (frustration < 42) return 2;
+  if (frustration < 66) return 3;
   return 4;
 }
 
-/** Seconds between spontaneous curses. */
+/** Seconds between spontaneous curses. Event lines (flee, catch, pen) come on top. */
 export function curseIntervalSeconds(level: number, frustration: number): number {
-  const base = 90;
-  const v = (base * (1.15 - frustration / 100)) / (1 + level / MAX_LEVEL);
-  return Math.max(5, v);
+  const base = 42;
+  const v = (base * (1.1 - frustration / 100)) / (1 + level / MAX_LEVEL);
+  return Math.max(4, v);
 }
 
 export const FRUSTRATION = {
@@ -46,7 +46,7 @@ export const FRUSTRATION = {
   duskPerMinute: 0.2,
   walkOfShame: 3,
   repeatEscape: 12,
-  penned: -8,
+  penned: -5,
   book: -10,
   breather: -5,
   decayPerMinute: -0.5,
@@ -62,11 +62,12 @@ export function clampFrustration(v: number): number {
  * the day began.
  */
 export function frustrationBaseline(hoursElapsed: number): number {
-  return Math.max(0, Math.min(72, (hoursElapsed - 0.75) * 11));
+  // He wakes up already a little sore about it.
+  return Math.max(0, Math.min(78, 12 + hoursElapsed * 9));
 }
 
 /** Per-tick drift toward the baseline: slow relief above it, steady simmer below it. */
 export function frustrationDrift(current: number, baseline: number, dtMinutes: number): number {
   if (current > baseline) return Math.max(baseline, current + FRUSTRATION.decayPerMinute * dtMinutes);
-  return Math.min(baseline, current + 1.2 * dtMinutes);
+  return Math.min(baseline, current + 2.0 * dtMinutes);
 }

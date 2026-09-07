@@ -73,11 +73,16 @@ Frustration bands map to filthiness ceilings (see `CONTENT_POLICY.md`):
 
 | Frustration | Band | Filthiness ceiling |
 | --- | --- | --- |
-| 0–19 | Muttering | F0 (clean) |
-| 20–39 | Grumbling | F1 (minced oaths: blast, dang, confound it) |
-| 40–59 | Cursing | F2 (mild: damn, hell, bloody, crap, arse) |
-| 60–79 | Swearing | F3 (strong: shit, bastard, piss, bollocks) |
-| 80–100 | Unhinged | F4 (the f-word and its inflections, cataloged compounds) |
+| 0–7 | Muttering | F0 (clean) |
+| 8–21 | Grumbling | F1 (minced oaths: blast, dang, confound it) |
+| 22–41 | Cursing | F2 (mild: damn, hell, bloody, crap, arse) |
+| 42–65 | Swearing | F3 (strong: shit, bastard, piss, bollocks) |
+| 66–100 | Unhinged | F4 (the f-word and its inflections, cataloged compounds) |
+
+Every herder is born knowing a small "stingers" pack (damn, hell,
+bugger, shit, bollocks and friends, F1–F3) so the first hour has bite
+even before the first book; the *eloquence* still has to be earned. The
+baseline frustration starts at 12 rather than 0 for the same reason.
 
 Both axes gate a word: a Level 3 herder at 95 frustration still cannot say
 the f-word because he has not learned it yet (it arrives with a Level 5
@@ -89,13 +94,13 @@ who can construct a perfect periodic sentence and chooses to end it with
 ## Curse frequency
 
 ```
-baseInterval = 90s
-interval = baseInterval * (1.15 - frustration/100) / (1 + level/12)
+baseInterval = 42s
+interval = baseInterval * (1.1 - frustration/100) / (1 + level/12)
 ```
 
-Level 0 calm: about one line every 100 s. Level 12 unhinged: about one
-every 7 s, with a hard floor of 5 s so the screen never becomes a wall of
-text. Event-triggered lines (sheep flees, book found, sheep penned) bypass
+Level 0 at the morning baseline: about one line every 40 s, plus a line
+for every catch, pen and flight. Level 12 unhinged: about one every 4 s
+(the floor) so the screen never becomes a wall of text. Event-triggered lines (sheep flees, book found, sheep penned) bypass
 the interval but respect a 3 s debounce.
 
 ## The ending

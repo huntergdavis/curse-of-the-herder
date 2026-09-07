@@ -22,10 +22,13 @@ test("a compressed day starts, the herder pens sheep, and nothing external is fe
 test("the Hall opens and closes", async ({ page }) => {
   await page.goto("?new=1");
   await expect(page.locator("#overlay")).toBeHidden({ timeout: 60_000 });
-  await page.click("#btn-hall");
+  await page.keyboard.press("h");
   await expect(page.locator("#hall")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.locator("#hall")).toBeHidden();
+  await page.click("#btn-menu");
+  await expect(page.locator("#menu")).toBeVisible();
+  await expect(page.locator("#sel-lang")).toBeVisible();
 });
 
 test("a whole compressed day ends with every sheep penned and a Hall record", async ({ page }) => {

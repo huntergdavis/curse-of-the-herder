@@ -42,6 +42,11 @@ export class Grammar {
     }
   }
 
+  /** Entries of one pack (for the reading list). */
+  packEntries(packId: string): LexEntry[] {
+    return this.lexicon.filter((e) => this.packOf.get(e) === packId);
+  }
+
   /** Expand a one-off template with the current context (used for quotation frames). */
   expandTemplate(template: string, ctx: Context, salt = 0): string | null {
     const rnd = mulberry32(fnv1a(`${ctx.seed}|frame|${ctx.tick}|${salt}`));

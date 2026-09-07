@@ -18,20 +18,21 @@ describe("progression", () => {
   });
   it("filth ceiling follows frustration bands", () => {
     expect(filthCeiling(0)).toBe(0);
-    expect(filthCeiling(45)).toBe(2);
+    expect(filthCeiling(30)).toBe(2);
+    expect(filthCeiling(50)).toBe(3);
     expect(filthCeiling(100)).toBe(4);
   });
   it("curse interval shrinks with level and frustration but never below 5 s", () => {
-    expect(curseIntervalSeconds(0, 0)).toBeGreaterThan(90);
-    expect(curseIntervalSeconds(12, 100)).toBeGreaterThanOrEqual(5);
+    expect(curseIntervalSeconds(0, 0)).toBeGreaterThan(40);
+    expect(curseIntervalSeconds(12, 100)).toBeGreaterThanOrEqual(4);
     expect(curseIntervalSeconds(12, 100)).toBeLessThan(curseIntervalSeconds(0, 0));
   });
   it("frustration baseline rises through the day and the meter drifts toward it", () => {
-    expect(frustrationBaseline(0)).toBe(0);
-    expect(frustrationBaseline(4)).toBeGreaterThan(30);
-    expect(frustrationBaseline(9)).toBe(72);
+    expect(frustrationBaseline(0)).toBe(12);
+    expect(frustrationBaseline(4)).toBeGreaterThan(40);
+    expect(frustrationBaseline(9)).toBe(78);
     expect(frustrationDrift(80, 40, 10)).toBe(75);
-    expect(frustrationDrift(10, 40, 10)).toBe(22);
+    expect(frustrationDrift(10, 40, 10)).toBe(30);
     expect(frustrationDrift(39.9, 40, 10)).toBe(40);
   });
 });

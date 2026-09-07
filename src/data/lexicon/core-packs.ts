@@ -15,7 +15,7 @@ const body = (w: string, extra: Partial<LexEntry> = {}): LexEntry => ({ w, pos: 
 const abs = (w: string): LexEntry => ({ w, pos: "abstract", band: 0, level: 0, pl: "-" });
 const pan = (w: string): LexEntry => ({ w, pos: "pantheon", band: 0, level: 0 });
 const threat = (w: string): LexEntry => ({ w, pos: "threat", band: 0, level: 0 });
-const swear = (w: string, band: 2 | 3 | 4, extra: Partial<LexEntry> = {}): LexEntry => ({ w, pos: "swear", band, level: 0, ...extra });
+const swear = (w: string, band: 1 | 2 | 3 | 4, extra: Partial<LexEntry> = {}): LexEntry => ({ w, pos: "swear", band, level: 0, ...extra });
 
 export const primer: LexPack = {
   id: "primer",
@@ -150,7 +150,7 @@ export const mildProfanity: LexPack = {
   title: "Words Overheard at the Cattle Market",
   curator: "hunter",
   reviewedAt: "2026-09-06",
-  level: 5,
+  level: 2,
   entries: [
     oath("damn", 2), oath("damn it", 2), oath("dammit", 2), oath("hell", 2), oath("bloody hell", 2), oath("hell's bells", 2), oath("hell's teeth", 2),
     oath("crap", 2), oath("oh, crap", 2), oath("arse", 2), oath("sod it", 2), oath("bugger", 2), oath("bugger it", 2), oath("bugger this", 2),
@@ -169,7 +169,7 @@ export const strongProfanity: LexPack = {
   title: "The Drover's Private Vocabulary",
   curator: "hunter",
   reviewedAt: "2026-09-06",
-  level: 6,
+  level: 4,
   entries: [
     oath("shit", 3), oath("shite", 3), oath("oh, shit", 3), oath("bollocks", 3), oath("piss", 3), oath("piss on it", 3), oath("bastard", 3),
     oath("shit and bollocks", 3), oath("bollocking hell", 3), oath("holy shit", 3), oath("pissing hell", 3), oath("arse-biscuits", 3),
@@ -187,7 +187,7 @@ export const fWord: LexPack = {
   title: "One Word, Many Uses",
   curator: "hunter",
   reviewedAt: "2026-09-06",
-  level: 8,
+  level: 6,
   entries: [
     oath("fuck", 4), oath("fuck it", 4), oath("fuck this", 4), oath("oh, fuck", 4), oath("fucking hell", 4), oath("fuck me sideways", 4), oath("for fuck's sake", 4),
     inten("fucking", 4), inten("absolutely fucking", 4), inten("motherfucking", 4, { targets: ["terrain", "weather", "day", "curse"] }),
@@ -197,4 +197,22 @@ export const fWord: LexPack = {
   ],
 };
 
-export const CORE_PACKS: LexPack[] = [primer, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord];
+/** What every herder knows before he has read a word: the short, sharp stuff. */
+export const stingers: LexPack = {
+  id: "stingers",
+  title: "Born Knowing",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 0,
+  entries: [
+    oath("damn", 2), oath("damn it", 2), oath("hell", 2), oath("bloody hell", 2), oath("blast", 1), oath("bugger", 2), oath("sod it", 2), oath("arse", 2),
+    oath("oh, hell", 2), oath("hell's teeth", 2), oath("crap", 2), oath("drat", 1), oath("bother", 1), oath("blast it", 1), oath("damn and blast", 2),
+    oath("bollocks", 3), oath("shit", 3), oath("oh, shit", 3), oath("bastard", 3),
+    swear("Damn", 2, { tombstoneSafe: true }), swear("Hell", 2, { tombstoneSafe: true }), swear("Bugger", 2, { tombstoneSafe: true }), swear("Arse", 2, { tombstoneSafe: true }),
+    swear("Shit", 3, { tombstoneSafe: true }), swear("Bollocks", 3, { tombstoneSafe: true }), swear("Blast", 1, { tombstoneSafe: true }),
+    inten("bloody", 2), inten("damned", 2), inten("sodding", 2), inten("blasted", 1), inten("bastard", 3), inten("shitting", 3),
+    ins("sod", { band: 2 }), ins("git", { band: 2 }), ins("bastard", { band: 3 }), ins("arse", { band: 2 }),
+  ],
+};
+
+export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord];

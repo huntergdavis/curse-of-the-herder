@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Curse of the Herder: a no-input browser screensaver. A cursed herder gathers his flock across a vast tile map over a 9-hour day, swearing ever more eloquently as he goes." />
     <title>Curse of the Herder</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='34' r='22' fill='%23f6f2e6' stroke='%232b2620' stroke-width='3'/%3E%3Cellipse cx='48' cy='30' rx='10' ry='9' fill='%233a2f2a'/%3E%3Ccircle cx='51' cy='28' r='2' fill='%23fff'/%3E%3Crect x='22' y='50' width='5' height='10' fill='%233a2f2a'/%3E%3Crect x='36' y='50' width='5' height='10' fill='%233a2f2a'/%3E%3C/svg%3E" />
@@ -32,6 +32,20 @@
       button, select { font: inherit; font-size: 14px; background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
       button:hover, .filebtn:hover { background: #fff3c4; }
       .filebtn { font: inherit; font-size: 14px; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+      #menu { z-index: 25; top: 60px; right: 12px; width: min(420px, calc(100vw - 24px)); padding: 12px 16px 10px; }
+      #menu header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      #menu h2 { margin: 0; font-size: 18px; }
+      .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .menu-grid label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; opacity: 0.9; }
+      .menu-grid label.filebtn { flex-direction: row; align-items: center; justify-content: center; font-size: 14px; }
+      .menu-grid select, .menu-grid button { width: 100%; }
+      .menu-foot { font-size: 12px; opacity: 0.65; margin: 10px 0 0; }
+      .reading { text-align: left; margin: 8px auto 0; font-size: 13px; max-width: 460px; }
+      .reading summary { cursor: pointer; font-weight: 600; }
+      .reading ol { margin: 6px 0 0; padding-left: 20px; max-height: 180px; overflow: auto; }
+      .reading li { margin: 2px 0; }
+      .rl-when { opacity: 0.6; font-size: 11px; margin-left: 4px; }
+      .rl-taught { display: block; font-family: var(--hand-font); opacity: 0.85; }
       #minimap-wrap { right: 12px; bottom: 12px; padding: 6px; line-height: 0; }
       #minimap { width: 160px; height: 160px; border-radius: 6px; image-rendering: auto; }
       #line { left: 12px; bottom: 12px; max-width: 46vw; font-family: var(--hand-font); font-size: 16px; opacity: 0.9; }
@@ -69,7 +83,23 @@
       body.quiet #toolbar, body.quiet #toast { opacity: 0; pointer-events: none; }
       body.quiet #hud, body.quiet #minimap-wrap, body.quiet #line { opacity: 0.55; }
       body.quiet { cursor: none; }
-      @media (max-width: 720px) { #line { display: none; } #minimap { width: 100px; height: 100px; } #hud { min-width: 0; } }
+      @media (max-width: 720px) {
+        .panel { padding: 6px 8px; border-radius: 10px; }
+        #hud { top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); min-width: 0; font-size: 12px; gap: 2px; max-width: 46vw; }
+        #hud .name { font-size: 14px; }
+        #hud .row { font-size: 12px; }
+        #hud .row.opt { display: none; }
+        #toolbar { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); gap: 6px; }
+        button, select, .filebtn { font-size: 13px; padding: 4px 8px; }
+        #line { left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); max-width: none; font-size: 14px; }
+        #minimap-wrap { display: none; }
+        #menu { top: 52px; }
+        .menu-grid { grid-template-columns: 1fr; }
+        #hall { top: 52px; width: calc(100vw - 16px); max-height: calc(100vh - 64px); }
+        #overlay .card { padding: 16px 18px; max-width: 92vw; }
+        #overlay h1 { font-size: 24px; }
+        .stone { width: 180px; }
+      }
     </style>
   </head>
   <body>
@@ -79,30 +109,42 @@
       <div class="row"><span class="label">Day</span><span id="hud-clock">09:00</span></div>
       <div class="row"><span class="label">Flock</span><span id="hud-flock">0 / 0</span></div>
       <div class="row"><span class="label">Level</span><span id="hud-level">0 · Grunting</span></div>
-      <div class="row"><span class="label">Books</span><span id="hud-books">0</span></div>
-      <div class="row"><span class="label">Vocabulary</span><span id="hud-vocab">–</span></div>
+      <div class="row opt"><span class="label">Books</span><span id="hud-books">0</span></div>
+      <div class="row opt"><span class="label">Vocabulary</span><span id="hud-vocab">–</span></div>
       <div class="row"><span class="label">Mood</span><span id="hud-frust">Calm</span></div>
       <div id="meter"><div id="meter-fill"></div></div>
     </section>
     <nav id="toolbar" class="panel" aria-label="Controls">
       <button id="btn-pause" title="Pause (space)">Pause</button>
-      <button id="btn-new" title="Start a new herder (N)">New herder</button>
-      <select id="sel-load" title="Load a herder in progress"><option value="">Load…</option></select>
-      <button id="btn-hall" title="Hall of Herders (H)">Hall</button>
-      <select id="sel-lang" title="How strong the language may get">
-        <option value="4">Language: full</option>
-        <option value="2">Language: mild</option>
-        <option value="1">Language: clean</option>
-      </select>
-      <button id="btn-export" title="Download this herder and the Hall as JSON">Export</button>
-      <label class="filebtn" title="Import a JSON export"><input id="inp-import" type="file" accept="application/json" hidden />Import</label>
-      <select id="sel-end" title="What happens when the last sheep is penned">
-        <option value="loop">Then: new herder</option>
-        <option value="hall">Then: show the Hall</option>
-        <option value="stop">Then: stop</option>
-      </select>
+      <button id="btn-menu" title="Menu (M)" aria-haspopup="true" aria-controls="menu">☰ Menu</button>
       <span id="hud-mode"></span>
     </nav>
+    <section id="menu" class="panel" hidden aria-label="Menu">
+      <header><h2>Curse of the Herder</h2><button id="btn-menu-close">Close</button></header>
+      <div class="menu-grid">
+        <button id="btn-new" title="Start a new herder (N)">New herder</button>
+        <button id="btn-hall" title="Hall of Herders (H)">Hall of Herders</button>
+        <label>Load a herder<select id="sel-load"><option value="">Load…</option></select></label>
+        <label>Language<select id="sel-lang">
+          <option value="4">Full: he says what he says</option>
+          <option value="2">Mild: damns and bloodies</option>
+          <option value="1">Clean: minced oaths only</option>
+        </select></label>
+        <label>When the last sheep is in<select id="sel-end">
+          <option value="loop">Wake a new herder</option>
+          <option value="hall">Show the Hall</option>
+          <option value="stop">Stop</option>
+        </select></label>
+        <label>Frame rate<select id="sel-fps">
+          <option value="60">Smooth (60)</option>
+          <option value="30">Balanced (30)</option>
+          <option value="15">Eco (15)</option>
+        </select></label>
+        <button id="btn-export" title="Download this herder and the Hall as JSON">Export JSON</button>
+        <label class="filebtn" title="Import a JSON export"><input id="inp-import" type="file" accept="application/json" hidden />Import JSON</label>
+      </div>
+      <p class="menu-foot">Space pauses · N new herder · H Hall · M menu · The toolbar fades when the mouse is still.</p>
+    </section>
     <div id="minimap-wrap" class="panel"><canvas id="minimap" width="160" height="160"></canvas></div>
     <div id="line" class="panel" aria-live="polite"><span class="label">Last heard</span><span id="line-text">…</span></div>
     <div id="toast" class="panel" hidden></div>

@@ -102,6 +102,11 @@ export const RULES: Rule[] = [
     "#bodypart.cap#. #interj.cap#.", "#remaining.cap#.", "#remaining.cap# left.", "#noun.cap#!", "#pantheon.cap#.",
   ]),
   ...R(0, "flee", ["No.", "Hey.", "#interj.cap#!", "Sheep!", "Back!", "Stop!", "Wait!", "#vocative.cap#!", "No no no.", "Oh no."]),
+  ...R(0, "flee", ["#oath.cap#!", "#oath.cap#! Sheep!", "#swear.cap#. Back!", "#swear.cap#!"], { minBand: 1 }),
+  ...R(0, "idle", ["#oath.cap#.", "#swear.cap#.", "#oath.cap#. #noun.cap#.", "#noun.cap#. #swear.cap#.", "#swear.cap#. #swear.cap#.", "#intensifier.cap# #noun#.", "#intensifier.cap# sheep."], { minBand: 1 }),
+  ...R(0, "caught", ["#oath.cap#, heavy.", "Got you, you #insult#.", "#swear.cap#. Mine."], { minBand: 1 }),
+  ...R(0, "penned", ["#oath.cap#. In.", "In, you #insult#.", "#swear.cap#. One."], { minBand: 1 }),
+  ...R(0, "absurd", ["#swear.cap#. How.", "#oath.cap#! Up there?!", "How. #swear.cap#. HOW."], { minBand: 1 }),
   ...R(0, "caught", ["Got.", "Mine.", "#interj.cap#.", "Heavy.", "Up.", "Come.", "Hnngh.", "Got #you#.", "Right."]),
   ...R(0, "penned", ["In.", "Good.", "One.", "Stay.", "There.", "Sit.", "#penned.cap#.", "In. Good.", "Stay in."]),
   ...R(0, "absurd", ["Why. Up.", "How.", "#target.cap#?!", "Up. Why.", "No. How.", "Sheep. Rock. Why.", "#interj.cap#. How."]),
@@ -115,6 +120,7 @@ export const RULES: Rule[] = [
   ...R(0, "breather", ["Sit.", "#bodypart.cap#.", "Moment.", "Rest. Short."]),
 
   // ---------------------------------------------------------------- Tier 1
+  ...R(1, "idle", ["#intensifier.cap# #adj# #target#.", "#oath.cap#, #target#.", "#adj.cap# #intensifier# #noun#.", "#swear.cap#. #adj.cap# #noun#.", "#intensifier.cap# #noun# in my boot."], { minBand: 1 }),
   ...R(1, "idle", [
     "#adj.cap# #target#.", "#adj.cap# #noun#.", "#interj.cap#, #noun#.", "#bodypart.cap# #adj#.", "Not again.", "#adj.cap# day.", "More #noun#.",
     "Too #adj#.", "#adj.cap#. #adj.cap#. #adj.cap#.", "#adj.cap# #target#, #adj# #noun#.", "#remaining.cap# more.", "#interj.cap#, #bodypart#.",
@@ -134,6 +140,7 @@ export const RULES: Rule[] = [
   ...R(1, "breather", ["Sit down. Short.", "#bodypart.cap#. #interj.cap#.", "Moment. Just a moment."]),
 
   // ---------------------------------------------------------------- Tier 2
+  ...R(2, "idle", ["This #intensifier# #target# is #adj#.", "#oath.cap#, my #bodypart#.", "I hate this #intensifier# #target#.", "#swear.cap#. #swear.cap#. #clause.cap#.", "Who put this #intensifier# #target# here?"], { minBand: 2 }),
   ...R(2, "idle", [
     "This #target# is #adj#.", "I do not like #noun.pl#.", "My #bodypart# are #adj#.", "This is #adj_noun.a#.", "Why is there #noun.a# in my #bodypart#?",
     "#remaining.cap# sheep left. #interj.cap#.", "I want to sit down.", "Every #target# is #adj#. Every one.", "There is #noun# in my boot.",
