@@ -298,11 +298,13 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   ctx.strokeStyle = INK;
   ctx.fillStyle = style.heat > 0.75 ? "#ffe9dc" : style.heat > 0.45 ? "#fff6e6" : "#fffdf5";
   ctx.beginPath();
+  let tailBaseY = by + bh;
   if (style.heat > 0.85) {
     // Jagged shout bubble: the inner envelope must clear the text box's corners.
     const spikes = 18;
     const baseRx = Math.hypot(bw / 2, bh / 2) * 0.92 + fontPx * 0.2;
     const baseRy = bh / 2 + Math.hypot(bw / 2, bh / 2) * 0.28 + fontPx * 0.2;
+    tailBaseY = by + bh / 2 + baseRy * 0.9;
     for (let i = 0; i <= spikes; i++) {
       const a = (i / spikes) * Math.PI * 2;
       const rx = baseRx + (i % 2 ? fontPx * 0.8 : 0);
@@ -320,17 +322,18 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   ctx.stroke();
   // Tail
   const tailBaseX = Math.max(bx + fontPx, Math.min(bx + bw - fontPx, tx));
+  const tipY = Math.max(tailBaseY + fontPx * 0.6, Math.min(ty, tailBaseY + fontPx * 1.4));
   ctx.beginPath();
-  ctx.moveTo(tailBaseX - fontPx * 0.5, by + bh - 1);
-  ctx.lineTo(tx, Math.min(ty, by + bh + fontPx * 1.2));
-  ctx.lineTo(tailBaseX + fontPx * 0.5, by + bh - 1);
+  ctx.moveTo(tailBaseX - fontPx * 0.5, tailBaseY - 1);
+  ctx.lineTo(tx, tipY);
+  ctx.lineTo(tailBaseX + fontPx * 0.5, tailBaseY - 1);
   ctx.closePath();
   ctx.fill();
   ctx.strokeStyle = INK;
   ctx.beginPath();
-  ctx.moveTo(tailBaseX - fontPx * 0.5, by + bh);
-  ctx.lineTo(tx, Math.min(ty, by + bh + fontPx * 1.2));
-  ctx.lineTo(tailBaseX + fontPx * 0.5, by + bh);
+  ctx.moveTo(tailBaseX - fontPx * 0.5, tailBaseY);
+  ctx.lineTo(tx, tipY);
+  ctx.lineTo(tailBaseX + fontPx * 0.5, tailBaseY);
   ctx.stroke();
   ctx.fillStyle = INK;
   ctx.textBaseline = "top";

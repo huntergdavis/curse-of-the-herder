@@ -340,7 +340,11 @@ function frame(nowMs: number): void {
         if (w.tick >= s.nextIdleCurseTick && !catchingUp) {
           if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
           const u = speakIdle(w, s.map, s.recent, BAND_CAP);
-          if (u) say(s, u.text, u.heat, u.seconds, nowMs);
+          if (u) {
+            say(s, u.text, u.heat, u.seconds, nowMs);
+            // The addressed sheep has nothing to say for itself.
+            if (u.sheepId !== undefined && Math.hypot((w.sheep[u.sheepId]?.x ?? 0) - w.herder.x, (w.sheep[u.sheepId]?.y ?? 0) - w.herder.y) < 14) s.bubbles.emote(u.sheepId, "…", Math.min(4, u.seconds), nowMs + 700);
+          }
           s.nextIdleCurseTick = w.tick + nextIdleCurseTicks(w);
         }
         if (w.finished) break;

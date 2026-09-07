@@ -23,6 +23,8 @@ export interface Utterance {
   heat: number;
   seconds: number;
   ruleId: string;
+  /** The sheep being addressed, if any, so it can react. */
+  sheepId?: number;
 }
 
 const packs = [...CORE_PACKS, ...PACKS_5_8, ...PACKS_9_12].filter((p) => p.reviewedAt);
@@ -129,7 +131,9 @@ export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap
   else if (u > 0.92 && (w.stats.flees + w.stats.rains + w.stats.shames + w.stats.absurds) >= 2) ev = "callback";
   const r = grammar.generate(ev, ctx) ?? grammar.generate("idle", ctx);
   if (!r) return null;
-  return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
+  const out: Utterance = { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
+  if (ctx.target.kind === "sheep" && w.herder.targetSheep >= 0) out.sheepId = w.herder.targetSheep;
+  return out;
 }
 
 export function speakEpitaph(w: WorldState, map: GameMap, recent: string[], bandCap: Band = 4): Utterance {

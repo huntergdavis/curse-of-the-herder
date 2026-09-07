@@ -55,7 +55,10 @@ function chooseTarget(w: WorldState, map: GameMap): SheepState | null {
   const atPen = Math.hypot(h.x - map.pen.x, h.y - map.pen.y) < 5;
   for (const s of w.sheep) {
     if (s.mode !== "loose") continue;
-    const score = atPen ? map.penDistance[s.y * map.size + s.x]! : Math.hypot(s.x - h.x, s.y - h.y) * (1 + s.ring * 0.05);
+    // Sheep positions are fractional while they amble; the field is indexed by tile.
+    const byPath = map.penDistance[Math.round(s.y) * map.size + Math.round(s.x)];
+    let score = atPen && byPath !== undefined && Number.isFinite(byPath) ? byPath : Math.hypot(s.x - h.x, s.y - h.y) * (1 + s.ring * 0.05);
+    if (!Number.isFinite(score)) score = 1e9; // never lose a sheep to a bad index; he will go and look
     if (score < bestScore) {
       bestScore = score;
       best = s;
