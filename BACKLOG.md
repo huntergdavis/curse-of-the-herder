@@ -75,6 +75,7 @@ long soak.
 - The Almanac counts lunches eaten by sheep, days a dog did its job, herders with a nemesis, and the most frequent passer-by; named sheep in the Hall say why they were named
 - The Cursed Ram: one house per village is the inn, with a swinging ram's-head sign; walking past it costs him ("That was the hardest thing I have done today and it is not yet noon"), at most once every half hour, and the Curse has checked he is not allowed in
 - On the neighbour's third pass, Also Prudence bolts from the line and runs downhill; he is thrilled ("IT HAPPENS TO HIM TOO!"), the Curse tells him not to enjoy it, and there is a toast
+- When he sits down, the dog sometimes fetches him a stick ("I asked for sheep and you have brought me KINDLING!")
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

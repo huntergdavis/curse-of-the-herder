@@ -121,6 +121,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(6, "curseReply", ["Yes, thank you, I am aware that I am cursed. The reminders are not, on the whole, helping with the cursing.", "Heckled by my own affliction. There is a word for that and I will find it in a book and I will use it at you."]),
   ...R(8, "curseReply", ["The curse spoke. I did not answer. Then I did. It was not a good answer."], { reg: ["hemingway"] }),
   ...R(10, "curseReply", ["Speak up, O Curse; my #adj# hearing is the one faculty you have not yet ruined, and I should hate for you to feel you had left a job unfinished."]),
+  // The dog brings him a stick. It is not a sheep.
+  ...R(0, "stick", ["Stick. Not sheep.", "No. Sheep. Not stick.", "…Stick. Fine. Good stick."]),
+  ...R(2, "stick", ["That is a stick. That is not a sheep. We have discussed this, #dog#. We have had the meeting.", "Thank you, #dog#. A stick. Sixty sheep out there and you bring me the one thing on this hill that has never run from anyone.", "A stick. For me. #dog#, I am touched, and I am going to throw it, and you are going to bring it back, and neither of those things is herding."]),
+  ...R(4, "stick", ["#oath_phrase#, #dog#, a stick! A STICK! I asked for sheep and you have brought me KINDLING!", "#pantheon.cap#, the dog has brought me a stick with the face of one who has solved everything. Nothing is solved. It is a very good stick."]),
+  ...R(6, "stick", ["I accept this stick, #dog#, in the spirit in which it is offered: as an apology for everything else, and a very small one."]),
+  ...R(8, "stick", ["The dog brought a stick. It was a good stick. It was not a sheep. We both let it go."], { reg: ["hemingway"] }),
   // The dog, underfoot.
   ...R(0, "dogUnderfoot", ["DOG. Feet. MOVE.", "Dog. Rug. Same thing.", "Ow. DOG."]),
   ...R(2, "dogUnderfoot", ["The dog. Lying there. In the one place on this entire hill I was about to put my FOOT.", "#dog#, you have a whole county to lie down in and you chose my boots.", "Up. UP. You are a sheepdog, not a doormat, although I am beginning to see the resemblance."]),

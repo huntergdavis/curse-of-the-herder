@@ -465,6 +465,9 @@ export class Renderer {
   onCowNear: (() => void) | null = null;
   /** The hens have just scattered in front of him. */
   onHensScatter: (() => void) | null = null;
+  /** The dog has just dropped a stick at his feet. */
+  onStick: (() => void) | null = null;
+  private stick = { until: 0, x: 0, y: 0, restKey: -1 };
   private lastHenTick = -1e9;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
   private arrivals: { id: number; atMs: number }[] = [];
@@ -739,8 +742,31 @@ export class Renderer {
         d.y += d.vy;
         if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
       }
+      // When he sits down, the dog sometimes fetches him a stick. It is not a sheep. It is offered anyway.
+      if (h.mode === "resting" && this.stick.restKey !== h.restUntilTick && Math.hypot(d.x - h.x, d.y - h.y) < 2.5 && !world.finished) {
+        this.stick.restKey = h.restUntilTick;
+        if ((h.restUntilTick * 7919) % 100 < 45) {
+          this.stick.until = nowMs + 9000;
+          this.stick.x = h.x + (h.facing === 2 ? -0.7 : 0.7);
+          this.stick.y = h.y + 0.9;
+          d.react = "stick";
+          d.reactUntil = nowMs + 2500;
+          this.onStick?.();
+        }
+      }
+      if (nowMs < this.stick.until) {
+        ctx.strokeStyle = "#6b4a2a";
+        ctx.lineWidth = Math.max(1.5, T * 0.05);
+        ctx.beginPath();
+        ctx.moveTo(sx(this.stick.x + 0.3), sy(this.stick.y) - T * 0.04);
+        ctx.lineTo(sx(this.stick.x + 0.75), sy(this.stick.y) - T * 0.14);
+        ctx.moveTo(sx(this.stick.x + 0.55), sy(this.stick.y) - T * 0.1);
+        ctx.lineTo(sx(this.stick.x + 0.62), sy(this.stick.y) - T * 0.2);
+        ctx.stroke();
+      }
       // Reactions: bolt from a wasp, one bark at a runaway, then lose interest.
       const reacting = nowMs < d.reactUntil;
+      if (reacting && d.react === "stick" && Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.75, "stick!");
       if (reacting && d.react === "wasp") {
         d.x += (d.facing === 0 ? -1 : 1) * 0.06;
         d.vx = (d.facing === 0 ? -1 : 1) * 0.06;

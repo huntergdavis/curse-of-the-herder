@@ -142,6 +142,11 @@ async function startSession(world: WorldState): Promise<void> {
     if (u) say(session, u.text, u.heat, u.seconds, performance.now(), false, u);
     if (u) maybeCurseRemarks(session, "inn", performance.now());
   };
+  renderer.onStick = () => {
+    if (!session) return;
+    const u = speakKind(session.world, session.map, "stick", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.2);
+    if (u) say(session, u.text, u.heat, u.seconds, performance.now() + 1500, true, u);
+  };
   renderer.onHensScatter = () => {
     if (!session || keyedUnit(session.world.seed, "hens-say", session.world.tick) > 0.5) return;
     const u = speakKind(session.world, session.map, "hens", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.3);
