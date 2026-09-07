@@ -513,6 +513,7 @@ export class Renderer {
   forceWave = false;
   /** Current fast-forward factor, so per-frame motion (the dog) keeps up with the sim. */
   fast = 1;
+  private lastFrameMs = 0;
   /** Whoever is passing this frame, real or finale, for the wave. */
   private rivalNow: { x: number; y: number } | null = null;
   /** He has walked up to a cow; the caller may have him say something about it. */
@@ -539,6 +540,9 @@ export class Renderer {
   draw(world: WorldState, cam: Camera, bubbles: Bubbles, nowMs: number): void {
     const ctx = this.ctx;
     const T = this.tilePx;
+    // Real seconds since the last frame, for per-frame motion that must keep pace with the sim at any speed or fps.
+    const frameDt = this.lastFrameMs > 0 ? Math.min(0.5, Math.max(0.001, (nowMs - this.lastFrameMs) / 1000)) : 1 / 60;
+    this.lastFrameMs = nowMs;
     // Terrain layer health: after a failure, come back up a mode once in a while; otherwise re-probe a cached chunk every few seconds.
     if (this.chunkMode !== "offscreen" && nowMs > this.chunkRetryAtMs && this.chunkRetryAtMs > 0) {
       this.chunkMode = "offscreen";
@@ -804,9 +808,10 @@ export class Renderer {
         }
       }
       if (!chasing && (moving || dist > (world.finished ? 0.3 : 3))) {
-        // At fast-forward the dog would fall behind a per-frame ease; scale the ease and snap if he still gets away.
-        const k = 1 - Math.exp(-(1 / 60) * 3.2 * Math.min(12, this.fast));
-        if (dist > 6 + 2 * Math.min(12, this.fast)) {
+        // Ease in real time, scaled by the fast-forward factor, so the dog keeps up at any speed or frame rate;
+        // if the herder still gets away (a catch-up burst, a snap of the camera) the dog snaps to heel.
+        const k = 1 - Math.exp(-frameDt * 3.2 * this.fast);
+        if (dist > (this.fast <= 1 ? 8 : 4 + 0.1 * this.fast)) {
           d.x = targetX;
           d.y = targetY;
         }
