@@ -48,7 +48,7 @@ export const NON_TERMINALS_5_8: NonTerminal[] = [
     options: [
       { t: "thou art #adj#", weight: 3 },
       { t: "thy wool offends the very #noun#", weight: 1 },
-      { t: "mine #bodypart# do ache", weight: 2 },
+      { t: "my #bodypart# do ache", weight: 2 },
       { t: "the #target# is #adj# and I am #selfadj#", weight: 2 },
       { t: "#remaining# sheep yet roam", weight: 2 },
       { t: "thou hast #verb.ed# enough", weight: 1 },
@@ -160,7 +160,7 @@ export const RULES_5_8: Rule[] = [
   ], BARD),
   ...R(6, "book", ["A book! #oath.cap#, I shall read, and be the more eloquent in my #abstract#.", "Soft, what words are these? Ill words, I hope, for the #target#.", "Marry, a book. I shall learn a phrase and spend it on a sheep."], BARD),
   ...R(6, "dusk", ["The light doth fail, and #remaining# sheep do not.", "Dusk, #oath#, and I am #selfadj# as #simile#."], BARD),
-  ...R(6, "breather", ["I sit. #oath.cap#, mine #bodypart# thank me; the #target# does not.", "A moment's rest, ere I #verb# again into #abstract#."], BARD),
+  ...R(6, "breather", ["I sit. #oath.cap#, my #bodypart# thank me; the #target# does not.", "A moment's rest, ere I #verb# again into #abstract#."], BARD),
   ...R(6, "walkOfShame", ["Past the pen, empty-handed, like #simile#. Look not upon me, #insult.pl#.", "#oath.cap#, I pass mine own pen with nothing. The sheep within do smirk."], BARD),
   ...R(6, "rain", ["Rain! #oath.cap#, the heavens are #adj# too!", "It rains, and I am #selfadj#, and the #target# is more #adj#."], BARD),
   ...R(6, "finished", ["#oath.cap#. All in. #penned.cap# sheep, and I, #adj# as #simile#, am done.", "The last is penned. Fie upon this day, and good night."], BARD),
