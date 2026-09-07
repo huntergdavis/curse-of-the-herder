@@ -31,6 +31,8 @@ export class Renderer {
   private houses: { x: number; y: number }[] = [];
   /** Villagers stand by their wells; each remembers when it last heard something. */
   private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }[] = [];
+  /** Hens by the houses: peck, scatter when he stomps through, come back. */
+  private hens: { hx: number; hy: number; x: number; y: number; fleeUntil: number; fx: number; fy: number }[] = [];
   /** Cows: one per village and one by the pen, chewing, explaining the cowpats. */
   private cows: { x: number; y: number; facing: number; variant: number; lastTick?: number }[] = [];
 
@@ -55,6 +57,17 @@ export class Renderer {
       if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
       if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3, offences: 0 });
     }
+    this.hens = [];
+    this.houses.forEach((hs, k) => {
+      if (k % 3 !== 0 || this.hens.length >= 24) return;
+      for (let j = 0; j < 2; j++) {
+        const x = hs.x + (j === 0 ? -1.2 : 1.4) + ((k * 7 + j * 3) % 5) * 0.15;
+        const y = hs.y + 1.3 + ((k * 3 + j) % 4) * 0.2;
+        const i = Math.round(y) * n + Math.round(x);
+        if (this.map.terrain[i] === Terrain.Water || this.map.deco[i] === Deco.House || this.map.deco[i] === Deco.HouseRed) continue;
+        this.hens.push({ hx: x, hy: y, x, y, fleeUntil: 0, fx: x, fy: y });
+      }
+    });
     this.cows = [];
     const spots = [...this.villagers.map((v) => ({ x: v.x, y: v.y })), { x: this.map.pen.x, y: this.map.pen.y }];
     spots.forEach((sp, k) => {
@@ -75,6 +88,59 @@ export class Renderer {
         }
       }
     });
+  }
+
+  /** A hen: a small brown comma with opinions. */
+  private drawHen(px: number, py: number, T: number, facing: number, fleeing: boolean, nowMs: number): void {
+    const ctx = this.ctx;
+    const flip = facing === 2 ? -1 : 1;
+    const peck = fleeing ? 0 : Math.max(0, Math.sin(nowMs / 260)) * T * 0.04;
+    const flap = fleeing ? Math.sin(nowMs / 60) * T * 0.05 : 0;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(flip, 1);
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, T * 0.14, T * 0.04, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#2b2620";
+    ctx.lineWidth = Math.max(1, T * 0.03);
+    // Legs
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.03, -T * 0.02);
+    ctx.lineTo(-T * 0.03, -T * 0.12);
+    ctx.moveTo(T * 0.04, -T * 0.02);
+    ctx.lineTo(T * 0.04, -T * 0.12);
+    ctx.stroke();
+    // Body
+    ctx.fillStyle = "#8a5a3a";
+    ctx.beginPath();
+    ctx.ellipse(0, -T * 0.2 - flap, T * 0.15, T * 0.11, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.12, -T * 0.24 - flap);
+    ctx.lineTo(-T * 0.2, -T * 0.34 - flap);
+    ctx.stroke();
+    // Head
+    ctx.beginPath();
+    ctx.arc(T * 0.13, -T * 0.3 + peck, T * 0.06, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Comb and beak
+    ctx.fillStyle = "#c0392b";
+    ctx.beginPath();
+    ctx.arc(T * 0.12, -T * 0.36 + peck, T * 0.025, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#e0a030";
+    ctx.beginPath();
+    ctx.moveTo(T * 0.18, -T * 0.3 + peck);
+    ctx.lineTo(T * 0.24, -T * 0.28 + peck);
+    ctx.lineTo(T * 0.18, -T * 0.26 + peck);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
 
   /** A cow. It is not his problem and it knows it. */
@@ -881,6 +947,23 @@ export class Renderer {
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
+    for (const hen of this.hens) {
+      if (Math.abs(hen.x - cam.x) * T > W + T || Math.abs(hen.y - cam.y) * T > H + T) continue;
+      const d = Math.hypot(hen.x - h.x, hen.y - h.y);
+      if (d < 2.2 && nowMs > hen.fleeUntil) {
+        hen.fleeUntil = nowMs + 2600;
+        const ang = Math.atan2(hen.y - h.y, hen.x - h.x) + (Math.random() - 0.5) * 0.8;
+        hen.fx = hen.hx + Math.cos(ang) * 2.4;
+        hen.fy = hen.hy + Math.sin(ang) * 1.6;
+      }
+      const fleeing = nowMs < hen.fleeUntil;
+      const tx = fleeing ? hen.fx : hen.hx;
+      const ty = fleeing ? hen.fy : hen.hy;
+      hen.x += (tx - hen.x) * (fleeing ? 0.18 : 0.03);
+      hen.y += (ty - hen.y) * (fleeing ? 0.18 : 0.03);
+      this.drawHen(sx(hen.x + 0.5), sy(hen.y + 0.9), T, tx >= hen.x ? 0 : 2, fleeing, nowMs);
+      if (fleeing && Math.floor(nowMs / 400) % 3 === 0) drawEmote(ctx, sx(hen.x + 0.5) + T * 0.2, sy(hen.y + 0.9) - T * 0.55, T * 0.55, "!");
+    }
     for (const c of this.cows) {
       if (Math.abs(c.x - cam.x) * T > W + T * 2 || Math.abs(c.y - cam.y) * T > H + T * 2) continue;
       const near = Math.hypot(c.x - h.x, c.y - h.y) < 3.5;
