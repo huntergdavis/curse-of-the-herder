@@ -345,6 +345,10 @@ function handleEvents(s: Session, nowMs: number): void {
       void vocabEl.offsetWidth;
       vocabEl.classList.add("pop");
     }
+    // The grudge is made official for the audience.
+    if (e.kind === "nemesis") s.renderer.wanted = sheepName(w.seed, e.sheepId);
+    if (e.kind === "nemesis") toast(`<strong>Nemesis declared:</strong> ${escapeHtml(sheepName(w.seed, e.sheepId))}, three flights and counting. He has a look in his eye.`);
+    if (e.kind === "nemesisCaught") toast(`<strong>Nemesis caught:</strong> ${escapeHtml(sheepName(w.seed, e.sheepId))}, after ${e.detail ?? "several"} flights. He will talk about this for years.`);
     // The neighbour takes a while to pass; a second remark as he leaves.
     if (e.kind === "rival") {
       const line = speakForEvent(w, s.map, { ...e, kind: "rivalGone", seq: e.seq * 10 + 7 }, { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP);
