@@ -41,6 +41,7 @@ long soak.
 - Sheep temperaments (dozy, curious, stubborn), the crook breaking once a day, sheep of the day, wind weather
 - Lunch beat, frustration arc rebalanced (mean 28 at 09:00 to 87 at 17:00), English-only verb slots, ?weather pin
 - Boulder sheep, the black sheep, miscounting, reduced-motion and text-size settings, culinary pack and bonus books (Cook's Oracle, Geology, Burns, Bierce, Rabelais), Molière and Cervantes lines, CONTRIBUTING and PR template
+- Milestone beats (halfway, ten to go, one to go), named sheep on Hall records, rule-recency variety control
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
