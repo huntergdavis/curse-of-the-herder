@@ -6,7 +6,7 @@ test("a compressed day starts, the herder pens sheep, and nothing external is fe
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("request", (r) => {
     const u = new URL(r.url());
-    if (u.hostname !== "localhost" && !/fonts\.(googleapis|gstatic)\.com$/.test(u.hostname)) external.push(r.url());
+    if (u.hostname !== "localhost") external.push(r.url());
   });
   await page.goto("?fast=120&new=1");
   await expect(page.locator("#hud-name")).not.toHaveText("Curse of the Herder", { timeout: 60_000 });

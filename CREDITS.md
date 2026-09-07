@@ -1,9 +1,15 @@
 # Credits and Third-Party Sources
 
-Nothing third-party has been imported yet. When an asset lands in
-`public/`, add a row with the exact bundle, its SHA-256, the snapshot
-date and the license. See `docs/research/ART.md` for the approved,
-conditional and rejected lists.
+When an asset lands in `public/`, add a row with the exact bundle, the
+snapshot date and the license. See `docs/research/ART.md` for the
+approved, conditional and rejected lists.
+
+| Asset | Files | License | Snapshot |
+| --- | --- | --- | --- |
+| Fredoka (variable, latin subset) by Milena Brandão and Hafontia | `public/fonts/Fredoka-400.woff2` | SIL OFL 1.1 (`public/fonts/OFL.txt`) | Google Fonts, 2026-09-06 |
+| Patrick Hand (latin subset) by Patrick Wagesreiter | `public/fonts/PatrickHand-400.woff2` | SIL OFL 1.1 (`public/fonts/OFL.txt`) | Google Fonts, 2026-09-06 |
+
+All terrain, sprites, UI and the tombstone are drawn procedurally in code.
 
 ## Planned attributions
 

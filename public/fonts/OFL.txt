@@ -1,0 +1,9 @@
+The fonts in this directory are licensed under the SIL Open Font License, Version 1.1.
+
+- Fredoka (Copyright 2021 The Fredoka Project Authors, https://github.com/hafontia-zz/Fredoka-One)
+- Patrick Hand (Copyright (c) 2010-2012 by Patrick Wagesreiter (mail@patrickwagesreiter.at))
+
+The full license text is available at https://openfontlicense.org and is
+reproduced here in summary: the fonts may be used, studied, modified and
+redistributed freely as long as they are not sold by themselves; modified
+versions may not use the Reserved Font Names.

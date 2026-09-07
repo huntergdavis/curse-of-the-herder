@@ -70,9 +70,13 @@ export class Grammar {
     return w;
   }
 
-  generate(event: RuleEvent, ctx: Context, salt = 0): GenerateResult | null {
+  generate(event: RuleEvent, ctx: Context, salt = 0, opts: { minTier?: number } = {}): GenerateResult | null {
     const rnd = mulberry32(fnv1a(`${ctx.seed}|${event}|${ctx.tick}|${salt}`));
-    const candidates = (this.rulesByEvent.get(event) ?? []).filter((r) => this.ruleAllowed(r, ctx));
+    let candidates = (this.rulesByEvent.get(event) ?? []).filter((r) => this.ruleAllowed(r, ctx));
+    if (opts.minTier !== undefined) {
+      const top = candidates.filter((r) => r.tier >= opts.minTier!);
+      if (top.length) candidates = top;
+    }
     if (candidates.length === 0) return null;
     for (let attempt = 0; attempt < 6; attempt++) {
       const rule = this.pickRule(candidates, ctx, rnd);
@@ -230,7 +234,7 @@ const TIME_PHRASES: [number, string[]][] = [
   [12, ["before noon", "with the sun climbing", "all morning", "on a perfectly good morning"]],
   [14, ["at midday", "with the sun straight up", "at lunch, which I have not had", "in the heat of the day"]],
   [16.5, ["all afternoon", "at this stage of the afternoon", "with the shadows getting long", "past teatime"]],
-  [18, ["at dusk", "with the light going", "at the fag end of the day", "as the sun gives up on me"]],
+  [18, ["at dusk", "with the light going", "at the tail end of the day", "as the sun gives up on me"]],
   [99, ["in the dark", "at night", "by moonlight, apparently", "after hours"]],
 ];
 
@@ -241,7 +245,10 @@ function timePhrase(hour: number, rnd: () => number): string {
 
 const BIG_NUMBERS = ["ten thousand", "a hundred", "forty", "seven", "a thousand", "twelve", "ninety-nine", "a million", "eleven", "several hundred"];
 
+const NO_STATS = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
+
 function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string | null {
+  const stats = ctx.stats ?? NO_STATS;
   switch (symbol) {
     case "target":
       return ctx.target.noun;
@@ -273,6 +280,18 @@ function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string 
       return BIG_NUMBERS[Math.floor(rnd() * BIG_NUMBERS.length)]!;
     case "hour":
       return numberWord(Math.max(1, Math.round(ctx.hour - 9)));
+    case "flees":
+      return numberWord(stats.flees);
+    case "fleesNth":
+      return ordinalWord(Math.max(1, stats.flees));
+    case "absurds":
+      return numberWord(stats.absurds);
+    case "rains":
+      return numberWord(stats.rains);
+    case "rainsNth":
+      return ordinalWord(Math.max(1, stats.rains));
+    case "shames":
+      return numberWord(stats.shames);
     default:
       return null;
   }

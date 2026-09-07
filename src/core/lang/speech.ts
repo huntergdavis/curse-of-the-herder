@@ -4,7 +4,10 @@
 import { CORE_PACKS } from "../../data/lexicon/core-packs";
 import { NON_TERMINALS, RULES } from "../../data/grammar/tiers-0-4";
 import { NON_TERMINALS_5_8, RULES_5_8 } from "../../data/grammar/tiers-5-8";
+import { CALLBACK_RULES } from "../../data/grammar/callbacks";
 import { PACKS_5_8 } from "../../data/lexicon/packs-5-8";
+import { PACKS_9_12 } from "../../data/lexicon/packs-9-12";
+import { NON_TERMINALS_9_12, RULES_9_12 } from "../../data/grammar/tiers-9-12";
 import { Terrain } from "../map/terrain";
 import type { GameMap } from "../map/generate";
 import { sheepName } from "../names";
@@ -22,8 +25,8 @@ export interface Utterance {
   ruleId: string;
 }
 
-const packs = [...CORE_PACKS, ...PACKS_5_8].filter((p) => p.reviewedAt);
-export const grammar = new Grammar(packs, [...RULES, ...RULES_5_8], [...NON_TERMINALS, ...NON_TERMINALS_5_8]);
+const packs = [...CORE_PACKS, ...PACKS_5_8, ...PACKS_9_12].filter((p) => p.reviewedAt);
+export const grammar = new Grammar(packs, [...RULES, ...RULES_5_8, ...RULES_9_12, ...CALLBACK_RULES], [...NON_TERMINALS, ...NON_TERMINALS_5_8, ...NON_TERMINALS_9_12]);
 
 const SIGNATURE_WORDS = ["turnip", "bucket", "parsnip", "cabbage", "sock", "thistle", "puddle", "trough", "wheelbarrow", "stile", "haystack", "pebble"];
 
@@ -82,6 +85,7 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
     recent,
     knownPacks: w.knownPacks,
     villageName: nearest.name,
+    stats: w.stats,
   };
 }
 
@@ -96,6 +100,7 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   walkOfShame: "walkOfShame",
   breather: "breather",
   rain: "rain",
+  bookPassed: "bookPassed",
 };
 
 function holdSeconds(text: string, heat: number): number {
@@ -121,7 +126,8 @@ export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap
   let ev: RuleEvent = "idle";
   const u = keyedUnit(w.seed, "idle-kind", w.tick);
   if (hour >= 16.5 && u < 0.3) ev = "dusk";
-  const r = grammar.generate(ev, ctx);
+  else if (u > 0.92 && (w.stats.flees + w.stats.rains + w.stats.shames + w.stats.absurds) >= 2) ev = "callback";
+  const r = grammar.generate(ev, ctx) ?? grammar.generate("idle", ctx);
   if (!r) return null;
   return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
 }
@@ -130,7 +136,11 @@ export function speakEpitaph(w: WorldState, map: GameMap, recent: string[], band
   const ctx = buildContext(w, map, null, recent, bandCap);
   ctx.heat = 1;
   ctx.band = Math.min(bandCap, 4) as Band;
-  const r = grammar.generate("epitaph", ctx) ?? { text: "Sheep.", ruleId: "fallback", tier: 0 };
+  // A stone has room for about a hundred characters, and deserves his best tiers.
+  const opts = { minTier: Math.max(0, ctx.level - 1) };
+  let r = grammar.generate("epitaph", ctx, 0, opts);
+  for (let salt = 1; (!r || r.text.length > 110) && salt < 12; salt++) r = grammar.generate("epitaph", ctx, salt, opts);
+  if (!r || r.text.length > 110) r = { text: "Sheep.", ruleId: "fallback", tier: 0 };
   return { text: r.text, heat: 1, seconds: 30, ruleId: r.ruleId };
 }
 

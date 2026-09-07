@@ -117,8 +117,9 @@ function fleeTo(w: WorldState, map: GameMap, s: SheepState): void {
     const i = y * map.size + x;
     if (!isWalkable(map.terrain[i]!) || !Number.isFinite(map.penDistance[i]!)) continue;
     if (map.deco[i] === Deco.Fence || map.deco[i] === Deco.PenGround || map.deco[i] === Deco.House || map.deco[i] === Deco.HouseRed) continue;
-    s.x = x;
-    s.y = y;
+    s.tx = x;
+    s.ty = y;
+    s.speed = 3.2;
     void len;
     return;
   }
@@ -130,16 +131,33 @@ function stepSheep(w: WorldState, map: GameMap): void {
     if (s.mode !== "loose") continue;
     const d = Math.hypot(s.x - h.x, s.y - h.y);
     if (!s.seen && d < SEE_RADIUS) s.seen = true;
-    // Wander a tile within the leash now and then.
+    // Move toward the current target at the current speed.
+    const dx = s.tx - s.x;
+    const dy = s.ty - s.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 1e-3) {
+      const stepLen = Math.min(dist, (s.speed || 0.6) * TICK_SECONDS);
+      s.x += (dx / dist) * stepLen;
+      s.y += (dy / dist) * stepLen;
+      if (stepLen >= dist - 1e-6) {
+        s.x = s.tx;
+        s.y = s.ty;
+        s.speed = 0;
+      }
+      continue;
+    }
+    // Stranded sheep stay stranded; the others amble a tile within the leash now and then.
+    if (s.absurd) continue;
     if (w.tick % 40 === s.id % 40 && keyedUnit(w.seed, "wander", s.id, w.tick) < 0.5 && d > 3) {
       const dir = Math.floor(keyedUnit(w.seed, "wander-dir", s.id, w.tick) * 4);
-      const nx = s.x + [1, -1, 0, 0][dir]!;
-      const ny = s.y + [0, 0, 1, -1][dir]!;
+      const nx = Math.round(s.x) + [1, -1, 0, 0][dir]!;
+      const ny = Math.round(s.y) + [0, 0, 1, -1][dir]!;
       if (Math.abs(nx - s.homeX) <= 2 && Math.abs(ny - s.homeY) <= 2 && nx > 0 && ny > 0 && nx < map.size - 1 && ny < map.size - 1) {
         const i = ny * map.size + nx;
-        if (isWalkable(map.terrain[i]!) && map.deco[i] !== Deco.Fence && map.deco[i] !== Deco.House && map.deco[i] !== Deco.HouseRed) {
-          s.x = nx;
-          s.y = ny;
+        if (isWalkable(map.terrain[i]!) && map.deco[i] !== Deco.Fence && map.deco[i] !== Deco.House && map.deco[i] !== Deco.HouseRed && map.deco[i] !== Deco.Library) {
+          s.tx = nx;
+          s.ty = ny;
+          s.speed = 0.6;
         }
       }
     }
@@ -241,6 +259,7 @@ function finishReading(w: WorldState): void {
     if (lib) lib.taken = true;
     const book = BOOK_BY_ID.get(r.bookId);
     w.booksRead++;
+    w.stats.books++;
     addFrustration(w, FRUSTRATION.book);
     if (book?.pack && !w.knownPacks.includes(book.pack)) w.knownPacks.push(book.pack);
     if (book?.register) {
@@ -270,6 +289,7 @@ function stepWeather(w: WorldState): void {
     const u = keyedUnit(w.seed, "weather", w.tick);
     if (u < 0.45 && !w.rainUntilTick) {
       w.rainUntilTick = w.tick + 8 * 60 * 4 + Math.floor(keyedUnit(w.seed, "rain-len", w.tick) * 14 * 60 * 4);
+      w.stats.rains++;
       pushEvent(w, { tick: w.tick, kind: "rain", sheepId: -1 });
     }
     w.nextWeatherTick = w.tick + 30 * 60 * 4 + Math.floor(keyedUnit(w.seed, "weather-gap", w.tick) * 50 * 60 * 4);
@@ -292,6 +312,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
     // A breather when he is fuming and empty-handed.
     if (w.frustration >= 60 && w.tick - w.lastBreatherTick > BREATHER_COOLDOWN && keyedUnit(w.seed, "breather", w.tick) < 0.5) {
       w.lastBreatherTick = w.tick;
+      w.stats.breathers++;
       h.mode = "resting";
       h.restUntilTick = w.tick + BREATHER_TICKS;
       addFrustration(w, FRUSTRATION.breather);
@@ -309,7 +330,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
       pushEvent(w, { tick: w.tick, kind: "finished", sheepId: -1 });
       return;
     }
-    if (!planPath(w, map, target.x, target.y)) {
+    if (!planPath(w, map, Math.round(target.x), Math.round(target.y))) {
       // Unreachable: treat as lost to the hills so the day can still end.
       target.mode = "penned";
       w.sheepPenned++;
@@ -339,6 +360,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
     h.tripTiles++;
     if (h.carrying < 0 && h.mode === "toSheep" && h.tripTiles > 30 && w.tick - w.lastShameTick > SHAME_COOLDOWN && Math.hypot(tx - map.pen.x, ty - map.pen.y) <= SHAME_RADIUS && h.path.length > 12) {
       w.lastShameTick = w.tick;
+      w.stats.shames++;
       addFrustration(w, FRUSTRATION.walkOfShame);
       pushEvent(w, { tick: w.tick, kind: "walkOfShame", sheepId: -1 });
     }
@@ -380,6 +402,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
       const hourFactor = 1 + w.tick / (4 * 3600 * 4) * 0.3; // later in the day, twitchier
       if (s.flees < MAX_FLEES && keyedUnit(w.seed, "flee", s.id, s.flees, w.tick) < s.skittish * 0.5 * hourFactor) {
         s.flees++;
+        w.stats.flees++;
         fleeTo(w, map, s);
         if (s.flees >= 2) {
           addFrustration(w, FRUSTRATION.repeatEscape);
@@ -390,7 +413,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
           pushEvent(w, { tick: w.tick, kind: "flee", sheepId: s.id });
         }
         h.approachCount = 0;
-        if (!planPath(w, map, s.x, s.y)) h.mode = "idle";
+        if (!planPath(w, map, Math.round(s.tx), Math.round(s.ty))) h.mode = "idle";
         return;
       }
     }
@@ -401,6 +424,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
         h.carrying = s.id;
         h.carryOdometer = 0;
         if (s.absurd) {
+          w.stats.absurds++;
           addFrustration(w, FRUSTRATION.absurdLocation);
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
         } else {
@@ -408,7 +432,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
         }
         if (planPath(w, map, map.pen.x, map.pen.y)) h.mode = "toPen";
         else h.mode = "idle";
-      } else if (!planPath(w, map, s.x, s.y)) {
+      } else if (!planPath(w, map, Math.round(s.tx), Math.round(s.ty))) {
         h.mode = "idle";
       }
     }
@@ -417,13 +441,25 @@ function stepHerder(w: WorldState, map: GameMap): void {
     if (s) {
       s.x = h.x;
       s.y = h.y;
+      s.tx = h.x;
+      s.ty = h.y;
+    }
+    // A book he cannot stop for.
+    if (w.tick % 8 === 0 && w.tick - w.lastBookPassTick > 10 * 60 * 4) {
+      const lib = nearbyLibrary(w);
+      if (lib >= 0 && Math.hypot(w.libraries[lib]!.x - h.x, w.libraries[lib]!.y - h.y) < 6) {
+        w.lastBookPassTick = w.tick;
+        pushEvent(w, { tick: w.tick, kind: "bookPassed", sheepId: -1 });
+      }
     }
     if (h.path.length === 0 && Math.hypot(h.x - map.pen.x, h.y - map.pen.y) < 0.75) {
       if (s) {
         s.mode = "penned";
         const k = w.sheepPenned;
-        s.x = map.pen.x - 1 + (k % 3);
-        s.y = map.pen.y - 1 + (Math.floor(k / 3) % 3);
+        s.x = map.pen.x - 1.2 + (k % 4) * 0.8 + keyedUnit(w.seed, "pen-x", k) * 0.3;
+        s.y = map.pen.y - 1.1 + (Math.floor(k / 4) % 4) * 0.7 + keyedUnit(w.seed, "pen-y", k) * 0.3;
+        s.tx = s.x;
+        s.ty = s.y;
         w.sheepPenned++;
         pushEvent(w, { tick: w.tick, kind: "penned", sheepId: s.id });
       }

@@ -27,6 +27,11 @@ export interface SheepState {
   seen: boolean;
   ring: number;
   named: boolean;
+  /** Where it is ambling to (fractional tiles); equal to x,y when idle. */
+  tx: number;
+  ty: number;
+  /** Tiles per second while moving; fleeing is fast. */
+  speed: number;
 }
 
 export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading";
@@ -67,7 +72,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed";
   sheepId: number;
   bookId?: string;
 }
@@ -109,6 +114,8 @@ export interface WorldState {
   lastShameTick: number;
   lastBreatherTick: number;
   longestLine: string;
+  lastBookPassTick: number;
+  stats: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
 }
 
 export const MAX_EVENTS = 16;
@@ -172,6 +179,9 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
         seen: false,
         ring: r,
         named: false,
+        tx: x,
+        ty: y,
+        speed: 0,
       });
     }
   });
@@ -222,6 +232,8 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     lastShameTick: -100000,
     lastBreatherTick: -100000,
     longestLine: "",
+    lastBookPassTick: -100000,
+    stats: { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 },
   };
 }
 
@@ -312,6 +324,11 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["totalWork"] !== "number") o["totalWork"] = 0;
     const h = o["herder"] as Record<string, unknown> | undefined;
     if (h && typeof h["tripTiles"] !== "number") h["tripTiles"] = 0;
+    if (typeof o["lastBookPassTick"] !== "number") o["lastBookPassTick"] = -100000;
+    if (!o["stats"]) o["stats"] = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
+    for (const sh of (o["sheep"] as Record<string, unknown>[]) ?? []) {
+      if (typeof sh["tx"] !== "number") { sh["tx"] = sh["x"]; sh["ty"] = sh["y"]; sh["speed"] = 0; }
+    }
   }
   assertWorld(o);
   return o;

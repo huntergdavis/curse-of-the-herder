@@ -29,6 +29,7 @@ function ctx(level: number, band: Band, tick = 1): Context {
     recent: [],
     knownPacks: [],
     villageName: "Muttonham",
+    stats: { flees: 3, absurds: 1, shames: 2, rains: 1, breathers: 0, books: 5 },
   };
 }
 

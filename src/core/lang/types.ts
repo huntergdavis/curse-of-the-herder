@@ -38,7 +38,7 @@ export interface LexEntry {
   tombstoneSafe?: boolean;
 }
 
-export type RuleEvent = "idle" | "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "finished" | "book" | "epitaph" | "rain" | "dusk" | "walkOfShame" | "breather";
+export type RuleEvent = "idle" | "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "finished" | "book" | "epitaph" | "rain" | "dusk" | "walkOfShame" | "breather" | "bookPassed" | "callback";
 
 export interface Rule {
   id: string;
@@ -90,4 +90,6 @@ export interface Context {
   /** Words the herder has learned from books, in addition to level-unlocked packs. */
   knownPacks: string[];
   villageName: string;
+  /** Running tallies for callbacks (optional so simple test contexts stay small). */
+  stats?: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
 }

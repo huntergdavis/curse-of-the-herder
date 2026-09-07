@@ -101,11 +101,44 @@ export class Renderer {
         this.drawHerder(world, sx, sy, T, phase, nowMs);
         herderDrawn = true;
       }
-      const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : "idle";
-      const facing = s.x < h.x ? 0 : 2;
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + 0.5), T * 0.9, pose, facing, phase, s.named);
+      const moving = s.mode === "loose" && (Math.abs(s.tx - s.x) > 1e-3 || Math.abs(s.ty - s.y) > 1e-3);
+      const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : "idle";
+      const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
+      const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
+      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + 0.5), T * 0.9, pose, facing, walkPhase, s.named);
+      // Stranded sheep look faintly puzzled about it, now and then.
+      if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
+
+    // The stone beside the pen, once the day is done.
+    if (world.finished) {
+      const gx = sx(this.map.pen.x + 3.2);
+      const gy = sy(this.map.pen.y + 0.9);
+      ctx.fillStyle = "rgba(0,0,0,0.2)";
+      ctx.beginPath();
+      ctx.ellipse(gx, gy, T * 0.45, T * 0.12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#a9a59b";
+      ctx.strokeStyle = "#2b2620";
+      ctx.lineWidth = Math.max(1, T * 0.05);
+      ctx.beginPath();
+      ctx.moveTo(gx - T * 0.36, gy);
+      ctx.lineTo(gx - T * 0.36, gy - T * 0.7);
+      ctx.arc(gx, gy - T * 0.7, T * 0.36, Math.PI, 0);
+      ctx.lineTo(gx + T * 0.36, gy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(43,38,32,0.45)";
+      ctx.lineWidth = Math.max(1, T * 0.035);
+      ctx.beginPath();
+      for (let k = 0; k < 3; k++) {
+        ctx.moveTo(gx - T * 0.2, gy - T * 0.55 + k * T * 0.14);
+        ctx.lineTo(gx + T * 0.2, gy - T * 0.55 + k * T * 0.14);
+      }
+      ctx.stroke();
+    }
 
     // Emotes above sheep.
     for (const b of bubbles.list) {
@@ -156,10 +189,24 @@ export class Renderer {
     }
 
     // Day tint over the world, under the bubble.
-    const tint = dayTint(this.hourOverride ?? dayHour(world));
+    const hour = this.hourOverride ?? dayHour(world);
+    const tint = dayTint(hour);
     if (!tint.endsWith("0)") && !tint.endsWith("0.000)")) {
       ctx.fillStyle = tint;
       ctx.fillRect(0, 0, W, H);
+    }
+    // Stars come out after half past six.
+    if (hour > 18.5) {
+      const a = Math.min(1, (hour - 18.5) / 1.2);
+      ctx.fillStyle = `rgba(255, 250, 230, ${(0.85 * a).toFixed(3)})`;
+      for (let i = 0; i < 90; i++) {
+        const px = ((i * 7919) % 1000) / 1000 * W;
+        const py = ((i * 104729) % 1000) / 1000 * H * 0.9;
+        const tw = 0.6 + 0.4 * Math.sin(nowMs / 700 + i);
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(1, T * 0.035) * tw, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     const line = bubbles.herderLine();
