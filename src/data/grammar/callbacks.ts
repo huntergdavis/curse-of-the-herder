@@ -106,7 +106,7 @@ export const CALLBACK_RULES: Rule[] = [
   // The old counting, as his grandfather did it.
   ...R(1, "penned", ["#yantancount.cap#. Old counting. Grandfather did it. Grandfather also miserable."], { weight: 0.5 }),
   ...R(2, "penned", ["#yantan.cap#. That is what the old shepherds would have called you, #vocative#. It means #penned#. It also means get IN.", "#yantancount.cap#. That is the old counting. My grandfather did it, and it did not make him any happier either."], { weight: 0.6 }),
-  ...R(3, "penned", ["#yantancount.cap#… and there I lose the old count and the new one both, and you are in, so nobody needs to know.", "#yantan.cap#, they would have said on the fells, and then a word I cannot say near a village, and then #yantan# again because the sheep had moved."], { weight: 0.6 }),
+  ...R(3, "penned", ["#yantancount.cap# and there I lose the old count and the new one both, and you are in, so nobody needs to know.", "#yantan.cap#, they would have said on the fells, and then a word I cannot say near a village, and then #yantan# again because the sheep had moved."], { weight: 0.6 }),
   ...R(6, "penned", ["#yantan.cap#. The old word for #penned#. Twenty words for counting sheep and none for what the sheep do to a man; the dales had their priorities."], { weight: 0.5 }),
   // The streak ends, as he said it would.
   ...R(0, "streakBroken", ["There. Knew it.", "And… gone.", "Told you. Told ME."]),
