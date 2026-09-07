@@ -57,7 +57,7 @@ Frame rate: the draw takes 1–3 ms on a MacBook Air (7 ms outliers), so the gam
      Sound: never.  P3: removed.  Web Worker: not planned.  Service worker: dropped.
      Keyboard shortcuts: skipped.  Second Jerome-style book: dropped.
 
- → Awaiting sign-off for 1.0.  On sign-off: bump package.json to 1.0.0, tag v1.0.0, deploy.
+ ✔ 1.0.0 released 2026-09-07 (tag v1.0.0). See CHANGELOG.md.
 ```
 
 ## How to check things

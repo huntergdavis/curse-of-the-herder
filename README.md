@@ -141,6 +141,8 @@ heap.
 
 ## Documents
 
+- `CHANGELOG.md` — what shipped in each release (1.0.0 on 2026-09-07).
+
 - [PLAN.md](PLAN.md): product and technical plan, build phases.
 - [BACKLOG.md](BACKLOG.md): prioritised work and the research index.
 - `docs/research/`:
