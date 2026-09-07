@@ -116,7 +116,7 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(8, "nemesis", ["Three times it ran. I stopped counting sheep and started counting that one."], { reg: ["hemingway"] }),
   // The enemy, on his shoulders at last.
   ...R(0, "nemesisCaught", ["GOT. YOU.", "Mine. MINE.", "Ha. HA."]),
-  ...R(2, "nemesisCaught", ["Got you. GOT you. #nth# time is the charm, #vocative#, and I am going to enjoy every step of this walk.", "You are heavier than you look and I hope that is guilt.", "Say goodbye to the hill, #vocative#. Say it. I will wait."]),
+  ...R(2, "nemesisCaught", ["Got you. GOT you. The charm, #vocative#, was patience, and I am going to enjoy every step of this walk.", "You are heavier than you look and I hope that is guilt.", "Say goodbye to the hill, #vocative#. Say it. I will wait."]),
   ...R(4, "nemesisCaught", ["#oath_phrase#, I have you at LAST, you #adj# #insult#, and if you so much as twitch I will carry you in a manner I cannot describe near a village!", "#pantheon.cap#, witness: the #adj# one, caught, by ME, with a #body_part# that is barely working."]),
   ...R(6, "nemesisCaught", ["Caught. Hold still, #vocative#; I want to remember the exact weight of you for when I am old and need something to smile about."]),
   ...R(8, "nemesisCaught", ["I had it. It did not struggle. It knew, the way they know."], { reg: ["hemingway"] }),

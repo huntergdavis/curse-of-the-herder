@@ -543,7 +543,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
       const hourFactor = 1 + w.tick / (4 * 3600 * 4) * 0.3; // later in the day, twitchier
       // The nemesis, once declared, lives up to it.
       const grudgeFactor = s.nemesis ? 1.6 : 1;
-      if (s.flees < MAX_FLEES && keyedUnit(w.seed, "flee", s.id, s.flees, w.tick) < s.skittish * 0.5 * hourFactor * grudgeFactor) {
+      if (s.flees < (s.nemesis ? MAX_FLEES + 2 : MAX_FLEES) && keyedUnit(w.seed, "flee", s.id, s.flees, w.tick) < s.skittish * 0.5 * hourFactor * grudgeFactor) {
         s.flees++;
         w.stats.flees++;
         if (w.streak >= 5) pushEvent(w, { tick: w.tick, kind: "streakBroken", sheepId: s.id, detail: String(w.streak) });
