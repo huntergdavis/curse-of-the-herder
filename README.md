@@ -77,6 +77,9 @@ in-game titles to real public-domain sources is in
   jailbreak in whispers before they go; runs of five and eight pennings
   without a flight are streaks he does not trust. At the pen he sometimes
   counts the old way: yan, tan, tethera, methera, pip.
+  Three days in four a sheep eats his lunch while he watches. Once a day,
+  after two, the dog actually herds a sheep to him, and nobody can explain
+  it; on other days it lies down exactly where his boot was going.
 - **Two axes drive every line.** *Eloquence* (level 0–12) comes from
   books; *frustration* (0–100) rises through the day with distance, rain,
   fleeing sheep and the walk of shame, and sets both curse frequency and
@@ -96,7 +99,9 @@ in-game titles to real public-domain sources is in
 - **Life on the map.** Villagers by the wells who gasp and answer back
   ("Language!"), a neighbour in a blue coat who strolls past every couple
   of hours with three sheep that follow him in a line (even the dog goes
-  to look), cows that explain the cowpats, loose sheep that drift over to
+  to look; on the third pass one of them bolts, and he is thrilled), hens
+  that scatter, an inn called the Cursed Ram that he walks past with
+  difficulty, cows that explain the cowpats, loose sheep that drift over to
   listen while he reads aloud, the Curse itself heckling from the
   sidelines, washing lines, roof cats, chimney smoke, scarecrows he
   envies, ducks with ducklings, frogs, fish, rabbits that bolt, owls and
