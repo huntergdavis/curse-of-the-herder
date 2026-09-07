@@ -27,6 +27,19 @@ export const CALLBACK_RULES: Rule[] = [
     "#flees.cap# ran. I counted. Counting is what you do when you cannot do anything else.",
     "It rained #rains# times. Each time it was rain. I did not expect it to be anything else.",
   ], { reg: ["hemingway"] }),
+  // Alliteration, generated rather than hard-coded (tier 9 and up).
+  ...R(9, "idle", [
+    "#bignum.cap# #adj.allit# #noun.allit.pl#!",
+    "#adj.allit.cap#, #adj.allit#, #adj.allit# #insult.allit#!",
+    "You #adj.allit# #insult.allit# of a #target#!",
+    "#oath.cap# and #adj.allit# #noun.allit.pl#, #vocative#, you #adj.allit# #insult.allit#!",
+    "#adj.allit.cap# #insult.allit.pl#, the lot of you! #adj.allit.cap# #insult.allit.pl#!",
+    "By all the #adj.allit# #noun.allit.pl# of #village#, stand STILL!",
+  ], { reg: ["nautical"] }),
+  ...R(9, "flee", ["#adj.allit.cap# #insult.allit#! Come back here!", "Stop, you #adj.allit#, #adj.allit# #insult.allit#!"], { reg: ["nautical"] }),
+  ...R(9, "caught", ["Got you, you #adj.allit# #insult.allit#.", "There, you #intensifier# #adj.allit# #insult.allit#. Home."], { reg: ["nautical"] }),
+  ...R(9, "penned", ["In, you #adj.allit# #insult.allit#, with the other #adj.allit# #insult.allit.pl#."], { reg: ["nautical"] }),
+  ...R(9, "epitaph", ["#adj.allit.cap#, #adj.allit#, #adj.allit#. Done.", "A #adj.allit# man among #adj.allit# #noun.allit.pl#."]),
   // Traps of the countryside. These are the lines that make a calm morning spike.
   ...R(0, "bog", ["Bog!", "Sinking. Sinking!", "#oath.cap#! Bog!", "Mud. To the knee. MUD."]),
   ...R(2, "bog", ["#oath.cap#, the bog has my boot. It can keep the boot. It cannot keep ME.", "I am in the bog to the knee. The sheep is not. The sheep never is.", "This is not mud. Mud lets go."], { }),

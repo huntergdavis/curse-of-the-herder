@@ -1,6 +1,7 @@
 // Sentence structures, tiers 0-4. See docs/research/SENTENCE_GRAMMAR.md.
 // #symbol# expands; modifiers: .cap .a .the .pl .up .s .ed .ing .poss
-// Context symbols: target targets name vocative you it time remaining penned nth books sig village bignum hour
+// Context symbols: target targets name vocative you it time remaining penned nth books sig village bignum hour dog
+// The .allit modifier makes every .allit slot in a line start with the same letter as the first one.
 import type { NonTerminal, Rule, RuleEvent } from "../../core/lang/types";
 
 const R = (tier: number, event: RuleEvent, templates: string[], extra: Partial<Rule> = {}): Rule[] =>

@@ -108,6 +108,7 @@ export class Grammar {
     for (let attempt = 0; attempt < 6; attempt++) {
       const rule = this.pickRule(candidates, ctx, rnd);
       this.usedThisLine = [];
+      this.allitLetter = null;
       const raw = this.expand(rule.template, ctx, rnd, 0, 4);
       if (raw === null) continue;
       let text = tidySentence(raw);
@@ -126,6 +127,8 @@ export class Grammar {
   }
 
   private usedThisLine: string[] = [];
+  /** First letter chosen by the first `.allit` slot in the current line; later `.allit` slots match it. */
+  private allitLetter: string | null = null;
 
   private ruleAllowed(r: Rule, ctx: Context): boolean {
     const minLevel = r.minLevel ?? r.tier;
@@ -159,17 +162,18 @@ export class Grammar {
         failed = true;
         return "";
       }
-      const value = this.resolve(symbol, ctx, rnd, depth, cap);
+      const wantAllit = mods.includes(".allit");
+      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit);
       if (value === null) {
         failed = true;
         return "";
       }
-      return applyModifiers(value.text, mods, value.entry);
+      return applyModifiers(value.text, mods.replace(".allit", ""), value.entry);
     });
     return failed ? null : out;
   }
 
-  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band): { text: string; entry?: LexEntry } | null {
+  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false): { text: string; entry?: LexEntry } | null {
     const contextual = contextSymbol(symbol, ctx, rnd);
     if (contextual !== null) return { text: contextual };
     const nt = this.nonTerminals.get(symbol);
@@ -197,10 +201,16 @@ export class Grammar {
       return { text: e.w, entry: e };
     }
     if (POS_SET.has(symbol as Pos)) {
-      const pool = (this.byPos.get(symbol) ?? []).filter((e) => this.entryAllowed(e, ctx, cap));
+      let pool = (this.byPos.get(symbol) ?? []).filter((e) => this.entryAllowed(e, ctx, cap));
       if (pool.length === 0) return null;
+      if (allit && this.allitLetter) {
+        const letter = this.allitLetter;
+        const matching = pool.filter((e) => e.w[0]?.toLowerCase() === letter);
+        if (matching.length) pool = matching;
+      }
       const weights = pool.map((e) => this.entryWeight(e, ctx));
       const e = pool[pickIndex(weights, rnd)]!;
+      if (allit && !this.allitLetter) this.allitLetter = e.w[0]?.toLowerCase() ?? null;
       this.usedThisLine.push(e.w);
       return { text: e.w, entry: e };
     }

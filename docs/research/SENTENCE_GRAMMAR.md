@@ -20,7 +20,7 @@ a few thousand words. The craft is in the structures.
 #F2:oath#                symbol restricted to filthiness band ≤ F2
 #L6:insult#              symbol restricted to level ≥ 6 packs
 [reg=bard]               set register for the rest of this expansion
-{alliterate:b}           constraint: pick words starting with 'b'
+#adj.allit#              modifier: all .allit slots in a line share the first slot's initial letter
 {syll=8}                 constraint: total syllables (for verse)
 {rhyme=#slot1#}          constraint: rhymes with an earlier slot
 ```

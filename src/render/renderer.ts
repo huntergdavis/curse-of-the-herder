@@ -224,7 +224,13 @@ export class Renderer {
   }
 
   /** The sheepdog: follows him about, sits when he sits, helps with nothing. */
-  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0 };
+  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "" };
+
+  /** The dog notices things, briefly. */
+  dogReact(kind: "wasp" | "flee" | "bite" | "book", nowMs: number): void {
+    this.dog.react = kind;
+    this.dog.reactUntil = nowMs + (kind === "wasp" ? 3500 : 2200);
+  }
 
   /** Epitaph of the herder before this one, carved on a stone by the pen. */
   memorial: { name: string; epitaph: string } | null = null;
@@ -382,9 +388,19 @@ export class Renderer {
         d.y += d.vy;
         if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
       }
+      // Reactions: bolt from a wasp, one bark at a runaway, then lose interest.
+      const reacting = nowMs < d.reactUntil;
+      if (reacting && d.react === "wasp") {
+        d.x += (d.facing === 0 ? -1 : 1) * 0.06;
+        d.vx = (d.facing === 0 ? -1 : 1) * 0.06;
+      }
       const dogMoving = Math.hypot(d.vx, d.vy) > 0.004;
       if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
-        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, dogMoving, !moving && !dogMoving, nowMs);
+        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, dogMoving, !moving && !dogMoving && !reacting, nowMs);
+        if (reacting) {
+          const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "…") : d.react === "bite" ? "?" : "…";
+          drawEmote(ctx, sx(d.x + 0.5) + T * 0.45, sy(d.y + 0.9) - T * 0.85, T * 0.8, glyph);
+        }
         if (T >= 40 && !moving) {
           ctx.font = `${Math.max(9, T * 0.18)}px "Fredoka", sans-serif`;
           ctx.textAlign = "center";
