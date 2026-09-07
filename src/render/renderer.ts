@@ -935,6 +935,8 @@ export class Renderer {
       }
       const huddle = this.season === "winter" && s.mode === "penned" ? 0.3 : 0;
       drawSheep(ctx, sx(s.x + 0.5 + (this.map.pen.x - s.x) * huddle), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5) + (this.map.pen.y - s.y) * huddle) + hopY, T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
+      // The nemesis, loose and within sight of him, is openly amused.
+      if (s.nemesis && s.mode === "loose" && Math.hypot(s.x - h.x, s.y - h.y) < 6 && Math.floor(nowMs / 1000) % 5 === 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "hah");
       if (s.named && s.mode === "loose" && T >= 32) {
         ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
         ctx.textAlign = "center";
@@ -978,7 +980,17 @@ export class Renderer {
       const r = rivalNow;
       const facing: 0 | 2 = r.dx > 0 ? 0 : 2;
       const back = r.dx > 0 ? -1 : 1;
-      for (let k = 3; k >= 1; k--) drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
+      for (let k = 3; k >= 1; k--) {
+        drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
+        if (T >= 32) {
+          // His sheep have names too. They are not interesting names. That is the point.
+          ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.fillStyle = "rgba(43,38,32,0.8)";
+          ctx.fillText(["Patience", "Prudence", "Also Prudence"][k - 1]!, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5) + T * 0.62);
+          ctx.textAlign = "left";
+        }
+      }
       drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: true, carrying: false, phase, fury: 0, resting: false, coat: "#4a6a8a" });
       const beat = Math.floor(nowMs / 1000) % 9;
       if ("finale" in r) {

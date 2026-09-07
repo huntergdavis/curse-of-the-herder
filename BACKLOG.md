@@ -65,6 +65,7 @@ long soak.
 - Yan Tan Tethera: the old dales sheep-count as grammar symbols (`#yantan#`, `#yantancount#`), used in pen lines from level 1 ("Yan, tan, tethera, methera. Old counting. Grandfather did it.")
 - Cows: one per village and one by the pen, chewing and swishing, "moo" when he passes, and a line about them every twenty sim-minutes at most ("a cow, standing there with the confidence of a thing nobody has ever tried to carry")
 - He answers the Curse back about half the time ("Say that to my face! You have no face! That is exactly my POINT!")
+- The neighbour has a name (Tom, Alfred, Cuthbert…) used in lines, the first-pass toast and the end card; his sheep are Patience, Prudence and Also Prudence; the nemesis goes "hah" when he comes near; the Curse notices him talking to cows
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

@@ -140,6 +140,7 @@ async function startSession(world: WorldState): Promise<void> {
     if (!session || session.world.herder.carrying < 0 && keyedUnit(session.world.seed, "cow-say", session.world.tick) > 0.6) return;
     const u = speakKind(session.world, session.map, "cow", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.3);
     if (u) say(session, u.text, u.heat, u.seconds, performance.now(), false, u);
+    if (u) maybeCurseRemarks(session, "cow", performance.now());
   };
   renderer.onHatLost = () => {
     if (!session) return;
@@ -464,6 +465,7 @@ const CURSE_LINES: Record<string, string[]> = {
   streakBroken: ["Told you.", "There. Better.", "Balance restored."],
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
+  cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
   book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],
