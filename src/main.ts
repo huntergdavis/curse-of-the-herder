@@ -179,6 +179,9 @@ async function startSession(world: WorldState): Promise<void> {
     const w = session.world;
     const cx = Math.round(w.herder.x);
     w.rival = { x: cx - 9, y: Math.round(w.herder.y) + 3, dx: 0.11, ticksLeft: 200 };
+    // ?rival=3 makes this his third pass, so Also Prudence bolts halfway across.
+    const nth = Number(params.get("rival"));
+    if (nth > 1) w.rivalsSeen = nth - 1;
   }
   const enemy = world.sheep.find((sh) => sh.nemesis);
   renderer.wanted = enemy ? sheepName(world.seed, enemy.id) : world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
