@@ -77,6 +77,7 @@ long soak.
 - On the neighbour's third pass, Also Prudence bolts from the line and runs downhill; he is thrilled ("IT HAPPENS TO HIM TOO!"), the Curse tells him not to enjoy it, and there is a toast
 - The neighbour stops dead for six seconds and calls after her, which is a new feeling for him
 - He waves back at the neighbour, stiffly, whenever he passes within five tiles and his hands are free (`?wave=1` holds the pose; `?rival=1` now spawns him three seconds in, within waving distance)
+- New book and register: *Three Men in a Boat* (Jerome K. Jerome, 1889, genuine excerpts) with a `jerome` pack of Victorian idler's outrage ("I like herding: it fascinates me. I can sit and look at a sheep for hours. It is the carrying I object to.")
 - When he sits down, the dog sometimes fetches him a stick ("I asked for sheep and you have brought me KINDLING!")
 - He throws the stick; the dog fetches it, the fastest it moves all day
 - Level-ups are announced: a toast with the new level name, a line about the words arriving ("A new word arrives and the first thing I do with it is throw it at a hill"), and a Curse remark

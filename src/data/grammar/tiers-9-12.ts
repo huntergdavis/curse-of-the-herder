@@ -382,5 +382,5 @@ export const RULES_9_12: Rule[] = [
     "Erudite. Exhausted. Ewe-adjacent.",
     "Sixty sheep taught him nothing. Twenty books taught him how to say so.",
     "A quiet man, until the sheep.",
-  ], META),
+  ], { ...META, maxChars: 108 }),
 ];

@@ -10,6 +10,7 @@ const GROSE = { reg: ["grose"] };
 const BARD = { reg: ["bard"] };
 const POLY = { reg: ["fr", "de", "it", "es", "yi", "sco", "au", "qc"] };
 const HEM = { reg: ["hemingway"] };
+const JER = { reg: ["jerome"] };
 
 export const NON_TERMINALS_5_8: NonTerminal[] = [
   {
@@ -246,4 +247,21 @@ export const RULES_5_8: Rule[] = [
   ...R(8, "rain", ["It rained. It had been going to rain all day. Now it rained.", "The rain came down on the #target# and on me. It did not choose."], HEM),
   ...R(8, "finished", ["They were all in. #penned.cap#. I stood at the gate and it was done and I did not feel what I thought I would feel.", "The last one was in. It was #time#. I sat down on the #noun# and that was the end of it."], HEM),
   ...R(8, "epitaph", ["He carried them. That was all.", "It was heavy. He went up.", "#penned.cap# sheep. One man. Done.", "The #noun# was #adj.own#.", "He did not ask how."], { ...HEM, maxChars: 80 }),
+  // Jerome K. Jerome: the idler's outrage, in long indignant sentences.
+  ...R(7, "idle", [
+    "I do not know why it should be, I am sure, but the sight of a sheep standing still when I am walking maddens me.",
+    "I like herding: it fascinates me. I can sit and look at a sheep for hours. It is the carrying I object to.",
+    "It is a most extraordinary thing, but I never look at #target.the# without being impelled to the conclusion that it is the most #adj# specimen of its kind on record.",
+    "There is nothing irritates me more than seeing a sheep sitting about doing nothing when I am working. Which is always. Which is all of them.",
+    "I want to get up and superintend, and walk round with my hands in my pockets, and tell the sheep what to do. The sheep has other ideas. The sheep always has other ideas.",
+    "Harris would have had that sheep in the pen by now, and cut himself, and broken the crook, and blamed the sheep, and I would have agreed with him.",
+    "Confound it, #vocative#, you have all the obstinacy of #simile.a# and none of the charm.",
+    "I have been told that a man should take his troubles lightly. I take mine on my shoulders, at about forty pounds each, up a hill.",
+    "One should not grumble, they say. They have not met #target.the#. They have not met any of them. They live in town.",
+  ], JER),
+  ...R(7, "caught", ["Got you, you great lumbering duffer. There is a knack to this and I do not have it and neither, I notice, do you.", "Up you come. Oh, bother, you are heavier than you have any right to be; I suspect you of eating on purpose."], JER),
+  ...R(7, "penned", ["In. Another one in. I feel like a man who has packed the hamper and forgotten the tin-opener: complete, technically.", "#penned.cap# in. I should like it noted that I did all of that without superintendence, which is the hardest way."], JER),
+  ...R(7, "rain", ["The rain came on, as it always does when one has decided against the umbrella, which is to say on principle."], JER),
+  ...R(7, "flee", ["Off it goes, at a pace it has never once shown in my direction. Hang it all.", "Dash it! It ran! It stood there like a tin of pineapple for an hour and now it RUNS!"], JER),
+  ...R(7, "breather", ["I shall sit. I am told that idleness is a vice; I have always found it the only one I am any good at."], JER),
 ];

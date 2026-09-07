@@ -78,6 +78,15 @@ export const BOOKS: Book[] = [
     excerpts: ["The hill was long. The sheep was heavy. He went up.", "It rained and the road was mud and he did not stop.", "He carried it and it did not thank him and that was all right.", "Short words. Wet boots. One more."],
   },
   {
+    id: "three-men", title: "Three Men in a Boat", author: "Jerome K. Jerome, 1889 (genuine excerpts)", pack: "jerome", register: "jerome", when: 0.6, colour: "#5b7f9a",
+    excerpts: [
+      "I like work: it fascinates me. I can sit and look at it for hours.",
+      "I don't know why it should be, I am sure; but the sight of another man asleep in bed when I am up, maddens me.",
+      "I can't sit still and see another man slaving and working. I want to get up and superintend, and walk round with my hands in my pockets, and tell him what to do.",
+      "Harris tried to open the tin with a pocket-knife, and broke the knife and cut himself badly; and George tried a pair of scissors, and the scissors flew up, and nearly put his eye out.",
+    ],
+  },
+  {
     id: "one-word", title: "One Word, Many Uses", author: "a Linguist", pack: "f-word", register: null, when: 0.84, colour: "#1f1f1f",
     excerpts: ["It is a noun, a verb, an adjective and, on a hill in the rain, a prayer.", "Use sparingly, like salt. Or like salt if you are very angry.", "Never at a person. Always at a hill.", "Chapter twelve: the hill, revisited."],
   },

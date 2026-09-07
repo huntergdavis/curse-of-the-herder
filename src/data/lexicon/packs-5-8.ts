@@ -339,6 +339,32 @@ export const hemingway: LexPack = {
   ],
 };
 
+const J = { reg: ["jerome"] };
+const j = (e: LexEntry): LexEntry => ({ ...e, ...J });
+
+/** Jerome K. Jerome: the Victorian idler's outrage. Tins of pineapple, tow-lines, and other men's idleness. */
+export const jerome: LexPack = {
+  id: "jerome",
+  title: "Three Men in a Boat",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 7,
+  entries: [
+    j(adj("beastly")), j(adj("confounded")), j(adj("bally")), j(adj("harum-scarum", { syl: 4 })), j(adj("preposterous", { syl: 4 })), j(adj("insufferable", { syl: 4 })),
+    j(adj("abominable", { syl: 4 })), j(adj("ridiculous", { syl: 4 })), j(adj("wretched")), j(adj("hopeless")), j(adj("exasperating", { syl: 5 })),
+    j(adj("maddening", { syl: 3 })), j(adj("lumbering", { syl: 3 })), j(adj("unprincipled", { syl: 4 })), j(adj("ungrateful", { syl: 3 })),
+    j(n("muddle")), j(n("nuisance")), j(n("humbug", { pl: "-" })), j(n("tomfoolery", { pl: "-" })), j(n("kettle")), j(n("hamper")), j(n("tin of pineapple")), j(n("tow-line")), j(n("banjo")),
+    j(n("umbrella")), j(n("tea", { pl: "-" })), j(n("patent medicine")), j(n("lock-keeper")), j(n("steam launch", { pl: "steam launches" })), j(n("cheese", { pl: "-" })),
+    j(ins("duffer")), j(ins("silly ass", { band: 1 })), j(ins("blithering duffer", { band: 1 })), j(ins("born fool", { band: 1 })), j(ins("great lumbering duffer")), j(ins("humbug")),
+    j(ins("idler")), j(ins("loafer")), j(ins("nincompoop")), j(ins("muddler")),
+    j(interj("Confound it!")), j(interj("Oh, bother!")), j(interj("Hang it all!")), j(interj("Dash it!")), j(interj("Well, I never!")),
+    j(abs("idleness")), j(abs("the work I am not doing")), j(abs("a settled melancholy")), j(abs("the injustice of it")),
+    j(sim("a tin of pineapple with no opener")), j(sim("a tow-line that has been left to itself for five minutes")), j(sim("a man packing a hamper and forgetting the butter")),
+    j(sim("Harris with a corkscrew")), j(sim("a steam launch on a quiet river")), j(sim("a patent medicine advertisement")),
+    j(verb("potter")), j(verb("loaf")), j(verb("dawdle")), j(verb("muddle")), j(verb("grumble")), j(verb("superintend")),
+  ],
+};
+
 const N_ = { reg: ["nautical"] };
 const nt = (e: LexEntry): LexEntry => ({ ...e, ...N_ });
 
@@ -374,4 +400,4 @@ export const nautical: LexPack = {
   ],
 };
 
-export const PACKS_5_8: LexPack[] = [groseVulgarTongue, bard, french, german, italianSpanish, yiddishScotsAussie, quebecSacres, hemingway, nautical];
+export const PACKS_5_8: LexPack[] = [groseVulgarTongue, bard, french, german, italianSpanish, yiddishScotsAussie, quebecSacres, hemingway, nautical, jerome];
