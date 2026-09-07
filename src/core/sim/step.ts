@@ -295,7 +295,8 @@ function govern(w: WorldState): void {
   const workFrac = w.sheepPenned === 0 ? 0 : done / w.sheep.length;
   const timeFrac = w.tick / DAY_TICKS;
   const ahead = workFrac - timeFrac;
-  const target = ahead > 0.02 ? Math.max(0.5, 1 - ahead * 3.0) : 1;
+  // Only ever slows him. Floor 0.4 so a quick board still lands its last sheep near six.
+  const target = ahead > 0.01 ? Math.max(0.4, 1 - ahead * 8.0) : 1;
   // Hysteresis: move a third of the way each period.
   w.speedScale += (target - w.speedScale) / 3;
 }

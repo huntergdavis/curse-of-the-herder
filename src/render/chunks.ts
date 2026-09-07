@@ -26,6 +26,22 @@ function freeSurface(s: Surface): void {
   }
 }
 
+/** A 1×1 canvas for reading probe pixels, so the chunk surfaces themselves are never read back. */
+let probeCanvas: { ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D } | null | undefined;
+function probeContext(): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null {
+  if (probeCanvas !== undefined) return probeCanvas?.ctx ?? null;
+  try {
+    const c = document.createElement("canvas");
+    c.width = 1;
+    c.height = 1;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    probeCanvas = ctx ? { ctx } : null;
+  } catch {
+    probeCanvas = null;
+  }
+  return probeCanvas?.ctx ?? null;
+}
+
 function hexRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -158,10 +174,14 @@ export class ChunkCache {
     return null;
   }
 
-  private healthy(ctx: Ctx, e: Entry): boolean {
+  private healthy(_ctx: Ctx, e: Entry): boolean {
     if (!e.probe) return true;
+    const pc = probeContext();
+    if (!pc) return true; // cannot check here; assume fine
     try {
-      const d = ctx.getImageData(e.probe.x, e.probe.y, 1, 1).data;
+      pc.clearRect(0, 0, 1, 1);
+      pc.drawImage(e.surface as CanvasImageSource, e.probe.x, e.probe.y, 1, 1, 0, 0, 1, 1);
+      const d = pc.getImageData(0, 0, 1, 1).data;
       const [r, g, b] = e.probe.rgb;
       return Math.abs(d[0]! - r) <= 24 && Math.abs(d[1]! - g) <= 24 && Math.abs(d[2]! - b) <= 24 && d[3]! > 200;
     } catch {

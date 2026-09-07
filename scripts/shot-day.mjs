@@ -4,6 +4,7 @@ import { chromium } from "@playwright/test";
 const [url, out, total = "200", every = "8"] = process.argv.slice(2);
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
 p.on("pageerror", (e) => console.log("[pageerror]", e.message));
+p.on("console", (m) => { if (m.type() === "warning" || m.type() === "error") console.log("[console]", m.type(), m.text()); });
 await p.goto(url);
 await p.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
 const t0 = Date.now(); let n = 0;
