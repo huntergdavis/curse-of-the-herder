@@ -845,6 +845,18 @@ export class Renderer {
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
+    // The neighbour and his three well-behaved sheep, strolling past.
+    if (world.rival) {
+      const r = world.rival;
+      const facing: 0 | 2 = r.dx > 0 ? 0 : 2;
+      const back = r.dx > 0 ? -1 : 1;
+      for (let k = 3; k >= 1; k--) drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
+      drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: true, carrying: false, phase, fury: 0, resting: false, coat: "#4a6a8a" });
+      const beat = Math.floor(nowMs / 1000) % 9;
+      if (beat < 2) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "hullo!");
+      else if (beat === 5) drawEmote(ctx, sx(r.x + 0.5 + back * 1.15) + T * 0.3, sy(r.y) - T * 0.2, T * 0.7, "baa");
+    }
+
     // Summer afternoons: a "phew" now and then.
     if (this.season === "summer" && hourNow > 12 && hourNow < 16 && Math.floor(nowMs / 1000) % 23 === 5) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "phew");
     // In a wind, every few minutes, the hat goes. It tumbles off downwind and reappears on his head a little later.

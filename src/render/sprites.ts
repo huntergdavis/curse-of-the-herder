@@ -119,6 +119,8 @@ export interface HerderPose {
   ranting?: boolean;
   /** The crook is in two pieces since this afternoon. */
   crookBroken?: boolean;
+  /** Somebody else's coat. */
+  coat?: string;
   /** Windy: one hand on the hat. */
   windy?: boolean;
   /** Eloquence level 0-12: adds a book, a quill, a scarf, spectacles, a laurel. */
@@ -183,7 +185,7 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.lineTo(T * 0.08 - stride * T * 0.14, -T * 0.02);
   ctx.stroke();
   // Tunic
-  ctx.fillStyle = p.fury > 0.8 ? "#8a3d2e" : "#7a5a3a";
+  ctx.fillStyle = p.fury > 0.8 ? "#8a3d2e" : p.coat ?? "#7a5a3a";
   ctx.strokeStyle = INK;
   ctx.lineWidth = Math.max(1, T * 0.05);
   ctx.beginPath();

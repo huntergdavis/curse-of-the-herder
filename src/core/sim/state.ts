@@ -93,7 +93,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak" | "streak" | "reread" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak" | "streak" | "reread" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
@@ -149,6 +149,10 @@ export interface WorldState {
   lastScarecrowTick: number;
   lastJailbreakTick: number;
   jailbreaks: number;
+  /** A neighbouring herder strolling past with a flock that behaves. */
+  rival?: { x: number; y: number; dx: number; ticksLeft: number } | undefined;
+  rivalLastTick?: number | undefined;
+  rivalsSeen?: number | undefined;
   /** Pennings in a row without a flight, a mishap or a stranded sheep. */
   streak: number;
   /** Fog until this tick (0 = clear). */

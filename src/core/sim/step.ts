@@ -658,6 +658,32 @@ function stepHerder(w: WorldState, map: GameMap): void {
 }
 
 /** Once or twice a day, a penned sheep gets out. It was IN. */
+/** Every couple of hours a neighbour walks past with three sheep that follow him like he asked nicely. */
+function stepRival(w: WorldState, map: GameMap): void {
+  const r = w.rival;
+  if (r) {
+    r.x += r.dx;
+    r.ticksLeft--;
+    if (r.ticksLeft <= 0) w.rival = undefined;
+    return;
+  }
+  const h = w.herder;
+  if (h.mode === "done" || h.mode === "reading" || w.finished) return;
+  if (w.tick % 40 !== 0 || w.tick < TICKS_PER_HOUR * 0.75) return;
+  if (w.tick - (w.rivalLastTick ?? -100000) < TICKS_PER_HOUR * 1.75) return;
+  if (keyedUnit(w.seed, "rival", w.tick) > 0.12) return;
+  const y = Math.round(h.y) + 3;
+  const cx = Math.round(h.x);
+  for (let x = cx - 13; x <= cx + 13; x++) if (!isWalkable(tileAt(map, x, y))) return;
+  const fromLeft = keyedUnit(w.seed, "rival-side", w.tick) < 0.5;
+  const speed = 0.11;
+  w.rival = { x: fromLeft ? cx - 9 : cx + 9, y, dx: fromLeft ? speed : -speed, ticksLeft: Math.ceil(22 / speed) };
+  w.rivalLastTick = w.tick;
+  w.rivalsSeen = (w.rivalsSeen ?? 0) + 1;
+  addFrustration(w, FRUSTRATION.rival);
+  pushEvent(w, { tick: w.tick, kind: "rival", sheepId: -1, detail: String(w.rivalsSeen) });
+}
+
 function stepJailbreak(w: WorldState, map: GameMap): void {
   if (w.finished || w.jailbreaks >= 2 || w.sheepPenned < 12) return;
   if (w.tick - w.lastJailbreakTick < 90 * 60 * 4) return;
@@ -698,6 +724,7 @@ export function step(w: WorldState, map: GameMap): WorldState {
   if (w.registers.length && w.tick % 40 === 0) w.registers = w.registers.filter((r) => r.untilTick > w.tick);
   stepWeather(w);
   stepJailbreak(w, map);
+  stepRival(w, map);
   govern(w);
   stepSheep(w, map);
   stepHerder(w, map);

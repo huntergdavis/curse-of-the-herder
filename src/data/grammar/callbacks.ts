@@ -108,6 +108,13 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "streakBroken", ["There it is. I KNEW it. Five in a row and then you, #vocative#. You could not let me have six.", "And the luck runs out, like everything else on this hill, downhill and away from me.", "I said it. I said this is how the bad ones start. Nobody listens to me. Least of all me."]),
   ...R(4, "streakBroken", ["#oath_phrase#! I called it! I called it at five and here it is at #vocative#!", "#pantheon.cap#, thank you for the run of luck; I see you have taken it back with interest."]),
   ...R(8, "streakBroken", ["The run ended. I had known it would. Knowing did not make the sheep slower."], { reg: ["hemingway"] }),
+  // The neighbour walks past. His sheep follow him. In a LINE.
+  ...R(0, "rival", ["Look. LOOK. His sheep. Walk BEHIND him.", "Him again. Hate him.", "Show-off. Show-OFF."]),
+  ...R(2, "rival", ["Oh, here he comes. Look at him. Look at his sheep. In a line. Like they LIKE him.", "Good morning to you too. No, no, they are all accounted for, I am carrying this one for FUN.", "Three sheep. He has three sheep and a smile. I have sixty and a hernia. Wave back. WAVE BACK.", "He does not even have a dog. He does not NEED a dog. I want to lie down in the river."]),
+  ...R(4, "rival", ["#oath_phrase#, there he goes, the #adj# #insult# with his three obedient sheep, and not one of them has ever been on a ROOF.", "#pantheon.cap#, you gave that man sheep that follow him and you gave me #vocative#. I would like to speak to whoever is in charge of allocations.", "Yes, hello! Lovely day! I hope your #body_part# falls off in a field!"]),
+  ...R(6, "rival", ["Observe him, #vocative#: a man whose flock obeys him without a single #adj# word spoken. I do not trust it. Nothing that quiet is honest.", "There goes the only man on this hill who has never needed a vocabulary. I pity him. I pity him very loudly."]),
+  ...R(8, "rival", ["He walked past. His sheep walked behind him. Nobody said anything. That was the worst of it."], { reg: ["hemingway"] }),
+  ...R(10, "rival", ["Behold the neighbour, in whose serene and #adj# wake three sheep process like #plural_noun# to a christening; he has never read a book in his life and he has never needed to, and I could weep."]),
   // Three flights. He has an enemy now.
   ...R(0, "nemesis", ["THREE. You. Enemy.", "You. I see you.", "Three times. Remember face."]),
   ...R(2, "nemesis", ["Three times, #vocative#. Three. That is not luck any more, that is a decision, and I have made one too.", "Right. You have a name now and I am going to use it in a tone of voice.", "Everyone else is a sheep. You are a project."]),

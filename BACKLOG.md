@@ -56,6 +56,7 @@ long soak.
 - Streaks he does not trust, rereads, weather-lifting lines, villagers with brooms, toasts visible in quiet mode
 - Streak-broken payoff line when a run of five or more ends, with a Curse remark; escapees get a "recaptured" line when caught again and an "(again)" name tag while loose; jailbreak count on the Hall card
 - Nemesis arc: the first sheep to bolt three times is declared the enemy ("Everyone else is a sheep. You are a project."), gets a triumph line and a Curse remark when finally caught, and is named in the hourly diary
+- The rival: every couple of hours a neighbour in a blue coat strolls past with three sheep that follow him in a line, waving; our herder seethes at every level ("Three sheep. He has three sheep and a smile. I have sixty and a hernia."), the Curse remarks, `?rival=1` forces one for screenshots
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

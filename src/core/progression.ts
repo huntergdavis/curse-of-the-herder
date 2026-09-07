@@ -38,6 +38,8 @@ export function curseIntervalSeconds(level: number, frustration: number): number
 }
 
 export const FRUSTRATION = {
+  /** A neighbour's flock walking past in a tidy line. */
+  rival: 7,
   perFortyTilesCarrying: 1,
   flee: 6,
   absurdLocation: 8,

@@ -140,6 +140,11 @@ async function startSession(world: WorldState): Promise<void> {
     if (u) say(session, u.text, u.heat, u.seconds, performance.now(), true, u);
   };
   if (params.get("hat")) renderer.hatPeriod = 10;
+  if (params.get("rival")) {
+    const w = session.world;
+    const cx = Math.round(w.herder.x);
+    w.rival = { x: cx - 9, y: Math.round(w.herder.y) + 3, dx: 0.11, ticksLeft: 200 };
+  }
   renderer.wanted = world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
   renderer.signatureWord = signatureWord(world.seed);
   renderer.reducedMotion = motionSetting;
@@ -424,6 +429,7 @@ const CURSE_LINES: Record<string, string[]> = {
   streak: ["Enjoy it.", "Five. The Curse is generous in small amounts.", "I did that. You are welcome. It ends now."],
   streakBroken: ["Told you.", "There. Better.", "Balance restored."],
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
+  rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
   book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],
