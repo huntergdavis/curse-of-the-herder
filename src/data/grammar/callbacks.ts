@@ -103,6 +103,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "streak", ["#pantheon.cap#, five in a row. I know what this is. This is the quiet before the sheep.", "Eight. EIGHT in a row. I am not going to say anything. I am not going to say ANYTHING. …Eight."]),
   ...R(8, "streak", ["Five went in and none of them ran. I did not trust it. I was right not to."], { reg: ["hemingway"] }),
   ...R(12, "streak", ["A run of luck, O Curse, is your favourite joke, and I have laughed at it every time, and I am laughing now, and I hate you."]),
+  // A sheep has eaten his lunch.
+  ...R(0, "lunchStolen", ["MY BREAD.", "No. NO. Mine.", "Cheese. Gone. SHEEP."]),
+  ...R(2, "lunchStolen", ["That was my LUNCH, #vocative#. Bread and cheese and the only good ten minutes in this day, and you have eaten it looking me in the EYE.", "Give it back. You cannot give it back. I know you cannot give it back. GIVE IT BACK.", "Sixty sheep on this hill and the one that finds me is the one that likes cheese."]),
+  ...R(4, "lunchStolen", ["#oath_phrase#! My lunch! Eaten by #vocative#, a creature with four stomachs and NO SHAME!", "#pantheon.cap#, you saw that. You saw that #adj# #insult# eat my cheese. Let it be recorded that I did not strike it. Yet."]),
+  ...R(6, "lunchStolen", ["Note for the record, #vocative#: you have eaten my lunch, and I have eaten nothing since dawn but my own words, which are #adj# and do not fill a man."]),
+  ...R(8, "lunchStolen", ["The sheep ate the bread. Then it ate the cheese. I watched. It was a good cheese."], { reg: ["hemingway"] }),
   // The Curse said something. He heard it.
   ...R(0, "curseReply", ["Heard that.", "Shut up, sky.", "Not funny."]),
   ...R(2, "curseReply", ["I heard that. I hear everything. It is the worst part.", "Oh good, it has opinions. The curse has OPINIONS. Nobody asked the curse.", "Yes. Thank you. Very helpful. Go and haunt a cow."]),

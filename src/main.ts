@@ -353,6 +353,7 @@ function handleEvents(s: Session, nowMs: number): void {
       vocabEl.classList.add("pop");
     }
     if (e.kind === "rival" && e.detail === "1") toast(`${escapeHtml(rivalName(w.seed))} from over the hill walks past with three sheep that follow him. Nobody knows how he does it.`);
+    if (e.kind === "lunchStolen") toast(`<strong>Lunch:</strong> eaten by ${escapeHtml(sheepName(w.seed, e.sheepId))}, while he watched. The cheese too.`);
     // The grudge is made official for the audience.
     if (e.kind === "nemesis") s.renderer.wanted = sheepName(w.seed, e.sheepId);
     if (e.kind === "nemesis") toast(`<strong>Nemesis declared:</strong> ${escapeHtml(sheepName(w.seed, e.sheepId))}, three flights and counting. He has a look in his eye.`);
@@ -377,7 +378,7 @@ function handleEvents(s: Session, nowMs: number): void {
       }
     }
     if (e.kind === "finished") onFinished(s);
-    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || e.kind === "nemesisCaught" || (e.kind === "mishap" && e.detail === "crook")) {
+    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || e.kind === "nemesisCaught" || e.kind === "lunchStolen" || (e.kind === "mishap" && e.detail === "crook")) {
       maybeCurseRemarks(s, e.kind === "mishap" ? "crook" : e.kind, nowMs);
     }
   }
@@ -466,6 +467,7 @@ const CURSE_LINES: Record<string, string[]> = {
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
   cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
+  lunchStolen: ["That was the good cheese, too.", "I did not arrange that. I would have, but I did not.", "Lunch is for the uncursed."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
   book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],

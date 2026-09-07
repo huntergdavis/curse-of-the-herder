@@ -936,6 +936,8 @@ export class Renderer {
       }
       const huddle = this.season === "winter" && s.mode === "penned" ? 0.3 : 0;
       drawSheep(ctx, sx(s.x + 0.5 + (this.map.pen.x - s.x) * huddle), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5) + (this.map.pen.y - s.y) * huddle) + hopY, T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
+      // The lunch thief chews, at length, in front of him.
+      if (s.thief && world.lunchStolenTick !== undefined && world.tick - world.lunchStolenTick < 200 && Math.floor(nowMs / 1000) % 3 !== 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "nom");
       // The nemesis, loose and within sight of him, is openly amused.
       if (s.nemesis && s.mode === "loose" && Math.hypot(s.x - h.x, s.y - h.y) < 6 && Math.floor(nowMs / 1000) % 5 === 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "hah");
       if (s.named && s.mode === "loose" && T >= 32) {
@@ -1511,17 +1513,19 @@ export class Renderer {
       const by = sy(h.y + 0.95) - T * 0.05;
       this.ctx.fillStyle = "#f4f1e6";
       this.ctx.fillRect(bx - T * 0.22, by - T * 0.12, T * 0.44, T * 0.16);
-      this.ctx.fillStyle = "#c9944a";
-      this.ctx.beginPath();
-      this.ctx.ellipse(bx - T * 0.08, by - T * 0.06, T * 0.12, T * 0.07, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-      this.ctx.fillStyle = "#f2d16b";
-      this.ctx.beginPath();
-      this.ctx.moveTo(bx + T * 0.04, by - T * 0.02);
-      this.ctx.lineTo(bx + T * 0.2, by - T * 0.02);
-      this.ctx.lineTo(bx + T * 0.12, by - T * 0.14);
-      this.ctx.closePath();
-      this.ctx.fill();
+      if (world.lunchStolenTick === undefined) {
+        this.ctx.fillStyle = "#c9944a";
+        this.ctx.beginPath();
+        this.ctx.ellipse(bx - T * 0.08, by - T * 0.06, T * 0.12, T * 0.07, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.fillStyle = "#f2d16b";
+        this.ctx.beginPath();
+        this.ctx.moveTo(bx + T * 0.04, by - T * 0.02);
+        this.ctx.lineTo(bx + T * 0.2, by - T * 0.02);
+        this.ctx.lineTo(bx + T * 0.12, by - T * 0.14);
+        this.ctx.closePath();
+        this.ctx.fill();
+      }
     }
     drawHerder(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) + mishapY - hop, T, {
       facing: h.facing,

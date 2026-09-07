@@ -44,6 +44,8 @@ export interface SheepState {
   escapee?: boolean;
   /** Declared the herder's personal enemy after its third flight. */
   nemesis?: boolean;
+  /** Ate his lunch. */
+  thief?: boolean;
   /** Personality: plain | skittish | stubborn | dozy | curious */
   temper?: string;
   /** Curious sheep: has it already come up to say hello? */
@@ -93,7 +95,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak" | "streak" | "reread" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival" | "rivalGone";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak" | "streak" | "reread" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival" | "rivalGone" | "lunchStolen";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
@@ -152,6 +154,9 @@ export interface WorldState {
   /** A neighbouring herder strolling past with a flock that behaves. */
   rival?: { x: number; y: number; dx: number; ticksLeft: number } | undefined;
   rivalLastTick?: number | undefined;
+  /** When lunch began, and when (if) a sheep helped itself to it. */
+  lunchTick?: number | undefined;
+  lunchStolenTick?: number | undefined;
   /** A jailbreak in the planning: the sheep whispers at the gate before it goes. */
   jailbreakPlan?: { tick: number; sheepId: number } | undefined;
   rivalsSeen?: number | undefined;

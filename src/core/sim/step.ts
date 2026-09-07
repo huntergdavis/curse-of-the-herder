@@ -390,6 +390,23 @@ function stepHerder(w: WorldState, map: GameMap): void {
   const h = w.herder;
   if (h.mode === "done") return;
   if (h.mode === "resting") {
+    // Halfway through lunch, a loose sheep within reach helps itself. The cheese does not survive.
+    if (w.lunchTick !== undefined && w.lunchStolenTick === undefined && w.tick === w.lunchTick + 70 && keyedUnit(w.seed, "lunch-thief") < 0.75) {
+      const thief = w.sheep.find((s) => s.mode === "loose" && !s.absurd && Math.hypot(s.x - h.x, s.y - h.y) < 8);
+      const dx = [1, -1].find((d) => isWalkable(tileAt(map, Math.round(h.x) + d, Math.round(h.y))));
+      if (thief && dx !== undefined) {
+        thief.x = Math.round(h.x) + dx;
+        thief.y = Math.round(h.y);
+        thief.tx = thief.x;
+        thief.ty = thief.y;
+        thief.thief = true;
+        thief.named = true;
+        w.lunchStolenTick = w.tick;
+        h.restUntilTick = w.tick + 12;
+        addFrustration(w, FRUSTRATION.lunchStolen);
+        pushEvent(w, { tick: w.tick, kind: "lunchStolen", sheepId: thief.id });
+      }
+    }
     if (w.tick >= h.restUntilTick) h.mode = "idle";
     return;
   }
@@ -408,6 +425,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
     // Lunch, once, somewhere after half past twelve: bread, cheese, a sit-down, the dog's opinion.
     if (!w.hadLunch && w.tick > 3.5 * TICKS_PER_HOUR && h.carrying < 0) {
       w.hadLunch = true;
+      w.lunchTick = w.tick;
       h.mode = "resting";
       h.restUntilTick = w.tick + 160; // forty seconds
       addFrustration(w, -12);
