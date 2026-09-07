@@ -102,7 +102,7 @@ long soak.
 
 - [ ] Simulation in a Web Worker. Decision: not planned. At 1× the sim is negligible on the main thread; a long catch-up is budgeted at 1,500 ticks per frame and janks for a few seconds once. Revisit only if a real device shows the sim itself (not rendering) on the profile.
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak. (Weekly soak exists and passes.)
-- [ ] Frame time on a real GPU browser: headless software rendering at 1080p measures ~167 ms/frame regardless of effects (fog +50 ms, wind +33 ms), i.e. the base full-screen passes dominate; effects are cheap. Measure on hardware with `node scripts/frame-time.mjs`; if a laptop struggles, the Eco frame-rate setting is the lever, and the fog gradient could become a cached image.
+- [ ] Frame time on a real GPU browser (`?stats=1` shows frame interval, draw ms, heap): headless software rendering at 1080p measures ~167 ms/frame regardless of effects (fog +50 ms, wind +33 ms), i.e. the base full-screen passes dominate; effects are cheap. Measure on hardware with `node scripts/frame-time.mjs`; if a laptop struggles, the Eco frame-rate setting is the lever, and the fog gradient could become a cached image.
 - [ ] Auto-update via version.json poll and a service worker.
 
 ## P1 — Presentation

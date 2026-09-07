@@ -124,6 +124,15 @@ in-game titles to real public-domain sources is in
   highlights of his day, and his dog; an Almanac at the top of the Hall
   finds patterns across all of them.
 
+## Measuring on your own machine
+
+Add `?stats=1` to the URL for a small overlay showing the average frame
+interval, the time spent drawing each frame (average and worst over the
+last second), the tile size, and the JS heap where the browser exposes
+it. Leave it running a minute; a healthy machine shows draw times well
+under the frame interval. It works in any browser; Chrome also shows the
+heap.
+
 ## Documents
 
 - [PLAN.md](PLAN.md): product and technical plan, build phases.

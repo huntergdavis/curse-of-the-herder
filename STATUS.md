@@ -46,7 +46,7 @@ One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:
      [ ] `self` target facet so "I am #adj#" only draws adjectives that fit a person
      [ ] Flyting as a real duel: escalating sheep emotes, herder reacting to them
  P1  Runtime
-     [ ] Frame time on a real GPU browser (`node scripts/frame-time.mjs`); needs a hardware machine
+     [ ] Frame time on a real GPU browser: open the site with `?stats=1` and read the overlay
      [ ] Service worker for offline / update (version.json poll exists)
      [ ] Web Worker sim — decided: not planned
  P1  Presentation
@@ -63,7 +63,7 @@ One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:
      [ ] Localised UI
  Verify on hardware (cannot be done headless)
      [ ] Confirm the sea-over-island fix on the retina laptop that showed it (a whole day, then a second herder)
-     [ ] Frame-time measurement
+     [ ] Frame-time measurement: `?stats=1` on the MacBook Air, a minute at 1× and at 100×
 ```
 
 ## How to check things

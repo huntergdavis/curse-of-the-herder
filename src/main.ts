@@ -27,6 +27,10 @@ const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 576
 const TICK_MS = TICK_SECONDS * 1000;
 const SAVE_EVERY_MS = 10_000;
 /** `?fps=15` (or the Eco setting) renders less often for laptops. */
+/** `?stats=1`: a small overlay with frame interval and draw time, for measuring on real hardware. */
+const SHOW_STATS = params.has("stats");
+const stats = { frames: 0, intervalSum: 0, drawSum: 0, worst: 0, lastReportMs: 0, lastFrameMs: 0 };
+
 const FPS_CAP = Math.max(5, Math.min(60, Number(params.get("fps") ?? repository.getSetting("fps", "60")) || 60));
 const FRAME_MIN_MS = 1000 / FPS_CAP;
 void TICKS_PER_HOUR;
@@ -910,7 +914,30 @@ function frame(nowMs: number): void {
   s.bubbles.prune(nowMs);
   if (!document.hidden && nowMs - lastDrawMs >= FRAME_MIN_MS - 1) {
     lastDrawMs = nowMs;
+    const drawStart = SHOW_STATS ? performance.now() : 0;
     s.renderer.draw(w, s.camera, s.bubbles, nowMs);
+    if (SHOW_STATS) {
+      const drawMs = performance.now() - drawStart;
+      if (stats.lastFrameMs) {
+        const interval = nowMs - stats.lastFrameMs;
+        stats.frames++;
+        stats.intervalSum += interval;
+        stats.drawSum += drawMs;
+        stats.worst = Math.max(stats.worst, drawMs);
+      }
+      stats.lastFrameMs = nowMs;
+      if (nowMs - stats.lastReportMs > 1000 && stats.frames > 0) {
+        const el = $("stats");
+        el.hidden = false;
+        const mem = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+        el.textContent = `frame ${(stats.intervalSum / stats.frames).toFixed(1)} ms (${(1000 / (stats.intervalSum / stats.frames)).toFixed(0)} fps)\ndraw  ${(stats.drawSum / stats.frames).toFixed(1)} ms avg · ${stats.worst.toFixed(1)} ms worst\ntile  ${s.renderer.tilePx} px · ${s.renderer.width}×${s.renderer.height} · ${FAST}×${mem ? `\nheap  ${(mem.usedJSHeapSize / 1048576).toFixed(0)} MB` : ""}`;
+        stats.frames = 0;
+        stats.intervalSum = 0;
+        stats.drawSum = 0;
+        stats.worst = 0;
+        stats.lastReportMs = nowMs;
+      }
+    }
     if (looking || look.returning || (nowMs | 0) % 4 === 0) {
       s.minimap.draw($<HTMLCanvasElement>("minimap"), w, { x: s.camera.x, y: s.camera.y, w: s.renderer.width / s.renderer.tilePx, h: s.renderer.height / s.renderer.tilePx, looking });
     }
