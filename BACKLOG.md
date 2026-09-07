@@ -54,6 +54,7 @@ long soak.
 - Jailbreak with wanted poster, the wind steals his hat, language audit fixes (uncountables, .own registers, foreign leakage)
 - The Curse's dry remarks from level 10, hat lines, bats after dark, French miscounting
 - Streaks he does not trust, rereads, weather-lifting lines, villagers with brooms, toasts visible in quiet mode
+- Streak-broken payoff line when a run of five or more ends, with a Curse remark; escapees get a "recaptured" line when caught again and an "(again)" name tag while loose; jailbreak count on the Hall card
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
