@@ -1197,6 +1197,10 @@ export class Renderer {
         }
       }
       if (boltT >= 0 && Math.floor(nowMs / 1000) % 3 === 1) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "…!");
+      // Villagers greet him by name. They have never once greeted our man.
+      for (const v of this.villagers) {
+        if (Math.hypot(v.x - r.x, v.y - r.y) < 6 && Math.floor(nowMs / 1000) % 4 === 2) drawEmote(ctx, sx(v.x + 0.5) + T * 0.3, sy(v.y) - T * 0.9, T * 0.8, "Morning!");
+      }
       drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: true, carrying: false, phase, fury: 0, resting: false, coat: "#4a6a8a" });
       const beat = Math.floor(nowMs / 1000) % 9;
       if ("finale" in r) {

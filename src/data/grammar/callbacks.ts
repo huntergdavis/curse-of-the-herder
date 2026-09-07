@@ -184,7 +184,7 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(10, "rival", ["Behold the neighbour, in whose serene and #adj# wake three sheep process like #plural_noun# to a christening; he has never read a book in his life and he has never needed to, and I could weep."]),
   // ...and there he goes.
   ...R(0, "rivalGone", ["Gone. Good.", "Bye. BYE.", "Walk faster."]),
-  ...R(2, "rivalGone", ["And there he goes. Not a word. Not one word, and the sheep still following. I hate it here.", "Did he nod? He nodded. That was a nod of PITY. I know a nod of pity, I own a mirror.", "Right. He is gone. Nobody saw that. #vocative#, you saw nothing.", "Even the dog went to look. Even the DOG. Get back here, #dog#, you traitor, you are not #rival.poss#."]),
+  ...R(2, "rivalGone", ["And there he goes. Not a word. Not one word, and the sheep still following. I hate it here.", "Did he nod? He nodded. That was a nod of PITY. I know a nod of pity, I own a mirror.", "They said good morning to him. To HIM. I have been past that well forty times today and got a broom.", "Right. He is gone. Nobody saw that. #vocative#, you saw nothing.", "Even the dog went to look. Even the DOG. Get back here, #dog#, you traitor, you are not #rival.poss#."]),
   ...R(4, "rivalGone", ["#oath_phrase#, and off he strolls into the #adj# distance, three sheep and not a care, and I hope the distance is uphill.", "Go on then, #rival#! Walk! Enjoy your obedient sheep and your #adj# posture!"]),
   ...R(6, "rivalGone", ["He is gone, and with him the last evidence that this job can be done quietly. I shall take it as a personal insult and keep going."]),
   ...R(8, "rivalGone", ["He went over the hill. The sheep went with him. I looked at mine."], { reg: ["hemingway"] }),
