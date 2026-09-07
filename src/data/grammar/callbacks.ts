@@ -121,6 +121,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(6, "curseReply", ["Yes, thank you, I am aware that I am cursed. The reminders are not, on the whole, helping with the cursing.", "Heckled by my own affliction. There is a word for that and I will find it in a book and I will use it at you."]),
   ...R(8, "curseReply", ["The curse spoke. I did not answer. Then I did. It was not a good answer."], { reg: ["hemingway"] }),
   ...R(10, "curseReply", ["Speak up, O Curse; my #adj# hearing is the one faculty you have not yet ruined, and I should hate for you to feel you had left a job unfinished."]),
+  // The dog, once, does its job.
+  ...R(0, "dogHelps", ["Dog. DOG. Did you…?", "Good… dog?", "Sheep coming. Dog behind. What."]),
+  ...R(2, "dogHelps", ["Did the dog just… no. No. #dog#, did you just do your JOB? Once? In front of me?", "The sheep is coming here. Of its own accord. The dog is behind it. I do not know what to do with my face.", "#dog#. #dog#, look at me. Was that on purpose? Blink twice if it was on purpose."]),
+  ...R(4, "dogHelps", ["#pantheon.cap#, the dog has herded a sheep. One. After #hour# hours. I shall need to sit down; I shall need a plaque.", "#oath_phrase#! #dog# has done a thing! A useful thing! Nobody move, nobody breathe, it may never happen again!"]),
+  ...R(6, "dogHelps", ["Mark the hour, #vocative#: #dog# has done, for the first and I suspect the last time, the thing it is named for. Both halves of the name."]),
+  ...R(8, "dogHelps", ["The dog moved the sheep. I did not say anything. Neither did the dog. It was the best moment of the day and we both knew it."], { reg: ["hemingway"] }),
   // The hens scatter. Everything scatters.
   ...R(0, "hens", ["Hens. Even hens. Run.", "Not you too.", "Cluck off."]),
   ...R(2, "hens", ["Even the hens. Even the HENS run from me. I have never so much as looked at a hen.", "Go on, scatter. Everything on this hill scatters. I could scatter a rock.", "Hens. Sixty sheep to find and the hens think it is about THEM."]),

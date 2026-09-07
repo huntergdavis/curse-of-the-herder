@@ -332,6 +332,10 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "mishap" && e.detail === "wasp") s.renderer.dogReact("wasp", nowMs);
     if (e.kind === "mishap" && e.detail === "bite") s.renderer.dogReact("bite", nowMs);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.renderer.dogReact("flee", nowMs);
+    if (e.kind === "dogHelps") {
+      s.renderer.dogReact("herd", nowMs, e.sheepId);
+      toast(`<strong>${escapeHtml(dogName(w.seed))}</strong> herded a sheep. Once. Nobody knows why. It will not be repeated.`);
+    }
     if (e.kind === "jailbreak") {
       s.renderer.dogReact("flee", nowMs);
       s.bubbles.emote(e.sheepId, "!", 3, nowMs);
@@ -383,7 +387,7 @@ function handleEvents(s: Session, nowMs: number): void {
       }
     }
     if (e.kind === "finished") onFinished(s);
-    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || e.kind === "nemesisCaught" || e.kind === "lunchStolen" || (e.kind === "mishap" && e.detail === "crook")) {
+    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || e.kind === "nemesisCaught" || e.kind === "lunchStolen" || e.kind === "dogHelps" || (e.kind === "mishap" && e.detail === "crook")) {
       maybeCurseRemarks(s, e.kind === "mishap" ? "crook" : e.kind, nowMs);
     }
   }
@@ -472,6 +476,7 @@ const CURSE_LINES: Record<string, string[]> = {
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
   cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
+  dogHelps: ["I did not authorise that.", "Do not get used to it.", "Even I am surprised."],
   lunchStolen: ["That was the good cheese, too.", "I did not arrange that. I would have, but I did not.", "Lunch is for the uncursed."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],

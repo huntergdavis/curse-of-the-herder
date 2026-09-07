@@ -716,6 +716,26 @@ function stepRival(w: WorldState, map: GameMap): void {
   pushEvent(w, { tick: w.tick, kind: "rival", sheepId: -1, detail: String(w.rivalsSeen) });
 }
 
+/** Once, after two o'clock, the dog herds the sheep he is walking toward straight to him. Nobody can explain it. */
+function stepDogHelps(w: WorldState): void {
+  if (w.dogHelped || w.finished || w.tick < 5 * TICKS_PER_HOUR) return;
+  const h = w.herder;
+  if (h.mode !== "toSheep" || h.carrying >= 0) return;
+  const s = w.sheep[h.targetSheep];
+  if (!s || s.mode !== "loose" || s.absurd || s.nemesis) return;
+  const d = Math.hypot(s.x - h.x, s.y - h.y);
+  if (d < 4 || d > 9) return;
+  if (keyedUnit(w.seed, "dog-helps", w.tick) > 0.004) return;
+  w.dogHelped = true;
+  s.tx = Math.round(h.x) + (s.x < h.x ? -1 : 1);
+  s.ty = Math.round(h.y);
+  s.speed = 2.2;
+  s.homeX = s.tx;
+  s.homeY = s.ty;
+  addFrustration(w, -8);
+  pushEvent(w, { tick: w.tick, kind: "dogHelps", sheepId: s.id });
+}
+
 function stepJailbreak(w: WorldState, map: GameMap): void {
   if (w.finished) return;
   const h = w.herder;
@@ -776,6 +796,7 @@ export function step(w: WorldState, map: GameMap): WorldState {
   stepWeather(w);
   stepJailbreak(w, map);
   stepRival(w, map);
+  stepDogHelps(w);
   govern(w);
   stepSheep(w, map);
   stepHerder(w, map);

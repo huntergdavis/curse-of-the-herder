@@ -435,12 +435,13 @@ export class Renderer {
   private finaleStartMs = -1;
 
   /** The sheepdog: follows him about, sits when he sits, helps with nothing. */
-  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "" };
+  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "", herdSheep: -1 };
 
   /** The dog notices things, briefly. */
-  dogReact(kind: "wasp" | "flee" | "bite" | "book", nowMs: number): void {
+  dogReact(kind: "wasp" | "flee" | "bite" | "book" | "herd", nowMs: number, sheepId = -1): void {
     this.dog.react = kind;
-    this.dog.reactUntil = nowMs + (kind === "wasp" ? 3500 : 2200);
+    this.dog.herdSheep = sheepId;
+    this.dog.reactUntil = nowMs + (kind === "wasp" ? 3500 : kind === "herd" ? 5000 : 2200);
   }
 
   private shoutingNow = false;
@@ -735,6 +736,18 @@ export class Renderer {
       if (reacting && d.react === "wasp") {
         d.x += (d.facing === 0 ? -1 : 1) * 0.06;
         d.vx = (d.facing === 0 ? -1 : 1) * 0.06;
+      }
+      // The one time it herds: it darts to the far side of the sheep and stays on its heels.
+      const herded = reacting && d.react === "herd" ? world.sheep[d.herdSheep] : undefined;
+      if (herded && herded.mode === "loose") {
+        const ax = herded.x + Math.sign(herded.x - h.x) * 1.1;
+        const ay = herded.y + 0.4;
+        d.vx = (ax - d.x) * 0.12;
+        d.vy = (ay - d.y) * 0.12;
+        d.x += d.vx;
+        d.y += d.vy;
+        if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
+        if (Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.7, "hup!");
       }
       const dogMoving = Math.hypot(d.vx, d.vy) > 0.004;
       if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
