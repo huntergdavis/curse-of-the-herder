@@ -125,6 +125,8 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   gaze: "gaze",
   mishap: "idle",
   started: "dawn",
+  curious: "curious",
+  dozy: "dozy",
 };
 
 function holdSeconds(text: string, heat: number): number {
@@ -141,7 +143,7 @@ export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent
   else if (e.kind === "absurd" && wasInRiver(w, map, e.sheepId)) ev = "river";
   const ctx = buildContext(w, map, e, recent, bandCap);
   // Events run hotter than the meter says: something just happened.
-  const bump: Partial<Record<RuleEvent, number>> = { flee: 0.25, repeatEscape: 0.4, absurd: 0.3, penned: -0.2, finished: 0.5, rant: 0.3, gaze: -0.5, bog: 0.35, nettles: 0.35, stub: 0.4, cowpat: 0.3, wasp: 0.45, bite: 0.4, gate: 0.35, molehill: 0.3 };
+  const bump: Partial<Record<RuleEvent, number>> = { flee: 0.25, repeatEscape: 0.4, absurd: 0.3, penned: -0.2, finished: 0.5, rant: 0.3, gaze: -0.5, bog: 0.35, nettles: 0.35, stub: 0.4, cowpat: 0.3, wasp: 0.45, bite: 0.4, gate: 0.35, molehill: 0.3, heave: 0.3, curious: -0.4, dozy: -0.1 };
   ctx.heat = Math.max(0, Math.min(1, ctx.heat + (bump[ev] ?? 0)));
   const r = grammar.generate(ev, ctx, e.sheepId) ?? (ev === "rant" ? grammar.generate("idle", ctx, e.sheepId) : null);
   if (!r) return null;

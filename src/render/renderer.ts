@@ -451,7 +451,7 @@ export class Renderer {
         herderDrawn = true;
       }
       const moving = s.mode === "loose" && (Math.abs(s.tx - s.x) > 1e-3 || Math.abs(s.ty - s.y) > 1e-3);
-      const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : "idle";
+      const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
       if (s.inRiver && s.mode === "loose") {
@@ -475,6 +475,7 @@ export class Renderer {
       }
       // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
+      else if (s.mode === "loose" && s.temper === "dozy" && Math.floor(nowMs / 1000 + s.id) % 5 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
       else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, (s.id * 13 + Math.floor(nowMs / 23000)) % 9 === 0 ? "achoo" : "baa");
       // At night one or two sheep snore at a time, gently.
       else if (world.finished && s.mode === "penned" && s.id % 20 === Math.floor(nowMs / 6000) % 20) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");

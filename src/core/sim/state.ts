@@ -36,6 +36,10 @@ export interface SheepState {
   onRoof?: boolean;
   /** Standing in the river; caught from the bank. */
   inRiver?: boolean;
+  /** Personality: plain | skittish | stubborn | dozy | curious */
+  temper?: string;
+  /** Curious sheep: has it already come up to say hello? */
+  greeted?: boolean;
 }
 
 export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting" | "gazing" | "mishap";
@@ -81,7 +85,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
@@ -216,6 +220,8 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
       const y = Math.floor(i / map.size);
       const t = map.terrain[i]!;
       const nearWater = [1, -1, map.size, -map.size].some((o) => map.terrain[i + o] === Terrain.Water);
+      const tr = rnd();
+      const temper = tr < 0.4 ? "plain" : tr < 0.6 ? "skittish" : tr < 0.75 ? "stubborn" : tr < 0.9 ? "dozy" : "curious";
       sheep.push({
         id: sheep.length,
         x,
@@ -223,7 +229,8 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
         homeX: x,
         homeY: y,
         mode: "loose",
-        skittish: 0.15 + rnd() * 0.6,
+        skittish: temper === "skittish" ? 0.6 + rnd() * 0.35 : temper === "dozy" || temper === "curious" ? 0.05 : 0.15 + rnd() * 0.4,
+        temper,
         flees: 0,
         absurd: t === Terrain.Rock || (nearWater && rnd() < 0.5),
         seen: false,

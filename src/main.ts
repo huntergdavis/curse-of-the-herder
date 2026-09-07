@@ -242,6 +242,12 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "repeatEscape" && w.sheep[e.sheepId]?.flees === 2) toast(`That one has earned a name. It is <strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> now.`);
     if (e.kind === "rainStops") s.renderer.rainStopped(nowMs);
+    if (e.kind === "penned") {
+      const el = $("hud-flock");
+      el.classList.remove("pop");
+      void el.offsetWidth;
+      el.classList.add("pop");
+    }
     if (e.kind === "mishap" && e.detail === "bite" && e.sheepId >= 0) s.bubbles.emote(e.sheepId, "grr", 2.5, nowMs);
     if (e.kind === "mishap" && e.detail === "wasp") s.renderer.dogReact("wasp", nowMs);
     if (e.kind === "mishap" && e.detail === "bite") s.renderer.dogReact("bite", nowMs);

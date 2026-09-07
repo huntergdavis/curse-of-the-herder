@@ -29,6 +29,8 @@
       #meter { height: 10px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--paper-2); }
       #meter > div { height: 100%; width: 0%; background: linear-gradient(90deg, #f2c14e, #e8743a, #c94f4f); transition: width 0.6s; }
       #meter.tremble { animation: tremble 0.12s infinite; }
+      #hud-flock.pop { animation: pop 0.5s ease-out; display: inline-block; }
+      @keyframes pop { 0% { transform: scale(1); } 35% { transform: scale(1.35); color: var(--accent); } 100% { transform: scale(1); } }
       @keyframes tremble { 0% { transform: translate(0, 0); } 25% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, 1px); } 100% { transform: translate(0, 0); } }
       #toolbar { top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; z-index: 20; }
       button, select { font: inherit; font-size: 14px; background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }

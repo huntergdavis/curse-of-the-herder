@@ -192,6 +192,23 @@ function stepSheep(w: WorldState, map: GameMap): void {
     }
     // Stranded sheep stay stranded; the others amble a tile within the leash now and then.
     if (s.absurd) continue;
+    if (s.temper === "dozy") continue;
+    // Curious sheep come to see what the fuss is.
+    if (s.temper === "curious" && d < 8 && d > 1.2 && w.tick % 12 === s.id % 12) {
+      const nx = Math.round(s.x + Math.sign(h.x - s.x));
+      const ny = Math.round(s.y + Math.sign(h.y - s.y));
+      const i = ny * map.size + nx;
+      if (nx > 0 && ny > 0 && nx < map.size - 1 && ny < map.size - 1 && isWalkable(map.terrain[i]!) && map.deco[i] !== Deco.Fence && map.deco[i] !== Deco.House && map.deco[i] !== Deco.HouseRed) {
+        s.tx = nx;
+        s.ty = ny;
+        s.speed = 0.9;
+      }
+      if (!s.greeted && d < 3) {
+        s.greeted = true;
+        pushEvent(w, { tick: w.tick, kind: "curious", sheepId: s.id });
+      }
+      continue;
+    }
     if (w.tick % 40 === s.id % 40 && keyedUnit(w.seed, "wander", s.id, w.tick) < 0.5 && d > 3) {
       const dir = Math.floor(keyedUnit(w.seed, "wander-dir", s.id, w.tick) * 4);
       const nx = Math.round(s.x) + [1, -1, 0, 0][dir]!;
@@ -518,8 +535,17 @@ function stepHerder(w: WorldState, map: GameMap): void {
           w.stats.absurds++;
           addFrustration(w, FRUSTRATION.absurdLocation);
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
+        } else if (s.temper === "dozy") {
+          pushEvent(w, { tick: w.tick, kind: "dozy", sheepId: s.id });
         } else {
           pushEvent(w, { tick: w.tick, kind: "caught", sheepId: s.id });
+        }
+        // Stubborn ones do not come up on the first heave.
+        if (s.temper === "stubborn" && keyedUnit(w.seed, "heave", s.id) < 0.6) {
+          if (planPath(w, map, map.pen.x, map.pen.y)) h.mode = "toPen";
+          else h.mode = "idle";
+          startMishap(w, "heave", 7, 10, s.id);
+          return;
         }
         if (planPath(w, map, map.pen.x, map.pen.y)) h.mode = "toPen";
         else h.mode = "idle";

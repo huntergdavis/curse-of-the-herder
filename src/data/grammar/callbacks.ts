@@ -82,6 +82,19 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // Temperaments: the stubborn heave, the curious one, the dozy one.
+  ...R(0, "heave", ["Hnngh.", "Up. UP.", "#oath.cap#. Heavy.", "Hnngh! Hnngh!"]),
+  ...R(2, "heave", ["Hnngh. You are heavier than you look. You look heavy.", "Up you come. No? Up you— #oath#, sheep, WORK with me.", "Are you holding on to the ground? You are holding on to the ground."]),
+  ...R(4, "heave", ["#oath_phrase#, #vocative#, you have the density of a #adj# anvil and the cooperation of a #adj# gate!", "#pantheon.cap#, it weighs like a sermon and it will not be lifted like one."]),
+  ...R(8, "heave", ["I lifted. It did not come. I lifted again. Then it came, and I wished it had not."], { reg: ["hemingway"] }),
+  ...R(0, "curious", ["Oh. Hello.", "You. Came. Good.", "Hm. Sensible sheep."]),
+  ...R(2, "curious", ["At least one of you has sense. Come here. You are my favourite. Do not tell the others.", "It walked up to me. It just walked up. I could weep.", "Look at this one. Look. This is how it is SUPPOSED to go."]),
+  ...R(4, "curious", ["#pantheon.cap#, a sheep with manners. I shall carry you gently, you #adj# little miracle.", "#oath.cap#, one came to me. One. Out of sixty. I will take it."]),
+  ...R(8, "curious", ["It came to me. I did not know what to do with that. I picked it up. That was the right thing."], { reg: ["hemingway"] }),
+  ...R(0, "dozy", ["Asleep. Still asleep.", "Zzz. Good. Up.", "Sleeping. Fine."]),
+  ...R(2, "dozy", ["It did not even wake up. I have carried furniture with more opinions.", "Asleep. On a hill. In the rain. I envy this sheep.", "Shh. Do not wake it. This is the best one."]),
+  ...R(4, "dozy", ["#pantheon.cap#, it sleeps. It sleeps like #simile#. Carry it soft, herder; this is the one good thing today.", "Dozing, you #adj# bolster. I should charge you rent."]),
+  ...R(8, "dozy", ["It was asleep. I carried it asleep. It woke at the pen and did not know it had moved. That is a good life."], { reg: ["hemingway"] }),
   // First words of the day, said at the pen with the whole thing ahead of him.
   ...R(0, "dawn", ["Right. Sheep.", "Morning. Sheep. Again.", "#interj.cap#. Day.", "Sixty. #interj.cap#.", "Up. Sheep. Go."]),
   ...R(2, "dawn", [
