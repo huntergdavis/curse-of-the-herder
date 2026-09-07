@@ -43,7 +43,6 @@ function startMishap(w: WorldState, kind: string, anger: number, ticks: number, 
   const h = w.herder;
   w.lastMishapTick = w.tick;
   w.stats.mishaps = (w.stats.mishaps ?? 0) + 1;
-  w.streak = 0;
   addFrustration(w, anger);
   h.rantReturnMode = h.mode === "mishap" ? h.rantReturnMode : h.mode;
   h.mode = "mishap";
