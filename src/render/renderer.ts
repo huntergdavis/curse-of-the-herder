@@ -251,6 +251,17 @@ export class Renderer {
     this.dog.reactUntil = nowMs + (kind === "wasp" ? 3500 : 2200);
   }
 
+  private shoutingNow = false;
+  /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
+  private arrivals: { id: number; atMs: number }[] = [];
+  /** The herder's signature word, drawn in colour when it appears in a bubble. */
+  signatureWord = "";
+
+  sheepPenned(id: number, nowMs: number): void {
+    this.arrivals.push({ id, atMs: nowMs });
+    if (this.arrivals.length > 8) this.arrivals.shift();
+  }
+
   /** Epitaph of the herder before this one, carved on a stone by the pen. */
   memorial: { name: string; epitaph: string } | null = null;
 
@@ -289,6 +300,7 @@ export class Renderer {
 
     const h = world.herder;
     const hourNow = this.hourOverride ?? dayHour(world);
+    this.shoutingNow = (bubbles.herderLine()?.heat ?? 0) > 0.7;
     setShadowSkew(Math.max(-0.6, Math.min(0.6, (hourNow - 13.5) * 0.14)));
 
     // Footprints in the mud: remember where he stepped, fade them out.
@@ -396,8 +408,9 @@ export class Renderer {
         d.init = true;
       }
       const moving = h.mode === "toSheep" || h.mode === "toPen" || h.mode === "toLibrary";
-      const targetX = h.x - (h.facing === 0 ? 1.6 : h.facing === 2 ? -1.6 : 0.9);
-      const targetY = h.y - (h.facing === 1 ? 1.4 : h.facing === 3 ? -1.4 : 0.3) + 0.5;
+      // At the end of the day the dog comes and lies down at his feet.
+      const targetX = world.finished ? h.x + 0.9 : h.x - (h.facing === 0 ? 1.6 : h.facing === 2 ? -1.6 : 0.9);
+      const targetY = world.finished ? h.y + 0.6 : h.y - (h.facing === 1 ? 1.4 : h.facing === 3 ? -1.4 : 0.3) + 0.5;
       let dist = Math.hypot(targetX - d.x, targetY - d.y);
       // When the herder stops, the dog notices flowers and drifts toward them, tail up.
       let chasing = false;
@@ -419,7 +432,7 @@ export class Renderer {
           }
         }
       }
-      if (!chasing && (moving || dist > 3)) {
+      if (!chasing && (moving || dist > (world.finished ? 0.3 : 3))) {
         const k = 1 - Math.exp(-(1 / 60) * 3.2);
         d.vx = (targetX - d.x) * k;
         d.vy = (targetY - d.y) * k;
@@ -487,6 +500,11 @@ export class Renderer {
       const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
+      // A newly penned sheep hops for a second; its neighbours in the pen cheer.
+      const arrival = this.arrivals.find((a) => a.id === s.id && nowMs - a.atMs < 1200);
+      const hopY = arrival ? -Math.abs(Math.sin(((nowMs - arrival.atMs) / 1200) * Math.PI * 3)) * T * 0.25 : 0;
+      const cheer = s.mode === "penned" && !arrival && this.arrivals.some((a) => nowMs - a.atMs < 1500) && s.id % 3 === Math.floor(nowMs / 500) % 3;
+      if (cheer) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "!");
       if (s.inRiver && s.mode === "loose") {
         // Ripples around a sheep standing in the water.
         ctx.strokeStyle = "rgba(255,255,255,0.55)";
@@ -498,7 +516,7 @@ export class Renderer {
           ctx.stroke();
         }
       }
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5)), T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
+      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5)) + hopY, T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
       if (s.named && s.mode === "loose" && T >= 32) {
         ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
         ctx.textAlign = "center";
@@ -794,6 +812,28 @@ export class Renderer {
       ctx.arc(mx - T * 0.32, my - T * 0.12, T * 0.6, 0, Math.PI * 2);
       ctx.fill();
     }
+    // A shooting star, now and then, once it is properly dark.
+    if (hour > 18.8 && !this.reducedMotion) {
+      const period = 23000;
+      const ph = (nowMs % period) / period;
+      if (ph < 0.06) {
+        const k = Math.floor(nowMs / period);
+        const x0 = W * (0.2 + ((k * 37) % 60) / 100);
+        const y0 = H * (0.08 + ((k * 53) % 25) / 100);
+        const t = ph / 0.06;
+        const x = x0 + t * T * 6;
+        const y = y0 + t * T * 2.2;
+        const g = ctx.createLinearGradient(x - T * 1.4, y - T * 0.5, x, y);
+        g.addColorStop(0, "rgba(255,255,255,0)");
+        g.addColorStop(1, `rgba(255,255,240,${(0.9 * (1 - t)).toFixed(3)})`);
+        ctx.strokeStyle = g;
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        ctx.beginPath();
+        ctx.moveTo(x - T * 1.4, y - T * 0.5);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+    }
     // Stars come out after half past six.
     if (hour > 18.5) {
       const a = Math.min(1, (hour - 18.5) / 1.2);
@@ -811,7 +851,7 @@ export class Renderer {
     const line = bubbles.herderLine();
     if (line) {
       const fontPx = Math.max(14 * this.dpr, Math.min(T * 0.42, 30 * this.dpr)) * this.fontScale;
-      drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * 1.45, line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT, highContrast: this.highContrast }, W, H);
+      drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * 1.45, line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT, highContrast: this.highContrast, highlight: this.signatureWord }, W, H);
     }
   }
 
@@ -884,6 +924,7 @@ export class Renderer {
       crookBroken: world.crookBroken,
       windy: isWindy(world) && h.carrying < 0 && !reading,
       level: levelFor(erudition(world.booksRead, world.sheepPenned, hoursElapsed(world))),
+      shouting: this.shoutingNow,
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

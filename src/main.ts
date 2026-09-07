@@ -133,6 +133,7 @@ async function startSession(world: WorldState): Promise<void> {
     napNoted: false,
   };
   renderer.hourOverride = null;
+  renderer.signatureWord = signatureWord(world.seed);
   renderer.reducedMotion = motionSetting;
   renderer.fontScale = textScale;
   renderer.highContrast = contrastSetting;
@@ -264,6 +265,7 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "repeatEscape" && w.sheep[e.sheepId]?.flees === 2) toast(`That one has earned a name. It is <strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> now.`);
     if (e.kind === "rainStops") s.renderer.rainStopped(nowMs);
     if (e.kind === "penned") {
+      s.renderer.sheepPenned(e.sheepId, nowMs);
       const el = $("hud-flock");
       el.classList.remove("pop");
       void el.offsetWidth;

@@ -122,6 +122,8 @@ export interface HerderPose {
   windy?: boolean;
   /** Eloquence level 0-12: adds a book, a quill, a scarf, spectacles, a laurel. */
   level?: number;
+  /** Mid-shout: an open mouth. */
+  shouting?: boolean;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -285,6 +287,13 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.beginPath();
   ctx.ellipse(T * 0.02, -T * 0.97 - bob, T * 0.15, T * 0.1, 0, 0, Math.PI);
   ctx.fill();
+  // Mouth: a line, or a shout.
+  if (p.shouting) {
+    ctx.fillStyle = "#4a1f1f";
+    ctx.beginPath();
+    ctx.ellipse(T * 0.1, -T * 0.99 - bob, T * 0.045, T * 0.06 + Math.abs(Math.sin(p.phase * Math.PI * 6)) * T * 0.02, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
   // Eye and brow (brow angle = fury)
   ctx.fillStyle = INK;
   ctx.beginPath();
@@ -370,6 +379,8 @@ export interface BubbleStyle {
   font: string;
   /** Pure white on black with a heavy outline, for legibility at a distance or low vision. */
   highContrast?: boolean;
+  /** A word to draw in the accent colour wherever it appears. */
+  highlight?: string;
 }
 
 /** Speech bubble whose tail points at (tx, ty). Returns nothing; clamps to canvas. */
@@ -434,11 +445,32 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   ctx.fillStyle = style.highContrast ? "#000000" : INK;
   if (style.highContrast) ctx.font = `bold ${fontPx}px ${style.font}`;
   ctx.textBaseline = "top";
+  const inkColour = ctx.fillStyle;
+  const drawLine = (l: string, x: number, y: number, centred: boolean): void => {
+    const hl = style.highlight?.toLowerCase();
+    if (!hl || !l.toLowerCase().includes(hl)) {
+      ctx.fillText(l, x, y);
+      return;
+    }
+    // Draw word by word so the signature word can take the accent colour.
+    const words = l.split(" ");
+    const total = ctx.measureText(l).width;
+    let cx = centred ? x - total / 2 : x;
+    ctx.textAlign = "left";
+    for (const w of words) {
+      const core = w.toLowerCase().replace(/[^a-z'-]/g, "");
+      ctx.fillStyle = core === hl || core === hl + "s" ? "#c94f4f" : inkColour;
+      ctx.fillText(w, cx, y);
+      cx += ctx.measureText(w + " ").width;
+    }
+    ctx.fillStyle = inkColour;
+    if (centred) ctx.textAlign = "center";
+  };
   if (verse) {
     ctx.textAlign = "center";
-    lines.forEach((l, i) => ctx.fillText(l, bx + bw / 2, by + padY + i * lineH));
+    lines.forEach((l, i) => drawLine(l, bx + bw / 2, by + padY + i * lineH, true));
   } else {
-    lines.forEach((l, i) => ctx.fillText(l, bx + padX, by + padY + i * lineH));
+    lines.forEach((l, i) => drawLine(l, bx + padX, by + padY + i * lineH, false));
   }
   ctx.restore();
 }
