@@ -357,6 +357,25 @@ export class Renderer {
         for (let x = x0; x <= x1; x++) {
           const i = y * this.map.size + x;
           const t = this.map.terrain[i];
+          if (t === Terrain.Grass || t === Terrain.Meadow) {
+            // Frogs sit by the water and croak now and then.
+            if (((x * 31 + y * 17) % 41) !== 7 || this.map.deco[i] !== Deco.None) continue;
+            const nearWater = [i - 1, i + 1, i - this.map.size, i + this.map.size].some((j) => this.map.terrain[j] === Terrain.Water);
+            if (!nearWater) continue;
+            const fx = sx(x + 0.5);
+            const fy = sy(y + 0.6);
+            ctx.fillStyle = "#4f8a3a";
+            ctx.beginPath();
+            ctx.ellipse(fx, fy, T * 0.13, T * 0.08, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#f4f1e6";
+            ctx.beginPath();
+            ctx.arc(fx - T * 0.06, fy - T * 0.07, T * 0.025, 0, Math.PI * 2);
+            ctx.arc(fx + T * 0.06, fy - T * 0.07, T * 0.025, 0, Math.PI * 2);
+            ctx.fill();
+            if (Math.floor(nowMs / 1000 + x) % 17 === 0) drawEmote(ctx, fx + T * 0.25, fy - T * 0.4, T * 0.6, "ribbit");
+            continue;
+          }
           if (t === Terrain.Water) {
             if (((x * 73 + y * 151) % 97) !== 3) continue; // roughly one duck per hundred water tiles
             const a = nowMs / 4000 + x;
@@ -477,6 +496,59 @@ export class Renderer {
       }
     }
 
+    // A hedgehog trundles along the road at dusk, near enough to notice.
+    if (hourNow > 16.8 && hourNow < 19 && !this.reducedMotion) {
+      const period = 90_000;
+      const ph = (nowMs % period) / period;
+      if (ph < 0.25) {
+        // Find a road tile near the herder to walk along.
+        const ry = Math.round(h.y) + 3;
+        let rx = -1;
+        for (let dx = -8; dx <= 8 && rx < 0; dx++) {
+          const x = Math.round(h.x) + dx;
+          const i = ry * this.map.size + x;
+          if (i >= 0 && i < this.map.size * this.map.size && (this.map.terrain[i] === Terrain.Road || this.map.terrain[i] === Terrain.Grass)) rx = x;
+        }
+        if (rx >= 0) {
+          const t = ph / 0.25;
+          const px = sx(rx - 4 + t * 8 + 0.5);
+          const py = sy(ry + 0.7);
+          ctx.fillStyle = "#5a4634";
+          ctx.beginPath();
+          ctx.ellipse(px, py, T * 0.16, T * 0.1, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "#3a2a1c";
+          ctx.lineWidth = Math.max(1, T * 0.025);
+          ctx.beginPath();
+          for (let k = -3; k <= 3; k++) {
+            ctx.moveTo(px + k * T * 0.04, py - T * 0.06);
+            ctx.lineTo(px + k * T * 0.05, py - T * 0.15 - Math.abs(k) * T * 0.005);
+          }
+          ctx.stroke();
+          ctx.fillStyle = "#3a2a1c";
+          ctx.beginPath();
+          ctx.arc(px + T * 0.17, py + T * 0.01, T * 0.03, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // The pen gate swings open as he arrives with a sheep.
+    if (h.carrying >= 0 && Math.hypot(h.x - this.map.pen.x, h.y - (this.map.pen.y + 2)) < 3) {
+      const gx = sx(this.map.pen.x + 0.5);
+      const gy = sy(this.map.pen.y + 2 + 0.5);
+      const open = Math.min(1, (3 - Math.hypot(h.x - this.map.pen.x, h.y - (this.map.pen.y + 2))) / 1.5);
+      ctx.strokeStyle = "#6b4a2b";
+      ctx.lineWidth = Math.max(1.5, T * 0.1);
+      ctx.beginPath();
+      const ang = open * 1.1;
+      ctx.moveTo(gx - T * 0.5, gy);
+      ctx.lineTo(gx - T * 0.5 + Math.cos(ang) * T, gy + Math.sin(ang) * T * 0.6);
+      ctx.moveTo(gx - T * 0.5, gy + T * 0.18);
+      ctx.lineTo(gx - T * 0.5 + Math.cos(ang) * T, gy + T * 0.18 + Math.sin(ang) * T * 0.6);
+      ctx.stroke();
+    }
+
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
@@ -523,6 +595,14 @@ export class Renderer {
         ctx.fillStyle = "rgba(43,38,32,0.8)";
         ctx.fillText(sheepName(world.seed, s.id), sx(s.x + 0.5), sy(s.y + 0.5) + T * 0.62);
         ctx.textAlign = "left";
+      }
+      // Two loose sheep standing near each other gossip.
+      if (s.mode === "loose" && !s.absurd && Math.floor(nowMs / 1000) % 13 === 4) {
+        const buddy = world.sheep.find((o) => o.id !== s.id && o.mode === "loose" && Math.hypot(o.x - s.x, o.y - s.y) < 2.2);
+        if (buddy && s.id < buddy.id) {
+          drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
+          drawEmote(ctx, sx(buddy.x + 0.5) + T * 0.3, sy(buddy.y) - T * 0.35, T * 0.8, "baa");
+        }
       }
       // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
