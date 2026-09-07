@@ -1,6 +1,6 @@
 import { generateMap, type GameMap } from "./core/map/generate";
 import { LEVEL_NAMES, erudition, levelFor } from "./core/progression";
-import { nextIdleCurseTicks, speakEpitaph, speakForEvent, speakIdle } from "./core/lang/speech";
+import { nextIdleCurseTicks, speakEpitaph, speakForEvent, speakIdle, speakKind } from "./core/lang/speech";
 import type { Band } from "./core/lang/types";
 import { createWorld, dayHour, hoursElapsed, mapForWorld, upgradeWorld, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
 import { step } from "./core/sim/step";
@@ -134,6 +134,11 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   renderer.setSeason(world.season);
+  renderer.onHatLost = () => {
+    if (!session) return;
+    const u = speakKind(session.world, session.map, "hat", { lines: session.recent, rules: session.recentRules }, BAND_CAP, 0.35);
+    if (u) say(session, u.text, u.heat, u.seconds, performance.now(), true, u);
+  };
   if (params.get("hat")) renderer.hatPeriod = 10;
   renderer.wanted = world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
   renderer.signatureWord = signatureWord(world.seed);
@@ -332,6 +337,9 @@ function handleEvents(s: Session, nowMs: number): void {
       }
     }
     if (e.kind === "finished") onFinished(s);
+    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || (e.kind === "mishap" && e.detail === "crook")) {
+      maybeCurseRemarks(s, e.kind === "mishap" ? "crook" : e.kind, nowMs);
+    }
   }
 }
 
@@ -405,9 +413,41 @@ function showExcerpts(s: Session, nowMs: number): void {
   }
 }
 
+const CURSE_LINES: Record<string, string[]> = {
+  rant: ["Noted.", "The Curse has heard this one before. In 1487.", "Shouting is permitted. It is not, historically, effective.", "The sky is not a party to your arrangement. I am."],
+  jailbreak: ["The Curse did not do that. The Curse admires it.", "Sixty is a courtesy figure.", "Fences are a suggestion. I thought you knew."],
+  milestone: ["Halfway is a word. It has never once been a place.", "You are counting. I find that touching.", "One left. You will remember this one. You always do."],
+  crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
+  finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
+  book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],
+};
+let lastCurseMs = -1e9;
+/** From level 10, the Curse itself occasionally remarks on events, drily, in its own voice. */
+function maybeCurseRemarks(s: Session, kind: string, nowMs: number): void {
+  const w = s.world;
+  const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
+  if (level < 10 || nowMs - lastCurseMs < 8 * 60 * 1000 / Math.max(1, FAST) && kind !== "finished") return;
+  const pool = CURSE_LINES[kind];
+  if (!pool || keyedUnit(w.seed, "curse-remark", w.tick) > 0.45) return;
+  lastCurseMs = nowMs;
+  const line = pool[Math.floor(keyedUnit(w.seed, "curse-remark-line", w.tick) * pool.length)] ?? pool[0]!;
+  window.setTimeout(() => {
+    const el = $("toast");
+    el.innerHTML = `<span class="curse-voice">The Curse:</span> ${escapeHtml(line)}`;
+    el.classList.add("curse");
+    el.hidden = false;
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      el.hidden = true;
+      el.classList.remove("curse");
+    }, 7000);
+  }, 2500);
+}
+
 let toastTimer = 0;
 function toast(html: string): void {
   const el = $("toast");
+  el.classList.remove("curse");
   el.innerHTML = html;
   el.hidden = false;
   window.clearTimeout(toastTimer);

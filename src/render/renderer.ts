@@ -267,6 +267,8 @@ export class Renderer {
   hatPeriod = 170;
   /** Name on the wanted poster by the pen, if a sheep has broken out. */
   wanted: string | null = null;
+  /** Called when the wind takes the hat, so the herder can have words. */
+  onHatLost: (() => void) | null = null;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
   private arrivals: { id: number; atMs: number }[] = [];
   /** The herder's signature word, drawn in colour when it appears in a bubble. */
@@ -825,6 +827,7 @@ export class Renderer {
       this.hat.lostAt = nowMs;
       this.hat.dx = 0;
       this.hat.dy = 0;
+      this.onHatLost?.();
     }
     if (hatGone) {
       const t = (nowMs - this.hat.lostAt) / 6500;
@@ -1012,8 +1015,24 @@ export class Renderer {
       }
     }
 
-    // Birds: a small flock crosses now and then, high above everything.
-    if (!this.reducedMotion) {
+    // Bats after dark: quick, jittery, low over the trees.
+    if (!this.reducedMotion && hourNow > 18.3) {
+      for (let i = 0; i < 4; i++) {
+        const a = nowMs / (700 + i * 90) + i * 1.9;
+        const bx = W * (0.3 + 0.4 * ((i * 0.31 + nowMs / 40000) % 1)) + Math.sin(a * 1.3) * T * 2;
+        const by = H * 0.25 + Math.sin(a) * T * 1.5 + Math.cos(a * 2.3) * T * 0.6;
+        const flap = Math.sin(nowMs / 60 + i) * T * 0.1;
+        ctx.strokeStyle = "rgba(20, 18, 30, 0.85)";
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        ctx.beginPath();
+        ctx.moveTo(bx - T * 0.14, by + flap);
+        ctx.quadraticCurveTo(bx - T * 0.07, by - T * 0.05, bx, by);
+        ctx.quadraticCurveTo(bx + T * 0.07, by - T * 0.05, bx + T * 0.14, by + flap);
+        ctx.stroke();
+      }
+    }
+    // Birds: a small flock crosses now and then, high above everything (by day).
+    if (!this.reducedMotion && hourNow <= 18.3) {
       const period = 140_000;
       const phase = (nowMs % period) / period;
       if (phase < 0.22) {

@@ -186,6 +186,15 @@ export function speakIdle(w: WorldState, map: GameMap, recent: string[] | Recent
   return out;
 }
 
+/** A line for a presentation-only event (the wind taking his hat) with no sim event behind it. */
+export function speakKind(w: WorldState, map: GameMap, kind: RuleEvent, recent: string[] | RecentMemory, bandCap: Band = 4, heatBump = 0.3): Utterance | null {
+  const ctx = buildContext(w, map, null, recent, bandCap);
+  ctx.heat = Math.max(0, Math.min(1, ctx.heat + heatBump));
+  const r = grammar.generate(kind, ctx, w.tick);
+  if (!r) return null;
+  return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId, used: r.used, targetLabel: targetLabel(ctx) };
+}
+
 export function speakEpitaph(w: WorldState, map: GameMap, recent: string[] | RecentMemory, bandCap: Band = 4): Utterance {
   const ctx = buildContext(w, map, null, recent, bandCap);
   ctx.heat = 1;

@@ -97,6 +97,14 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "idle", ["Spring. Everything is growing, including the distance between me and the sheep.", "Lambs, somewhere, are being sweet. These are not lambs. These are opinions with wool.", "The flowers are out. The sheep are eating them. Nature is a circle and I am walking round it."], { season: "spring", weight: 0.7 }),
   ...R(2, "idle", ["Summer. The sun is a cowpat in the sky and I am the boot.", "Hot. The sheep are wearing wool in this. By choice. I have questions.", "Midsummer, and the sheep have found the one patch of shade and are not sharing."], { season: "summer", weight: 0.7 }),
   ...R(4, "idle", ["#oath.cap#, the heat! I am a stew and the sheep are the dumplings and none of us asked to be lunch."], { season: "summer", weight: 0.7 }),
+  // The wind has the hat.
+  ...R(0, "hat", ["Hat! HAT!", "My hat. Wind. HAT.", "#oath.cap#! Hat!"]),
+  ...R(2, "hat", ["My hat! Come back! You are the only thing that has stayed on all day!", "The wind has my hat. The wind does not need a hat. The wind has never needed anything.", "That is my hat. That WAS my hat. It is the wind's hat now, and the wind is welcome to it, and I want it back."]),
+  ...R(4, "hat", ["#oath_phrase#! My hat! Twenty years on my head and it leaves me for a BREEZE!", "#pantheon.cap#, the hat! Not the hat! Take a sheep! Take TWO!"]),
+  ...R(8, "hat", ["The wind took the hat. I watched it go. It did not go far. Neither had I, all day."], { reg: ["hemingway"] }),
+  ...R(11, "hat", ["Farewell, my hat, so faithful and so green; / Go where the sheep go, which is: I don't know where they've been."], { reg: ["verse"] }),
+  // Miscounting in other tongues.
+  ...R(7, "miscount", ["Un, deux, trois… #penned#. Where was I. Quatre. No. #penned.cap#.", "Eins, zwei, drei… I have lost count in two languages now. #penned.cap#. Probably."]),
   // Jailbreak. It was in. It was IN.
   ...R(0, "jailbreak", ["IN. It was IN.", "Pen. Out. HOW.", "#swear.cap#! Out!", "No. No. NO."]),
   ...R(2, "jailbreak", [

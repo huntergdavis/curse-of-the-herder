@@ -57,6 +57,8 @@
       #line .label { font-family: var(--hud-font); font-size: 12px; opacity: 0.6; display: block; }
       #toast { left: 50%; top: 14px; transform: translateX(-50%); font-size: 15px; background: #fff3c4; animation: drop 0.4s ease-out; }
       #toast[hidden] { display: none; }
+      #toast.curse { background: #2b2620; color: #f4ecd8; border-color: #8a6238; font-family: var(--hand-font); font-size: 17px; }
+      #toast.curse .curse-voice { font-family: var(--hud-font); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; margin-right: 6px; }
       @keyframes drop { from { transform: translate(-50%, -30px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
       #overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(43, 38, 32, 0.55); color: var(--paper); font-size: 22px; text-align: center; padding: 24px; }
       #overlay[hidden] { display: none; }
