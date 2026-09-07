@@ -18,6 +18,39 @@ function walkingHerder(world: WorldState): boolean {
   return world.herder.mode === "toSheep" || world.herder.mode === "toPen";
 }
 
+/** Path of circle (cx, cy, R) with circle (ox, oy, r) bitten out of it. Falls back to the full disc if they do not overlap. */
+function crescentPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, R: number, ox: number, oy: number, r: number): void {
+  const dx = ox - cx;
+  const dy = oy - cy;
+  const d = Math.hypot(dx, dy);
+  ctx.beginPath();
+  if (d >= R + r || d <= Math.abs(R - r) || d === 0) {
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    return;
+  }
+  // Intersection points via the standard two-circle construction.
+  const a = (R * R - r * r + d * d) / (2 * d);
+  const h = Math.sqrt(Math.max(0, R * R - a * a));
+  const px = cx + (a * dx) / d;
+  const py = cy + (a * dy) / d;
+  const i1x = px + (h * dy) / d;
+  const i1y = py - (h * dx) / d;
+  const i2x = px - (h * dy) / d;
+  const i2y = py + (h * dx) / d;
+  const t1 = Math.atan2(i1y - cy, i1x - cx);
+  const t2 = Math.atan2(i2y - cy, i2x - cx);
+  const u1 = Math.atan2(i1y - oy, i1x - ox);
+  const u2 = Math.atan2(i2y - oy, i2x - ox);
+  // Outer arc of the moon on the side away from the bite, then back along the bite's edge.
+  const awayAngle = Math.atan2(cy - oy, cx - ox);
+  const mid = (t1 + t2) / 2;
+  const ccw = Math.cos(mid - awayAngle) < 0; // choose the arc that passes through the far side
+  ctx.moveTo(i1x, i1y);
+  ctx.arc(cx, cy, R, t1, t2, ccw);
+  ctx.arc(ox, oy, r, u2, u1, !ccw);
+  ctx.closePath();
+}
+
 /** Word-wrap `text` to `maxWidth` with the context's current font; at most `maxLines`, the last ending in an ellipsis if cut. */
 export function fitLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
   const words = text.split(/\s+/).filter(Boolean);
@@ -76,6 +109,14 @@ export class Renderer {
     canvas.addEventListener("contextrestored", () => this.dropChunks());
     this.indexHouses();
     this.resize();
+  }
+
+  /** Debug hooks (`?debug=1`). */
+  debugMap(): GameMap {
+    return this.map;
+  }
+  debugChunks(): { mode: string; cached: number; tilePx: number; mapSize: number; sameMap: boolean } {
+    return { mode: this.chunkMode, cached: this.chunks?.size ?? -1, tilePx: this.chunks?.tilePx ?? -1, mapSize: this.chunks?.map.size ?? -1, sameMap: this.chunks?.map === this.map };
   }
 
   setMap(map: GameMap): void {
@@ -919,8 +960,8 @@ export class Renderer {
       if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
         this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, (dogMoving || chasing) && !underfoot, (!moving && !dogMoving && !reacting && !chasing) || underfoot, nowMs);
         if (reacting) {
-          const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "…") : d.react === "bite" ? "?" : "…";
-          drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.4, sy(d.y + 0.9) - T * 0.95, T * 0.8, glyph);
+          const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "") : d.react === "bite" ? "?" : "";
+          if (glyph) drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.4, sy(d.y + 0.9) - T * 0.95, T * 0.8, glyph);
         }
         if (T >= 40 && !moving) {
           ctx.font = `${Math.max(9, T * 0.18)}px "Fredoka", sans-serif`;
@@ -1255,7 +1296,7 @@ export class Renderer {
       if (s.mode === "loose" && !s.absurd && Math.floor(nowMs / 1000) % 13 === 4) {
         const buddy = world.sheep.find((o) => o.id !== s.id && o.mode === "loose" && Math.hypot(o.x - s.x, o.y - s.y) < 2.2);
         if (buddy && s.id < buddy.id) {
-          drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
+          drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "baa?");
           drawEmote(ctx, sx(buddy.x + 0.5) + T * 0.3, sy(buddy.y) - T * 0.35, T * 0.8, "baa");
         }
       }
@@ -1269,11 +1310,11 @@ export class Renderer {
       else if (world.jailbreakPlan && s.mode === "penned") {
         const plotter = world.jailbreakPlan.sheepId === s.id;
         const beat = Math.floor(nowMs / 900) % 4;
-        if (plotter && beat < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.75, beat === 0 ? "psst" : "…");
+        if (plotter && beat === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.75, "psst");
         else if (!plotter && beat === 3 && s.id % 7 === Math.floor(nowMs / 3600) % 7) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.7, "?");
       }
       // One penned sheep at a time gives him a look when he passes empty-handed.
-      else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && s.id % 12 === Math.floor(nowMs / 4000) % 12) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
+
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
@@ -1749,13 +1790,9 @@ export class Renderer {
       const a = Math.min(1, (hour - 18.4) / 1.0);
       const mx = W * 0.82;
       const my = H * (0.22 - a * 0.06);
+      // A true crescent: the moon disc minus an offset disc, as one path, so nothing shows through the bite.
       ctx.fillStyle = `rgba(255, 250, 225, ${(0.9 * a).toFixed(3)})`;
-      ctx.beginPath();
-      ctx.arc(mx, my, T * 0.7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = `rgba(60, 60, 110, ${(0.9 * a).toFixed(3)})`;
-      ctx.beginPath();
-      ctx.arc(mx - T * 0.32, my - T * 0.12, T * 0.6, 0, Math.PI * 2);
+      crescentPath(ctx, mx, my, T * 0.7, mx - T * 0.34, my - T * 0.1, T * 0.62);
       ctx.fill();
     }
     // A shooting star, now and then, once it is properly dark.

@@ -1,0 +1,14 @@
+import { chromium } from "@playwright/test";
+const [url, dpr = "3"] = process.argv.slice(2);
+const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: Number(dpr) });
+p.on("console", (m) => { if (m.type() === "warning" || m.type() === "error") console.log("[console]", m.text().slice(0, 160)); });
+await p.goto(url);
+await p.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
+await p.waitForTimeout(3000);
+console.log("herder1", JSON.stringify(await p.evaluate(() => window.__curse.diag())));
+const first = await p.textContent("#hud-name");
+await p.waitForFunction((n) => (document.getElementById("hud-name")?.textContent ?? "") !== n && document.getElementById("overlay")?.hidden, first, { timeout: 300000, polling: 1000 });
+await p.waitForTimeout(3000);
+console.log("herder2", JSON.stringify(await p.evaluate(() => window.__curse.diag())));
+await p.screenshot({ path: `/tmp/claude-1000/-home-hunter-workspace-the-curse-of-the-herder/7dc8bf11-9b0b-4daa-baf5-bd5f847f1b08/scratchpad/diag-h2.png` });
+await b.close();

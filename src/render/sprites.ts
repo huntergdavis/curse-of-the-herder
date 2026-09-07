@@ -210,8 +210,6 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.fillStyle = "#7b2d3a";
     ctx.fillRect(-T * 0.36, -T * 0.78 - bob, T * 0.16, T * 0.22);
     ctx.strokeRect(-T * 0.36, -T * 0.78 - bob, T * 0.16, T * 0.22);
-    ctx.fillStyle = "#fffdf5";
-    ctx.fillRect(-T * 0.34, -T * 0.76 - bob, T * 0.03, T * 0.18);
   }
   // Arms
   ctx.strokeStyle = "#e8b98a";
@@ -325,10 +323,10 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.arc(0, -T * 1.08 - bob, T * 0.2, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-  // Beard
+  // Beard, kept under the chin so nothing pokes out behind the head.
   ctx.fillStyle = "#c9c2b5";
   ctx.beginPath();
-  ctx.ellipse(T * 0.02, -T * 0.97 - bob, T * 0.15, T * 0.1, 0, 0, Math.PI);
+  ctx.ellipse(T * 0.09, -T * 0.97 - bob, T * 0.1, T * 0.08, 0, 0, Math.PI);
   ctx.fill();
   // Mouth: a line, or a shout.
   if (p.shouting) {
@@ -347,21 +345,7 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.moveTo(T * 0.02, -T * (1.17 - p.fury * 0.03) - bob);
   ctx.lineTo(T * 0.16, -T * (1.17 + p.fury * 0.05) - bob);
   ctx.stroke();
-  // Level 6: a quill behind the ear. Level 10: spectacles.
-  if (lvl >= 6) {
-    ctx.strokeStyle = "#f4f1e6";
-    ctx.lineWidth = Math.max(1.5, T * 0.05);
-    ctx.beginPath();
-    ctx.moveTo(-T * 0.16, -T * 1.1 - bob);
-    ctx.lineTo(-T * 0.3, -T * 1.42 - bob);
-    ctx.stroke();
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = Math.max(1, T * 0.03);
-    ctx.beginPath();
-    ctx.moveTo(-T * 0.16, -T * 1.1 - bob);
-    ctx.lineTo(-T * 0.3, -T * 1.42 - bob);
-    ctx.stroke();
-  }
+  // Level 10: spectacles.
   if (lvl >= 10) {
     ctx.strokeStyle = INK;
     ctx.lineWidth = Math.max(1, T * 0.035);

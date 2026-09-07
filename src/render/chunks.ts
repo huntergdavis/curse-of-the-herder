@@ -81,6 +81,10 @@ export class ChunkCache {
     this.frame++;
   }
 
+  get size(): number {
+    return this.cache.size;
+  }
+
   /** Free every surface now. A dropped cache of two dozen 4 MB canvases should not wait for the GC. */
   dispose(): void {
     for (const e of this.cache.values()) freeSurface(e.surface);

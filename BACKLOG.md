@@ -79,6 +79,7 @@ long soak.
 - He waves back at the neighbour, stiffly, whenever he passes within five tiles and his hands are free (`?wave=1` holds the pose; `?rival=1` now spawns him three seconds in, within waving distance)
 - New book and register: *Three Men in a Boat* (Jerome K. Jerome, 1889, genuine excerpts) with a `jerome` pack of Victorian idler's outrage ("I like herding: it fascinates me. I can sit and look at a sheep for hours. It is the carrying I object to.")
 - Easter egg: *Crib Notes: Dungeon Crawler Carl* (a summary, no text quoted) with a `crawler` pack and register: "Goddamnit, Donut!" as his oath, unnamed sheep addressed as Donut while the register is hot, achievement announcements, a 🏆 toast on reading, and Donut and Mongo in the sheep-name pool
+- Visual nits: the level-6 quill (a cream stroke off the back of the head) and the book's white page edge are gone and the beard sits under the chin; every "…" indicator (addressed sheep, dog reactions, penned sheep, gossip, jailbreak plotting) is gone because text bubbles already carry the scene; the moon is a true crescent (one path) instead of a cream disc with a blue disc over it
 - Dog fixes: motion rates scale with the fast-forward factor and it snaps to heel if left more than a few tiles behind (it could not keep up at 100×); emote bubbles come from the head end on whichever side it faces (they were coming out of the wrong end when it faced left); the sprite has a snout and a floppy ear so it stops reading as a cat
 - Minimap reticle and look-around: the minimap shows the viewport as a reticle (gold while steering); click or hold-and-drag on it to look anywhere on the island; the view glides back to the herder two seconds after release. Playwright test covers it via `?debug=1`
 - Bug fix: terrain chunk canvases are now probed after rendering and every few seconds (one known-colour pixel each); a chunk that comes back wrong drops the cache and steps down to on-DOM canvases, then to painting terrain directly, retrying the fast path every 20 s. Chunk surfaces are capped at 64 px a tile (4 MB each, was up to 9 MB), freed explicitly on every map/season/resize change, and cleared on `contextlost`. This is the fix for the "sea over the whole island" report after a full day on a retina laptop
@@ -123,13 +124,6 @@ long soak.
 - [ ] README screenshots and a 20 s GIF of a late-day rant.
 - [ ] `?size=1000` board option; ring radii scale.
 - [ ] Boundary-check script once `core/` stabilises.
-
-## P3 — Someday
-
-- [ ] Multiple herders on one board (a cursed family).
-- [ ] Shareable "curse card" image export from the Hall (client-side canvas → PNG; download is user-initiated).
-- [ ] Localised UI (the herder stays English-first; his French is a feature).
-- [ ] A sheepdog who is no help at all.
 
 ## Research backlog index
 

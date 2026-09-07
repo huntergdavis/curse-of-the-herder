@@ -57,10 +57,6 @@ One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:
      [ ] Keyboard shortcuts (space pause, N new, H hall)
      [ ] README screenshots and a 20 s GIF
      [ ] A second Jerome-style book for variety at levels 7–8
- P3  Someday
-     [ ] Multiple herders on one board (a cursed family)
-     [ ] Shareable "curse card" PNG from the Hall
-     [ ] Localised UI
  Verify on hardware (cannot be done headless)
      [ ] Confirm the sea-over-island fix on the retina laptop that showed it (a whole day, then a second herder)
      [ ] Frame-time measurement: `?stats=1` on the MacBook Air, a minute at 1× and at 100×

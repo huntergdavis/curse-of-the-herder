@@ -114,7 +114,21 @@ function hideOverlay(): void {
 
 /** Test hook: `?debug=1` exposes the camera position. */
 if (params.has("debug")) {
-  (window as unknown as { __curse: { camera: () => { x: number; y: number } | null } }).__curse = { camera: () => (session ? { x: session.camera.x, y: session.camera.y } : null) };
+  (window as unknown as { __curse: unknown }).__curse = {
+    camera: () => (session ? { x: session.camera.x, y: session.camera.y } : null),
+    diag: () => {
+      if (!session) return null;
+      const w = session.world;
+      const hx = Math.round(w.herder.x);
+      const hy = Math.round(w.herder.y);
+      return {
+        name: w.name, seed: w.seed, size: w.size, herder: { x: w.herder.x, y: w.herder.y }, camera: { x: session.camera.x, y: session.camera.y },
+        simTerrainAtHerder: session.map.terrain[hy * session.map.size + hx], sameMapObject: session.renderer.debugMap() === session.map,
+        renderTerrainAtHerder: session.renderer.debugMap().terrain[hy * session.renderer.debugMap().size + hx], renderMapSize: session.renderer.debugMap().size,
+        chunk: session.renderer.debugChunks(), tilePx: session.renderer.tilePx, dpr: window.devicePixelRatio,
+      };
+    },
+  };
 }
 
 async function startSession(world: WorldState): Promise<void> {
@@ -855,7 +869,7 @@ function frame(nowMs: number): void {
           if (u) {
             say(s, u.text, u.heat, u.seconds, nowMs, false, u);
             // The addressed sheep has nothing to say for itself.
-            if (u.sheepId !== undefined && Math.hypot((w.sheep[u.sheepId]?.x ?? 0) - w.herder.x, (w.sheep[u.sheepId]?.y ?? 0) - w.herder.y) < 14) s.bubbles.emote(u.sheepId, "…", Math.min(4, u.seconds), nowMs + 700);
+            // (The addressed sheep used to get a "…" bubble here; it made the scene busy, so it is gone.)
           }
           s.nextIdleCurseTick = w.tick + nextIdleCurseTicks(w);
         }
