@@ -172,7 +172,7 @@ export const RULES_5_8: Rule[] = [
     "#oath.cap#, #oath#, #oath#. There. Three languages, one #target#.", "#vocative.cap#, you #insult#. You #insult#. You, in a word, #insult#.",
     "I have words in four tongues for you, #vocative#, and the kindest is #insult#.", "#oath.cap#, #clause#, and #oath#, #clause#.",
     "Every language has a word for you, #vocative#. Today's is #insult#.", "#oath.cap#. #interj.cap#. #oath.cap#. I have run out of English.",
-    "A #target# like this deserves a foreign oath: #oath#.", "#clause.cap#. #oath.cap#. #clause.cap#. #oath.cap#. It is a rhythm now.",
+    "A #target# like this deserves a better oath than I own. #oath.cap#. That will have to do.", "#clause.cap#. #oath.cap#. #clause.cap#. #oath.cap#. It is a rhythm now.",
     "#vocative.cap#, sacré #insult#, #clause#.", "Herr #target.cap#, you #intensifier# #adj# #insult#, #clause#.",
     "#oath.cap#! The #target# is #adj#, the sky is #adj#, and I am #selfadj# in several languages.", "You #insult#, #vocative#. You #adj#, #adj# #insult#. #oath.cap#.",
     "#interj.cap#. #oath.cap#. #remaining.cap# sheep, and no word in any tongue for how #adj# I am.", "#oath.cap#, and I mean that in the original.",

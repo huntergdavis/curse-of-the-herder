@@ -195,7 +195,7 @@ export const fWord: LexPack = {
     inten("fucking", 4), inten("absolutely fucking", 4), inten("motherfucking", 4, { targets: ["terrain", "weather", "day", "curse"] }),
     swear("Fuck", 4, { tombstoneSafe: true }), swear("Fuck it", 4, { tombstoneSafe: true }), swear("Fucking hell", 4, { tombstoneSafe: true }),
     ins("fuckwit", { band: 4 }), ins("fucking liability", { band: 4 }), ins("fuck-knuckle", { band: 4 }), ins("fucknugget", { band: 4 }),
-    adj("fucking", { band: 4 }), adj("fucked", { band: 4, targets: ["terrain", "day", "self", "curse"] }),
+    adj("fucked", { band: 4, targets: ["terrain", "day", "self", "curse"] }),
   ],
 };
 

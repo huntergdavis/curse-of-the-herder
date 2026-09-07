@@ -64,7 +64,7 @@ function pickTarget(w: WorldState, map: GameMap, e: WorldEvent | null): Context[
   if (r < 0.45 && h.targetSheep >= 0) return sheepTarget(h.targetSheep);
   if (r < 0.8) return { kind: "terrain", noun: terrainNoun(map, h.x, h.y, keyedUnit(w.seed, "terrain-noun", w.tick)), name: null, plural: false };
   if (r < 0.9) return { kind: "day", noun: "day", name: null, plural: false };
-  return { kind: "curse", noun: "curse", name: null, plural: false };
+  return { kind: "curse", noun: "Curse", name: null, plural: false };
 }
 
 /** The caller's memory of recent rule ids (kept outside the grammar so generation stays pure). */

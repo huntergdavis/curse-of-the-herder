@@ -518,7 +518,7 @@ function say(s: Session, text: string, heat: number, seconds: number, nowMs: num
     tallyUse(s.world, u.used, u.targetLabel);
     if (u.ruleId) {
       s.recentRules.push(u.ruleId);
-      if (s.recentRules.length > 12) s.recentRules.shift();
+      if (s.recentRules.length > 40) s.recentRules.shift();
     }
   }
   // Villagers within earshot are scandalised by strong language.
@@ -526,7 +526,7 @@ function say(s: Session, text: string, heat: number, seconds: number, nowMs: num
   s.bubbles.say(text, heat, seconds, nowMs);
   s.world.totalCurses++;
   s.recent.push(text);
-  if (s.recent.length > 32) s.recent.shift();
+  if (s.recent.length > 120) s.recent.shift();
   if (text.length > s.world.longestLine.length) s.world.longestLine = text;
   // Keep the day's best lines: heat plus length, favouring the rare long hot ones.
   {
