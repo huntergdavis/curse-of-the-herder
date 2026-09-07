@@ -128,6 +128,10 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   repository.setActiveId(world.id);
+  // The previous herder's stone stands by the pen.
+  const hall = await repository.hall();
+  const prev = hall.find((r) => r.seed !== world.seed);
+  renderer.memorial = prev ? { name: prev.name, epitaph: prev.epitaph } : null;
   await refreshLoadList();
   hideOverlay();
   updateHud(true);

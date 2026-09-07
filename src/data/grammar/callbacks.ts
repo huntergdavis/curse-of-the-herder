@@ -27,6 +27,15 @@ export const CALLBACK_RULES: Rule[] = [
     "#flees.cap# ran. I counted. Counting is what you do when you cannot do anything else.",
     "It rained #rains# times. Each time it was rain. I did not expect it to be anything else.",
   ], { reg: ["hemingway"] }),
+  // The signature word: every herder has one noun he cannot stop saying.
+  ...R(1, "idle", ["#sig.cap#.", "#sig.cap#. Always #sig#.", "Where is my #sig#."]),
+  ...R(3, "idle", [
+    "I have said #sig# #bignum# times today. It is a good word. It is not helping.",
+    "If I had a #sig# for every #adj# sheep, I would have a great many #sig.pl# and the same number of sheep.",
+    "Everything today comes back to the #sig#. I do not know why. Neither does the #sig#.",
+  ]),
+  ...R(7, "idle", ["#sig.cap#, in every language, is still a #sig#. I checked."]),
+  ...R(12, "idle", ["Historians will ask why he kept saying #sig#. Historians will not get an answer. Neither did the sheep."]),
   ...R(0, "gaze", ["Cloud.", "Nice cloud.", "Sky.", "Hm. Bird.", "Sun. Good."]),
   ...R(1, "gaze", ["Nice cloud. Shaped like a sheep. Of course.", "Quiet. For a moment. Quiet.", "Good sky today. Shame about the ground."]),
   ...R(2, "gaze", [

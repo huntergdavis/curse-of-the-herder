@@ -156,6 +156,9 @@ export class Renderer {
     this.rainbowFromMs = nowMs;
   }
 
+  /** Epitaph of the herder before this one, carved on a stone by the pen. */
+  memorial: { name: string; epitaph: string } | null = null;
+
   draw(world: WorldState, cam: Camera, bubbles: Bubbles, nowMs: number): void {
     const ctx = this.ctx;
     const T = this.tilePx;
@@ -343,6 +346,48 @@ export class Renderer {
     // Whistling while he works, when the day has not yet got to him.
     if (walkingHerder(world) && world.frustration < 18 && Math.floor(nowMs / 1000) % 11 < 3) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "♪");
 
+    // Yesterday's herder rests beside the pen; today's herder walks past him every trip.
+    if (this.memorial && !world.finished) {
+      const gx = sx(this.map.pen.x - 2.7);
+      const gy = sy(this.map.pen.y + 0.9);
+      if (Math.abs(this.map.pen.x - cam.x) * T < W && Math.abs(this.map.pen.y - cam.y) * T < H) {
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.beginPath();
+        ctx.ellipse(gx, gy, T * 0.4, T * 0.1, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#b3afa5";
+        ctx.strokeStyle = "#2b2620";
+        ctx.lineWidth = Math.max(1, T * 0.05);
+        ctx.beginPath();
+        ctx.moveTo(gx - T * 0.32, gy);
+        ctx.lineTo(gx - T * 0.32, gy - T * 0.6);
+        ctx.arc(gx, gy - T * 0.6, T * 0.32, Math.PI, 0);
+        ctx.lineTo(gx + T * 0.32, gy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        if (T >= 40 && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 9) {
+          ctx.fillStyle = "rgba(43,38,32,0.85)";
+          ctx.font = `${Math.max(8, T * 0.16)}px "Patrick Hand", cursive`;
+          ctx.textAlign = "center";
+          ctx.fillText(this.memorial.name, gx, gy - T * 0.55);
+          const words = this.memorial.epitaph.split(" ");
+          let line = "";
+          let ly = gy - T * 0.36;
+          for (const wd of words) {
+            if ((line + " " + wd).trim().length > 14) {
+              ctx.fillText(line, gx, ly);
+              ly += T * 0.17;
+              line = wd;
+            } else line = (line + " " + wd).trim();
+            if (ly > gy - T * 0.05) break;
+          }
+          if (line && ly <= gy - T * 0.05) ctx.fillText(line, gx, ly);
+          ctx.textAlign = "left";
+        }
+      }
+    }
+
     // The stone beside the pen, once the day is done.
     if (world.finished) {
       const gx = sx(this.map.pen.x + 3.2);
@@ -474,6 +519,56 @@ export class Renderer {
       ctx.stroke();
       ctx.fillStyle = "rgba(60, 70, 110, 0.18)";
       ctx.fillRect(0, 0, W, H);
+    }
+
+    // A warm band across the top of the sky at sunset.
+    if (hourNow > 16.4 && hourNow < 18.6) {
+      const k = Math.sin(((hourNow - 16.4) / 2.2) * Math.PI);
+      const g = ctx.createLinearGradient(0, 0, 0, H * 0.45);
+      g.addColorStop(0, `rgba(255, 150, 80, ${(0.35 * k).toFixed(3)})`);
+      g.addColorStop(1, "rgba(255, 150, 80, 0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H * 0.45);
+    }
+
+    // A rainbow for a minute after the rain stops.
+    {
+      const age = (nowMs - this.rainbowFromMs) / 60_000;
+      if (age >= 0 && age < 1 && !isRaining(world)) {
+        const alpha = age < 0.15 ? age / 0.15 : age > 0.7 ? (1 - age) / 0.3 : 1;
+        const cx0 = W * 0.5;
+        const cy0 = H * 1.05;
+        const r0 = Math.min(W, H) * 0.75;
+        const bands = ["#ff5a5a", "#ffa23c", "#ffe14c", "#6fd36f", "#5aa7ff", "#8a6cff"];
+        ctx.lineWidth = Math.max(3, T * 0.12);
+        bands.forEach((c, i) => {
+          ctx.strokeStyle = c;
+          ctx.globalAlpha = 0.28 * alpha;
+          ctx.beginPath();
+          ctx.arc(cx0, cy0, r0 - i * ctx.lineWidth, Math.PI * 1.08, Math.PI * 1.92);
+          ctx.stroke();
+        });
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // Fireflies at dusk, drifting near the herder.
+    if (hourNow > 17.3 && hourNow < 19.6) {
+      const strength = Math.min(1, (hourNow - 17.3) / 0.6);
+      for (let i = 0; i < 14; i++) {
+        const a = nowMs / (2600 + i * 90) + i * 2.1;
+        const px = sx(h.x + 0.5) + Math.cos(a) * T * (2 + (i % 5)) + Math.sin(a * 1.7) * T;
+        const py = sy(h.y + 0.5) + Math.sin(a * 0.8) * T * (1.5 + (i % 4)) - T * 0.6;
+        const blink = Math.max(0, Math.sin(nowMs / 400 + i * 1.9));
+        ctx.fillStyle = `rgba(255, 240, 140, ${(blink * 0.25 * strength).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(3, T * 0.16), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(255, 250, 200, ${(blink * strength).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(1.5, T * 0.06), 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     // Fog: a soft white veil that thins toward the herder.
