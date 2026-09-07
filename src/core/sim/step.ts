@@ -725,7 +725,7 @@ function stepDogHelps(w: WorldState): void {
   if (!s || s.mode !== "loose" || s.absurd || s.nemesis) return;
   const d = Math.hypot(s.x - h.x, s.y - h.y);
   if (d < 4 || d > 9) return;
-  if (keyedUnit(w.seed, "dog-helps", w.tick) > 0.004) return;
+  if (keyedUnit(w.seed, "dog-helps", w.tick) > 0.01) return;
   w.dogHelped = true;
   s.tx = Math.round(h.x) + (s.x < h.x ? -1 : 1);
   s.ty = Math.round(h.y);
