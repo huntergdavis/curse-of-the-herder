@@ -278,8 +278,9 @@ export interface BubbleStyle {
 
 /** Speech bubble whose tail points at (tx, ty). Returns nothing; clamps to canvas. */
 export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontPx: number, style: BubbleStyle, canvasW: number, canvasH: number): void {
-  // Verse uses " / " as a hard line break; prose wraps.
-  const lines = text.includes(" / ") ? text.split(" / ").flatMap((l) => wrapText(l, 44)) : wrapText(text, 40);
+  // Verse uses " / " as a hard line break and is centred; prose wraps.
+  const verse = text.includes(" / ");
+  const lines = verse ? text.split(" / ").flatMap((l) => wrapText(l, 44)) : wrapText(text, 40);
   ctx.font = `${fontPx}px ${style.font}`;
   const lineH = fontPx * 1.22;
   let w = 0;
@@ -298,12 +299,14 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   ctx.fillStyle = style.heat > 0.75 ? "#ffe9dc" : style.heat > 0.45 ? "#fff6e6" : "#fffdf5";
   ctx.beginPath();
   if (style.heat > 0.85) {
-    // Jagged shout bubble.
+    // Jagged shout bubble: the inner envelope must clear the text box's corners.
     const spikes = 18;
+    const baseRx = Math.hypot(bw / 2, bh / 2) * 0.92 + fontPx * 0.2;
+    const baseRy = bh / 2 + Math.hypot(bw / 2, bh / 2) * 0.28 + fontPx * 0.2;
     for (let i = 0; i <= spikes; i++) {
       const a = (i / spikes) * Math.PI * 2;
-      const rx = bw / 2 + (i % 2 ? fontPx * 0.9 : fontPx * 0.2);
-      const ry = bh / 2 + (i % 2 ? fontPx * 0.9 : fontPx * 0.2);
+      const rx = baseRx + (i % 2 ? fontPx * 0.8 : 0);
+      const ry = baseRy + (i % 2 ? fontPx * 0.8 : 0);
       const px = bx + bw / 2 + Math.cos(a) * rx;
       const py = by + bh / 2 + Math.sin(a) * ry;
       if (i === 0) ctx.moveTo(px, py);
@@ -331,7 +334,12 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   ctx.stroke();
   ctx.fillStyle = INK;
   ctx.textBaseline = "top";
-  lines.forEach((l, i) => ctx.fillText(l, bx + padX, by + padY + i * lineH));
+  if (verse) {
+    ctx.textAlign = "center";
+    lines.forEach((l, i) => ctx.fillText(l, bx + bw / 2, by + padY + i * lineH));
+  } else {
+    lines.forEach((l, i) => ctx.fillText(l, bx + padX, by + padY + i * lineH));
+  }
   ctx.restore();
 }
 

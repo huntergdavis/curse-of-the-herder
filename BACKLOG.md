@@ -19,27 +19,27 @@ long soak.
 - Libraries and books (catalogue order, cooldown, register drift, excerpts)
 - Frustration baseline, rain, walk of shame, breathers, speed governor
 - IndexedDB saves, resume, New/Load, wall-clock catch-up, ?fast, ?clean
-- Ending: epitaph, dusk fade, tombstone card, Hall of Herders, loop setting
+- Ending: epitaph, dusk fade, stars, tombstone by the pen and on the card, Hall of Herders, loop setting
+- Tiers 9-12 (nautical, baroque, verse, meta), callbacks, wistful book lines
+- Language selector (full/mild/clean), Export/Import JSON, ?books=N, ?fps=N
+- Liveness watchdog, capped catch-up with a "long sit-down" line, self-hosted OFL fonts
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
-## P0 — Finish the language arc
+## P0 — Language polish
 
-- [ ] Tiers 9-12 (nautical, baroque, verse, meta) packs and structures. (fork in progress)
-- [ ] Epitaph quality pass: only `tombstoneSafe`/short rules for the stone; test that epitaphs are ≤ 110 chars.
-- [ ] Callbacks: 5% of idle lines reference an event from the ring ("This is the third river today.").
-- [ ] Wistful line when passing a library while carrying ("I will come back for you, book.").
-- [ ] Sheep-name lines when the *carried* sheep is named.
-- [ ] Register-specific idle weighting so a fresh book audibly changes his voice for ten minutes (partly done via reg ×3).
+- [ ] Read a full simulated day as a script (`npx tsx scripts/transcript.ts`) once per release and cut the 10% weakest templates.
+- [ ] Alliteration constraint in the engine (`{alliterate:b}`) so tier 9 can generate rather than hard-code runs.
+- [ ] Syllable-aware slots for verse using the `syl` field, so haiku and limerick slots scan.
+- [ ] Per-register heat rules (Hemingway exempt already; verse should keep its own punctuation).
+- [ ] Flyting duel beat: herder vs. a named sheep, alternating lines, sheep "replies" with emotes.
+- [ ] Reading-aloud beat: he quotes the book's excerpt *in his own register* ten minutes later (a callback to the book).
 
 ## P1 — Runtime robustness (Phase 4 leftovers)
 
-- [ ] Simulation in a Web Worker behind a versioned protocol.
-- [ ] Liveness watchdog (pure predicate, 5 s cadence).
-- [ ] Cap catch-up at 4 h and say something about having had a sit-down.
+- [ ] Simulation in a Web Worker behind a versioned protocol (main thread stays smooth during 4-hour catch-ups).
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
-- [ ] Self-host Patrick Hand and Fredoka (OFL) and make the no-network test strict.
 - [ ] Auto-update via version.json poll and a service worker.
-- [ ] "Workday" FPS mode (15 FPS) and reduced-motion mode.
+- [ ] Reduced-motion mode; a Settings panel for fps/band/end-of-day instead of toolbar selects.
 
 ## P1 — Presentation
 

@@ -8,6 +8,7 @@ import { repository } from "./persist/db";
 import { BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
 import { makeHallRecord, type HallRecord } from "./core/hall";
+import { catchUpPlan, shouldRecover } from "./runtime/liveness";
 import { Bubbles } from "./render/bubbles";
 import { Camera } from "./render/camera";
 import { Minimap } from "./render/minimap";
@@ -18,8 +19,11 @@ const params = new URLSearchParams(location.search);
 const FAST = Math.max(1, Math.min(600, Number(params.get("fast") ?? 1) || 1));
 const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 512) || 512));
 const TICK_MS = TICK_SECONDS * 1000;
-const MAX_CATCH_UP_TICKS = 4 * TICKS_PER_HOUR;
 const SAVE_EVERY_MS = 10_000;
+/** `?fps=15` (or the Eco setting) renders less often for laptops. */
+const FPS_CAP = Math.max(5, Math.min(60, Number(params.get("fps") ?? repository.getSetting("fps", "60")) || 60));
+const FRAME_MIN_MS = 1000 / FPS_CAP;
+void TICKS_PER_HOUR;
 /** `?clean=1` caps filth at F1 for shared displays; the toolbar setting persists; `?filth=max` removes the frustration gate for testing. */
 let BAND_CAP: Band = params.get("clean") ? 1 : (Number(repository.getSetting("band", "4")) as Band);
 /** `?books=N` starts a new herder as if he had already read N books (skip ahead). */
@@ -48,11 +52,21 @@ interface Session {
   /** Wall ms when the last sheep was penned; drives the dusk fade. */
   finishedAtMs: number;
   endHandled: boolean;
+  napNoted: boolean;
 }
 
 let session: Session | null = null;
 let paused = false;
 let lastFrameMs = performance.now();
+let lastTickMs = performance.now();
+let lastDrawMs = 0;
+
+const NAP_LINES = [
+  "I had a sit-down. A long one. The sheep did not move either, out of respect.",
+  "Where was I. Right. Sheep.",
+  "I must have dozed. The hill is still here. Of course it is.",
+  "That was a long blink. Nobody tell the sheep.",
+];
 
 function randomSeed(): string {
   const bytes = new Uint8Array(8);
@@ -90,6 +104,7 @@ async function startSession(world: WorldState): Promise<void> {
     excerptShown: -1,
     finishedAtMs: 0,
     endHandled: false,
+    napNoted: false,
   };
   renderer.hourOverride = null;
   repository.setActiveId(world.id);
@@ -305,10 +320,18 @@ function frame(nowMs: number): void {
 
   if (!paused && !w.finished) {
     const wall = Date.now();
-    let due = Math.floor(((wall - w.lastWallMs) / TICK_MS) * FAST);
+    const plan = catchUpPlan(wall - w.lastWallMs, TICK_MS, FAST);
+    let due = plan.ticks;
+    if (plan.longNap && !s.napNoted) {
+      s.napNoted = true;
+      const line = NAP_LINES[Math.floor(Math.random() * NAP_LINES.length)] ?? NAP_LINES[0]!;
+      say(s, line, 0.2, 6, nowMs);
+      if (plan.dropped) toast("He was away so long the day paused. Picking up where he left off.");
+    }
+    if (plan.dropped) w.lastWallMs = wall - (due / FAST) * TICK_MS;
     if (due > 0) {
+      lastTickMs = nowMs;
       const catchingUp = due > 40;
-      due = Math.min(due, MAX_CATCH_UP_TICKS);
       // Budget per frame so a big catch-up does not freeze the tab.
       const budget = catchingUp ? 1500 : due;
       const run = Math.min(due, budget);
@@ -324,7 +347,10 @@ function frame(nowMs: number): void {
       }
       if (w.tick >= s.nextIdleCurseTick) s.nextIdleCurseTick = w.tick + nextIdleCurseTicks(w);
       w.lastWallMs += Math.round((run / FAST) * TICK_MS);
-      if (run >= due || w.finished) w.lastWallMs = wall;
+      if (run >= due || w.finished) {
+        w.lastWallMs = wall;
+        s.napNoted = false;
+      }
       handleEvents(s, nowMs);
       showExcerpts(s, nowMs);
     }
@@ -350,12 +376,24 @@ function frame(nowMs: number): void {
   s.camera.follow(h.x + lx, h.y + ly, dt * Math.min(FAST, 12));
   if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) > 8) s.camera.snap(h.x, h.y);
   s.bubbles.prune(nowMs);
-  if (!document.hidden) {
+  if (!document.hidden && nowMs - lastDrawMs >= FRAME_MIN_MS - 1) {
+    lastDrawMs = nowMs;
     s.renderer.draw(w, s.camera, s.bubbles, nowMs);
     if ((nowMs | 0) % 4 === 0) s.minimap.draw($<HTMLCanvasElement>("minimap"), w);
   }
   updateHud();
 }
+
+/** Watchdog: if the loop dies while we are visible and running, restart it from the saved state. */
+window.setInterval(() => {
+  const s = session;
+  if (!s) return;
+  if (shouldRecover({ nowMs: performance.now(), lastTickMs, lastFrameMs, hidden: document.hidden, paused, finished: s.world.finished })) {
+    console.warn("Curse of the Herder: loop stalled; restarting frame loop.");
+    lastTickMs = lastFrameMs = performance.now();
+    requestAnimationFrame(frame);
+  }
+}, 5000);
 
 async function boot(): Promise<void> {
   window.addEventListener("resize", () => session?.renderer.resize());
