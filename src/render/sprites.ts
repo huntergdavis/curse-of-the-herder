@@ -357,7 +357,7 @@ export function drawEmote(ctx: Ctx, x: number, y: number, T: number, glyph: stri
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = INK;
-  ctx.font = `bold ${T * 0.32}px sans-serif`;
+  ctx.font = glyph.length > 1 ? `italic ${T * 0.2}px "Patrick Hand", cursive` : `bold ${T * 0.32}px sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(glyph, x, y + T * 0.02);

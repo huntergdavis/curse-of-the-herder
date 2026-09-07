@@ -20,14 +20,27 @@ export class Renderer {
   width = 0;
   height = 0;
 
+  private houses: { x: number; y: number }[] = [];
+
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
+    this.indexHouses();
     this.resize();
   }
 
   setMap(map: GameMap): void {
     this.map = map;
     this.chunks = null;
+    this.indexHouses();
+  }
+
+  private indexHouses(): void {
+    this.houses = [];
+    const n = this.map.size;
+    for (let i = 0; i < n * n; i++) {
+      const d = this.map.deco[i];
+      if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
+    }
   }
 
   resize(): void {
@@ -106,8 +119,9 @@ export class Renderer {
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
       drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : 0.5)), T * (s.onRoof ? 0.75 : 0.9), pose, facing, walkPhase, s.named);
-      // Stranded sheep look faintly puzzled about it, now and then.
+      // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
+      else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "baa");
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
@@ -146,6 +160,46 @@ export class Renderer {
       const s = world.sheep[b.anchor];
       if (!s) continue;
       drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, b.text);
+    }
+
+    // Chimney smoke: a few soft puffs drifting up and to the right from each house.
+    for (const hse of this.houses) {
+      if (Math.abs(hse.x - cam.x) * T > W / 2 + T * 2 || Math.abs(hse.y - cam.y) * T > H / 2 + T * 2) continue;
+      const seedish = (hse.x * 31 + hse.y * 17) % 1000;
+      for (let k = 0; k < 3; k++) {
+        const t = ((nowMs / 2600 + k / 3 + seedish / 1000) % 1);
+        const px = sx(hse.x + 0.72) + t * T * 0.6 + Math.sin((t + k) * 6) * T * 0.05;
+        const py = sy(hse.y + 0.12) - t * T * 0.9;
+        ctx.fillStyle = `rgba(240, 240, 235, ${(0.45 * (1 - t)).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(px, py, T * (0.06 + t * 0.12), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Birds: a small flock crosses now and then, high above everything.
+    {
+      const period = 140_000;
+      const phase = (nowMs % period) / period;
+      if (phase < 0.22) {
+        const t = phase / 0.22;
+        const flockSeed = Math.floor(nowMs / period);
+        const dir = flockSeed % 2 === 0 ? 1 : -1;
+        const baseY = H * (0.15 + ((flockSeed * 37) % 60) / 100);
+        const baseX = dir > 0 ? -T + t * (W + 2 * T) : W + T - t * (W + 2 * T);
+        ctx.strokeStyle = "rgba(43,38,32,0.7)";
+        ctx.lineWidth = Math.max(1, T * 0.035);
+        for (let b = 0; b < 5; b++) {
+          const bx = baseX - dir * b * T * 0.55 * (b % 2 ? 1 : 0.8);
+          const by = baseY + Math.abs(b - 2) * T * 0.3 + Math.sin(nowMs / 90 + b) * T * 0.04;
+          const flap = Math.sin(nowMs / 110 + b * 1.3) * T * 0.09;
+          ctx.beginPath();
+          ctx.moveTo(bx - T * 0.16, by + flap);
+          ctx.lineTo(bx, by - T * 0.02);
+          ctx.lineTo(bx + T * 0.16, by + flap);
+          ctx.stroke();
+        }
+      }
     }
 
     // Village names on their signposts, when close enough to read.

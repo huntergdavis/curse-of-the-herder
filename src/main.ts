@@ -189,6 +189,8 @@ function fmtClock(hour: number): string {
 }
 
 let lastHud = "";
+let lastVocabBooks = -1;
+let lastVocabLevel = -1;
 function updateHud(force = false): void {
   if (!session) return;
   const w = session.world;
@@ -201,6 +203,11 @@ function updateHud(force = false): void {
   $("hud-flock").textContent = `${w.sheepPenned} / ${w.sheep.length}`;
   $("hud-level").textContent = `${level} · ${LEVEL_NAMES[level] ?? ""}`;
   $("hud-books").textContent = String(w.booksRead);
+  if (force || w.booksRead !== lastVocabBooks || level !== lastVocabLevel) {
+    lastVocabBooks = w.booksRead;
+    lastVocabLevel = level;
+    $("hud-vocab").textContent = `${grammar.knownWords(buildContext(w, session.map, null, [], BAND_CAP))} words`;
+  }
   const mood = w.frustration < 20 ? "Muttering" : w.frustration < 40 ? "Grumbling" : w.frustration < 60 ? "Cursing" : w.frustration < 80 ? "Swearing" : "Unhinged";
   $("hud-frust").textContent = `${mood} · ${Math.round(w.frustration)}`;
   $<HTMLDivElement>("meter-fill").style.width = `${w.frustration}%`;
