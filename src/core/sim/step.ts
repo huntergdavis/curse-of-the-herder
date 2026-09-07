@@ -136,8 +136,9 @@ function walk(w: WorldState, budget: number): number {
     h.y += (dy / dist) * step;
     budget -= step;
     moved += step;
-    if (Math.abs(dx) > Math.abs(dy)) h.facing = dx > 0 ? 0 : 2;
-    else h.facing = dy > 0 ? 1 : 3;
+    // Face the way he is going. Vertical legs of a path keep the last left/right facing,
+    // otherwise a leftward journey up a hill would draw him looking right the whole way.
+    if (Math.abs(dx) > 1e-6) h.facing = dx > 0 ? 0 : 2;
     if (step >= dist - 1e-6) {
       h.x = next.x;
       h.y = next.y;

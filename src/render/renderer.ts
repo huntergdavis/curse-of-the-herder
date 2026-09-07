@@ -166,6 +166,8 @@ export class Renderer {
     this.stick.restKey = -1;
     this.dog.init = false;
     this.dog.reactUntil = 0;
+    this.dog.stride = 0;
+    this.dog.speed = 0;
     this.rivalNow = null;
     this.screenProbeMisses = 0;
   }
@@ -367,7 +369,7 @@ export class Renderer {
     return null;
   }
 
-  private drawDog(px: number, py: number, T: number, facing: number, moving: boolean, lying: boolean, nowMs: number): void {
+  private drawDog(px: number, py: number, T: number, facing: number, moving: boolean, lying: boolean, nowMs: number, stride = (nowMs / 260) % 1): void {
     const ctx = this.ctx;
     const flip = facing === 2 ? -1 : 1;
     ctx.save();
@@ -379,14 +381,15 @@ export class Renderer {
     ctx.fill();
     ctx.strokeStyle = "#2b2620";
     ctx.lineWidth = Math.max(1, T * 0.04);
-    const bob = moving ? Math.abs(Math.sin(nowMs / 130)) * T * 0.05 : 0;
+    const bob = moving ? Math.abs(Math.sin(stride * Math.PI * 2)) * T * 0.06 : 0;
     const bodyY = lying ? -T * 0.14 : -T * 0.3 - bob;
     // Legs
     if (!lying) {
       ctx.strokeStyle = "#2b2620";
       ctx.lineWidth = Math.max(1.5, T * 0.06);
       ctx.beginPath();
-      const sw = moving ? Math.sin(nowMs / 130) * T * 0.08 : 0;
+      // A proper trot: front and back pairs swing in opposition, a good deal further than before.
+      const sw = moving ? Math.sin(stride * Math.PI * 2) * T * 0.14 : 0;
       for (const [lx, sgn] of [[-0.16, 1], [0.14, -1], [-0.08, -1], [0.06, 1]] as const) {
         ctx.moveTo(lx * T, bodyY + T * 0.08);
         ctx.lineTo(lx * T + sw * sgn, -T * 0.02);
@@ -625,7 +628,7 @@ export class Renderer {
   private finaleStartMs = -1;
 
   /** The sheepdog: follows him about, sits when he sits, helps with nothing. */
-  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "", herdSheep: -1 };
+  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "", herdSheep: -1, px: 0, py: 0, stride: 0, speed: 0 };
 
   /** The dog notices things, briefly. */
   dogReact(kind: "wasp" | "flee" | "bite" | "book" | "herd" | "underfoot", nowMs: number, sheepId = -1): void {
@@ -942,6 +945,8 @@ export class Renderer {
       if (!d.init) {
         d.x = h.x - 1.5;
         d.y = h.y;
+        d.px = d.x;
+        d.py = d.y;
         d.init = true;
       }
       const moving = h.mode === "toSheep" || h.mode === "toPen" || h.mode === "toLibrary";
@@ -1070,9 +1075,15 @@ export class Renderer {
         d.vx = 0;
         d.vy = 0;
       }
-      const dogMoving = Math.hypot(d.vx, d.vy) > 0.004;
+      // Gait from ground actually covered this frame, so the legs match the trot whatever the easing or frame rate.
+      const travelled = Math.hypot(d.x - d.px, d.y - d.py);
+      d.speed = frameDt > 0 ? travelled / frameDt : 0; // tiles per second
+      d.px = d.x;
+      d.py = d.y;
+      if (d.speed > 0.15) d.stride = (d.stride + travelled * 1.6) % 1;
+      const dogMoving = d.speed > 0.15;
       if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
-        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, (dogMoving || chasing) && !underfoot, (!moving && !dogMoving && !reacting && !chasing) || underfoot, nowMs);
+        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, (dogMoving || chasing) && !underfoot, (!moving && !dogMoving && !reacting && !chasing) || underfoot, nowMs, d.stride);
         if (reacting) {
           const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "") : d.react === "bite" ? "?" : "";
           if (glyph) drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.4, sy(d.y + 0.9) - T * 0.95, T * 0.8, glyph);
@@ -1184,14 +1195,36 @@ export class Renderer {
         ctx.stroke();
         const tx = sx(this.map.pen.x + 1 + 0.5);
         const ty = sy(this.map.pen.y + 1 + 0.5);
-        ctx.fillStyle = "#8a6238";
+        // The water trough: a plank box on two short legs, water inside with a glint, a drip on the lip.
         ctx.strokeStyle = "#2b2620";
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        ctx.fillStyle = "#6b4a2b";
+        ctx.fillRect(tx - T * 0.24, ty + T * 0.06, T * 0.08, T * 0.12);
+        ctx.fillRect(tx + T * 0.16, ty + T * 0.06, T * 0.08, T * 0.12);
+        ctx.strokeRect(tx - T * 0.24, ty + T * 0.06, T * 0.08, T * 0.12);
+        ctx.strokeRect(tx + T * 0.16, ty + T * 0.06, T * 0.08, T * 0.12);
+        ctx.fillStyle = "#8a6238";
         ctx.beginPath();
-        ctx.roundRect(tx - T * 0.3, ty - T * 0.12, T * 0.6, T * 0.24, T * 0.04);
+        ctx.roundRect(tx - T * 0.32, ty - T * 0.14, T * 0.64, T * 0.24, T * 0.04);
         ctx.fill();
         ctx.stroke();
+        // Plank seams on the front face.
+        ctx.strokeStyle = "rgba(43,38,32,0.35)";
+        ctx.beginPath();
+        ctx.moveTo(tx - T * 0.3, ty + T * 0.0);
+        ctx.lineTo(tx + T * 0.3, ty + T * 0.0);
+        ctx.stroke();
+        // Water, seen from above the lip, with a light glint that drifts.
         ctx.fillStyle = "#4f8fc9";
-        ctx.fillRect(tx - T * 0.26, ty - T * 0.08, T * 0.52, T * 0.12);
+        ctx.beginPath();
+        ctx.ellipse(tx, ty - T * 0.1, T * 0.27, T * 0.06, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#2b2620";
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.beginPath();
+        ctx.ellipse(tx - T * 0.1 + Math.sin(nowMs / 1300) * T * 0.05, ty - T * 0.11, T * 0.07, T * 0.015, 0, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 

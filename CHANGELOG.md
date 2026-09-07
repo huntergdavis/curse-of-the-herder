@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-09-07
+
+- The dog's legs trot again: its gait now follows the ground it actually covers each frame, with a longer stride.
+- He faces the way he is going: vertical legs of a path keep the last left/right facing instead of drawing him looking right.
+- The water trough in the pen looks like a trough (planks, legs, water with a glint) rather than a blue bar.
+
 ## 1.0.0 — 2026-09-07
 
 The first release. A cursed herder gathers sixty sheep across a 576×576
