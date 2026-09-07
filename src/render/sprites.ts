@@ -11,7 +11,9 @@ export function setShadowSkew(v: number): void {
 export type SheepPose = "idle" | "walk" | "carried" | "asleep" | "fled";
 
 /** Draw a sheep centred at (x, y) with body width ~T. `phase` 0..1 animates. */
-export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: SheepPose, facing: number, phase: number, named: boolean, crowned = false): void {
+export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: SheepPose, facing: number, phase: number, named: boolean, crowned = false, black = false): void {
+  const wool = black ? "#3a3532" : pose === "asleep" ? "#e9e4d3" : "#f6f2e6";
+  const face = black ? "#e8e2d4" : "#3a2f2a";
   const flip = facing === 2 ? -1 : 1;
   ctx.save();
   ctx.translate(x, y);
@@ -35,7 +37,7 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
   }
   ctx.stroke();
   // Body (a cloud)
-  ctx.fillStyle = pose === "asleep" ? "#e9e4d3" : "#f6f2e6";
+  ctx.fillStyle = wool;
   ctx.strokeStyle = INK;
   ctx.lineWidth = Math.max(1, T * 0.05);
   ctx.beginPath();
@@ -48,7 +50,7 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
     ctx.fill();
   }
   // Head
-  ctx.fillStyle = "#3a2f2a";
+  ctx.fillStyle = face;
   ctx.beginPath();
   ctx.ellipse(T * 0.36, -T * 0.02 + bob, T * 0.16, T * 0.14, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -65,7 +67,7 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
     ctx.lineTo(T * 0.44, -T * 0.04 + bob);
     ctx.stroke();
   } else {
-    ctx.fillStyle = "#f6f2e6";
+    ctx.fillStyle = black ? "#f6f2e6" : "#f6f2e6";
     ctx.beginPath();
     ctx.arc(T * 0.4, -T * 0.05 + bob, T * 0.045, 0, Math.PI * 2);
     ctx.fill();

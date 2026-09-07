@@ -106,7 +106,7 @@ function planPath(w: WorldState, map: GameMap, tx: number, ty: number): boolean 
 function planToSheep(w: WorldState, map: GameMap, s: SheepState): boolean {
   const tx = Math.round(s.tx);
   const ty = Math.round(s.ty);
-  if (!s.onRoof && !s.inRiver) return planPath(w, map, tx, ty);
+  if (!s.onRoof && !s.inRiver && !s.onBoulder) return planPath(w, map, tx, ty);
   for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]] as const) {
     const i = (ty + dy) * map.size + (tx + dx);
     if (map.deco[i] === Deco.House || map.deco[i] === Deco.HouseRed || map.deco[i] === Deco.Fence) continue;
@@ -548,9 +548,10 @@ function stepHerder(w: WorldState, map: GameMap): void {
     }
     // The sheep may have wandered; re-path when the path is exhausted but we are not there.
     if (h.path.length === 0) {
-      if (d <= (s.onRoof || s.inRiver ? 1.6 : 0.75)) {
+      if (d <= (s.onRoof || s.inRiver || s.onBoulder ? 1.6 : 0.75)) {
         s.onRoof = false;
         s.inRiver = false;
+        s.onBoulder = false;
         s.mode = "carried";
         h.carrying = s.id;
         h.carryOdometer = 0;
@@ -560,6 +561,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
         } else if (s.temper === "dozy") {
           pushEvent(w, { tick: w.tick, kind: "dozy", sheepId: s.id });
+        } else if (s.black) {
+          pushEvent(w, { tick: w.tick, kind: "black", sheepId: s.id });
         } else {
           pushEvent(w, { tick: w.tick, kind: "caught", sheepId: s.id });
         }

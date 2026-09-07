@@ -29,6 +29,7 @@
       #meter { height: 10px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--paper-2); }
       #meter > div { height: 100%; width: 0%; background: linear-gradient(90deg, #f2c14e, #e8743a, #c94f4f); transition: width 0.6s; }
       #meter.tremble { animation: tremble 0.12s infinite; }
+      body.reduced-motion #meter.tremble, body.reduced-motion #hud-flock.pop, body.reduced-motion #toast { animation: none; }
       #hud-flock.pop { animation: pop 0.5s ease-out; display: inline-block; }
       @keyframes pop { 0% { transform: scale(1); } 35% { transform: scale(1.35); color: var(--accent); } 100% { transform: scale(1); } }
       @keyframes tremble { 0% { transform: translate(0, 0); } 25% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, 1px); } 100% { transform: translate(0, 0); } }
@@ -147,6 +148,10 @@
           <option value="20">20×</option>
           <option value="50">50×</option>
           <option value="100">100× (a day in five minutes)</option>
+        </select></label>
+        <label>Motion<select id="sel-motion">
+          <option value="full">Full (birds, butterflies, fireflies)</option>
+          <option value="reduced">Reduced (calmer picture)</option>
         </select></label>
         <label>Frame rate<select id="sel-fps">
           <option value="60">Smooth (60)</option>

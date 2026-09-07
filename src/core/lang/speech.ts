@@ -129,6 +129,7 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   dozy: "dozy",
   wind: "wind",
   lunch: "lunch",
+  black: "black",
 };
 
 function holdSeconds(text: string, heat: number): number {
@@ -143,6 +144,9 @@ export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent
   if (e.kind === "mishap" && e.detail) ev = e.detail as RuleEvent;
   if (e.kind === "absurd" && wasOnRoof(w, map, e.sheepId)) ev = "roof";
   else if (e.kind === "absurd" && wasInRiver(w, map, e.sheepId)) ev = "river";
+  else if (e.kind === "absurd" && map.deco[Math.round(w.sheep[e.sheepId]?.homeY ?? 0) * map.size + Math.round(w.sheep[e.sheepId]?.homeX ?? 0)] === Deco.Boulder) ev = "boulder";
+  // Every few pennings he counts the flock and gets it wrong.
+  if (e.kind === "penned" && w.sheepPenned >= 6 && keyedUnit(w.seed, "miscount", w.sheepPenned) < 0.18) ev = "miscount";
   const ctx = buildContext(w, map, e, recent, bandCap);
   // Events run hotter than the meter says: something just happened.
   const bump: Partial<Record<RuleEvent, number>> = { flee: 0.25, repeatEscape: 0.4, absurd: 0.3, penned: -0.2, finished: 0.5, rant: 0.3, gaze: -0.5, bog: 0.35, nettles: 0.35, stub: 0.4, cowpat: 0.3, wasp: 0.45, bite: 0.4, gate: 0.35, molehill: 0.3, heave: 0.3, curious: -0.4, dozy: -0.1, crook: 0.5, lunch: -0.6 };

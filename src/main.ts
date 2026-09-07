@@ -75,6 +75,7 @@ interface Session {
 
 let session: Session | null = null;
 let paused = false;
+let motionSetting = false;
 let lastFrameMs = performance.now();
 let lastTickMs = performance.now();
 let lastDrawMs = 0;
@@ -127,6 +128,7 @@ async function startSession(world: WorldState): Promise<void> {
     napNoted: false,
   };
   renderer.hourOverride = null;
+  renderer.reducedMotion = motionSetting;
   repository.setActiveId(world.id);
   // A fresh herder says his first words of the day.
   if (world.tick === 0 && world.events[0]) {
@@ -617,6 +619,20 @@ async function boot(): Promise<void> {
     if (session) session.world.lastWallMs = Date.now();
     updateHud(true);
     toast(FAST === 1 ? "Real time. A day is a day." : `${FAST}× speed: a day takes about ${Math.round((9 * 60) / FAST)} minutes.`);
+  });
+  const selMotion = $<HTMLSelectElement>("sel-motion");
+  const osReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  const applyMotion = (v: string): void => {
+    const reduced = v === "reduced";
+    document.body.classList.toggle("reduced-motion", reduced);
+    if (session) session.renderer.reducedMotion = reduced;
+    motionSetting = reduced;
+  };
+  selMotion.value = repository.getSetting("motion", osReduced ? "reduced" : "full");
+  applyMotion(selMotion.value);
+  selMotion.addEventListener("change", () => {
+    repository.setSetting("motion", selMotion.value);
+    applyMotion(selMotion.value);
   });
   const selFps = $<HTMLSelectElement>("sel-fps");
   selFps.value = String(FPS_CAP === 60 || FPS_CAP === 30 || FPS_CAP === 15 ? FPS_CAP : 60);

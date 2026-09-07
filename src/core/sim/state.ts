@@ -36,6 +36,10 @@ export interface SheepState {
   onRoof?: boolean;
   /** Standing in the river; caught from the bank. */
   inRiver?: boolean;
+  /** Perched on a boulder; caught from beside it. */
+  onBoulder?: boolean;
+  /** The one black sheep. */
+  black?: boolean;
   /** Personality: plain | skittish | stubborn | dozy | curious */
   temper?: string;
   /** Curious sheep: has it already come up to say hello? */
@@ -85,7 +89,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
@@ -195,8 +199,20 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     if (bank.length >= 2 && d !== undefined && d > 60 * (map.size / 512) && d < 300 * (map.size / 512)) shallows.push(i);
   }
   const riverCount = Math.min(3, shallows.length);
+  // Boulders on rock, a little way out.
+  const boulders: number[] = [];
+  for (let i = 0; i < map.size * map.size; i++) if (map.deco[i] === Deco.Boulder && Number.isFinite(map.penDistance[i]!) && map.penDistance[i]! > 80 * (map.size / 512)) boulders.push(i);
+  const boulderCount = Math.min(3, boulders.length);
   rings.forEach((ring, r) => {
     let bucket = buckets[r]!;
+    // Swap one sheep of the middle rings for a boulder sheep.
+    if (r >= 2 && r <= 4 && sheep.filter((x) => x.onBoulder).length < boulderCount && boulders.length) {
+      const i = boulders.splice(Math.floor(rnd() * boulders.length), 1)[0]!;
+      const x = i % map.size;
+      const y = Math.floor(i / map.size);
+      sheep.push({ id: sheep.length, x, y, homeX: x, homeY: y, mode: "loose", skittish: 0, flees: 0, absurd: true, seen: false, ring: r, named: false, tx: x, ty: y, speed: 0, onBoulder: true, temper: "plain" });
+      ring = { ...ring, count: ring.count - 1 };
+    }
     // Swap one sheep of the middle rings for a river sheep.
     if (r >= 1 && r <= 3 && sheep.filter((x) => x.inRiver).length < riverCount && shallows.length) {
       const i = shallows.splice(Math.floor(rnd() * shallows.length), 1)[0]!;
@@ -246,6 +262,11 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
       });
     }
   });
+
+  // There is always one.
+  const plainOnes = sheep.filter((x) => !x.absurd);
+  const black = plainOnes[Math.floor(rnd() * plainOnes.length)];
+  if (black) black.black = true;
 
   return {
     schemaVersion: SCHEMA_VERSION,

@@ -210,6 +210,9 @@ export class Renderer {
     return this.chunks;
   }
 
+  /** Fewer moving decorations for viewers who prefer reduced motion. */
+  reducedMotion = false;
+
   /** When set, the sky follows this hour instead of the world clock (ending fade). */
   hourOverride: number | null = null;
   /** Wall ms when the rain last stopped; a rainbow follows for a while. */
@@ -351,7 +354,7 @@ export class Renderer {
             ctx.moveTo(px + T * 0.2, py + T * 0.12);
             ctx.lineTo(px + T * 0.45, py + T * 0.22);
             ctx.stroke();
-          } else if (this.map.deco[i] === Deco.Flowers && hourNow < 17.5) {
+          } else if (this.map.deco[i] === Deco.Flowers && hourNow < 17.5 && !this.reducedMotion) {
             const u = keyedUnit(this.map.seed, "bfly", x, y);
             if (u > 0.5) continue;
             const a = nowMs / 1300 + u * 20;
@@ -465,7 +468,7 @@ export class Renderer {
           ctx.stroke();
         }
       }
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : 0.5)), T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3);
+      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5)), T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
       if (s.named && s.mode === "loose" && T >= 32) {
         ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
         ctx.textAlign = "center";
@@ -582,7 +585,7 @@ export class Renderer {
     }
 
     // Birds: a small flock crosses now and then, high above everything.
-    {
+    if (!this.reducedMotion) {
       const period = 140_000;
       const phase = (nowMs % period) / period;
       if (phase < 0.22) {
@@ -694,7 +697,7 @@ export class Renderer {
     }
 
     // Fireflies at dusk, drifting near the herder.
-    if (hourNow > 17.3 && hourNow < 19.6) {
+    if (hourNow > 17.3 && hourNow < 19.6 && !this.reducedMotion) {
       const strength = Math.min(1, (hourNow - 17.3) / 0.6);
       for (let i = 0; i < 14; i++) {
         const a = nowMs / (2600 + i * 90) + i * 2.1;
@@ -713,7 +716,7 @@ export class Renderer {
     }
 
     // Wind: leaves and petals stream across the screen.
-    if (isWindy(world)) {
+    if (isWindy(world) && !this.reducedMotion) {
       const dir = 1;
       for (let i = 0; i < 26; i++) {
         const speed = 0.9 + (i % 5) * 0.25;
@@ -855,7 +858,7 @@ export class Renderer {
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",
     });
     if (h.carrying >= 0) {
-      drawSheep(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) - T * 1.35 + mishapY - hop, T * 0.8, "carried", h.facing === 2 ? 0 : 2, phase, world.sheep[h.carrying]?.named ?? false);
+      drawSheep(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) - T * 1.35 + mishapY - hop, T * 0.8, "carried", h.facing === 2 ? 0 : 2, phase, world.sheep[h.carrying]?.named ?? false, false, !!world.sheep[h.carrying]?.black);
     }
   }
 }

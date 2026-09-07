@@ -55,7 +55,7 @@ export const BOOKS: Book[] = [
   },
   {
     id: "french", title: "A Phrasebook for the Disgruntled Traveller", author: "Mme. Anon", pack: "french", register: "fr", when: 0.56, colour: "#2e4a9f",
-    excerpts: ["Sacrebleu: a mild oath, suitable for spilled soup and lost sheep.", "Merde: exactly what you think. Pronounce it with feeling.", "Andouille (f.): a sausage; also a fool. The French see no difference.", "Putain: reserve this for rivers."],
+    excerpts: ["Sacrebleu: a mild oath, suitable for spilled soup and lost sheep.", "Merde: exactly what you think. Pronounce it with feeling.", "« Par ma foi ! il y a plus de quarante ans que je dis de la prose sans que j'en susse rien. » (Molière, Le Bourgeois gentilhomme, 1670)", "Andouille (f.): a sausage; also a fool. The French see no difference.", "« Couvrez ce sein que je ne saurais voir. » (Molière, Tartuffe. Also applies to sheep, if you squint.)"],
   },
   {
     id: "german", title: "Schimpfwörter für Anfänger", author: "Herr Dr. Anon", pack: "german", register: "de", when: 0.6, colour: "#4a4a4a",
@@ -63,7 +63,7 @@ export const BOOKS: Book[] = [
   },
   {
     id: "porca", title: "Porca Miseria! and Other Useful Phrases", author: "Sig. and Sra. Anon", pack: "italian-spanish", register: "it", when: 0.64, colour: "#c94f4f",
-    excerpts: ["Porca miseria: 'pig misery'. There is no better description of this afternoon.", "Mannaggia: say it while throwing your hands up. The hands are mandatory.", "Cabezón: big-head; stubborn. Every sheep you have ever met.", "Caramba is for surprise. Rayos is for rain."],
+    excerpts: ["Porca miseria: 'pig misery'. There is no better description of this afternoon.", "Mannaggia: say it while throwing your hands up. The hands are mandatory.", "« En un lugar de la Mancha, de cuyo nombre no quiero acordarme… » (Cervantes, Don Quijote, 1605. Every field is that place.)", "Cabezón: big-head; stubborn. Every sheep you have ever met.", "« La libertad, Sancho, es uno de los más preciosos dones que a los hombres dieron los cielos. » (Don Quijote, II.58. The sheep agree, which is the problem.)"],
   },
   {
     id: "sacres", title: "Ye Sacres of Kébec", author: "un gars", pack: "quebec-sacres", register: "qc", when: 0.68, colour: "#3b6fb5",
