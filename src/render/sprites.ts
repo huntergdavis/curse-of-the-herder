@@ -92,6 +92,8 @@ export interface HerderPose {
   /** Sitting with a book. */
   reading?: boolean;
   bookColour?: string;
+  /** Mid-rant: the hat leaves his head. */
+  ranting?: boolean;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -235,10 +237,11 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.moveTo(T * 0.02, -T * (1.17 - p.fury * 0.03) - bob);
   ctx.lineTo(T * 0.16, -T * (1.17 + p.fury * 0.05) - bob);
   ctx.stroke();
-  // Hat: wide brim, tall dome; tilts back when furious.
+  // Hat: wide brim, tall dome; tilts back when furious and jumps clean off mid-rant.
   ctx.save();
-  ctx.translate(0, -T * 1.22 - bob);
-  ctx.rotate(-p.fury * 0.25);
+  const hop = p.ranting ? Math.abs(Math.sin(p.phase * Math.PI * 4)) * T * 0.45 : 0;
+  ctx.translate(0, -T * 1.22 - bob - hop);
+  ctx.rotate(-p.fury * 0.25 + (p.ranting ? Math.sin(p.phase * Math.PI * 8) * 0.3 : 0));
   ctx.fillStyle = "#5b7a3a";
   ctx.beginPath();
   ctx.ellipse(0, 0, T * 0.36, T * 0.09, 0, 0, Math.PI * 2);

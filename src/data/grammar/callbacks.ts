@@ -27,6 +27,20 @@ export const CALLBACK_RULES: Rule[] = [
     "#flees.cap# ran. I counted. Counting is what you do when you cannot do anything else.",
     "It rained #rains# times. Each time it was rain. I did not expect it to be anything else.",
   ], { reg: ["hemingway"] }),
+  ...R(0, "gaze", ["Cloud.", "Nice cloud.", "Sky.", "Hm. Bird.", "Sun. Good."]),
+  ...R(1, "gaze", ["Nice cloud. Shaped like a sheep. Of course.", "Quiet. For a moment. Quiet.", "Good sky today. Shame about the ground."]),
+  ...R(2, "gaze", [
+    "That cloud looks like a sheep. Everything looks like a sheep. That is the problem.",
+    "A moment of peace. I will remember this when the rest of the day happens.",
+    "The sky is doing very well. I have no complaints about the sky. Yet.",
+    "Listen. Nothing. No bleating. This is what other people's jobs are like.",
+  ]),
+  ...R(4, "gaze", [
+    "#pantheon.cap#, that is a handsome cloud. I shall hold it against nobody.",
+    "Peace, briefly, like #simile#. Let no sheep interrupt it. (One will.)",
+  ]),
+  ...R(8, "gaze", ["I looked at the sky. It was a good sky. The sheep were still there when I looked down.", "There was a cloud. I watched it. It did not run away. I liked it for that."], { reg: ["hemingway"] }),
+  ...R(11, "gaze", ["A cloud, a hill, a moment's ease; / Then sixty sheep. Oh, well. As you please."], { reg: ["verse"] }),
   ...R(1, "river", ["Wet sheep.", "Water. Sheep. Why.", "Out. Out of the water.", "#interj.cap#. Swimming."]),
   ...R(2, "river", [
     "You are standing in the water. On purpose. I can tell it is on purpose.",

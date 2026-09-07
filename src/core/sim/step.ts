@@ -25,6 +25,8 @@ const BREATHER_TICKS = 80; // 20 s sit-down
 const BREATHER_COOLDOWN = 25 * 60 * 4;
 const RANT_TICKS = 12; // 3 s of shaking fists at the sky
 const RANT_COOLDOWN = 11 * 60 * 4;
+const GAZE_TICKS = 10; // a calm moment looking at a cloud
+const GAZE_COOLDOWN = 9 * 60 * 4;
 
 function pushEvent(w: WorldState, e: Omit<WorldEvent, "seq">): void {
   w.events.push({ ...e, seq: w.eventCount++ });
@@ -335,7 +337,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
     if (!w.reading || w.tick >= w.reading.untilTick) finishReading(w);
     return;
   }
-  if (h.mode === "ranting") {
+  if (h.mode === "ranting" || h.mode === "gazing") {
     if (w.tick >= h.restUntilTick) h.mode = h.rantReturnMode ?? "idle";
     return;
   }
@@ -375,6 +377,15 @@ function stepHerder(w: WorldState, map: GameMap): void {
     if (onWay >= 0 && goToLibrary(w, map, onWay)) return;
   }
 
+  // When he is calm he sometimes stops to look at a cloud. It will not last.
+  if ((h.mode === "toSheep" || h.mode === "toPen") && w.frustration < 28 && w.tick - w.lastGazeTick > GAZE_COOLDOWN && keyedUnit(w.seed, "gaze", w.tick) < 0.0025) {
+    w.lastGazeTick = w.tick;
+    h.restUntilTick = w.tick + GAZE_TICKS;
+    h.rantReturnMode = h.mode;
+    h.mode = "gazing";
+    pushEvent(w, { tick: w.tick, kind: "gaze", sheepId: -1 });
+    return;
+  }
   // When he is unhinged he stops now and then to shake his fists at the sky.
   if ((h.mode === "toSheep" || h.mode === "toPen") && w.frustration >= 75 && w.tick - w.lastRantTick > RANT_COOLDOWN && keyedUnit(w.seed, "rant", w.tick) < 0.002) {
     w.lastRantTick = w.tick;

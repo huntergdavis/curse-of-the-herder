@@ -422,6 +422,8 @@ async function showHall(): Promise<void> {
   const hall = $<HTMLElement>("hall");
   const grid = $("hall-grid");
   const records = await repository.hall();
+  const totals = records.reduce((a, r) => ({ sheep: a.sheep + r.sheep, curses: a.curses + r.totalCurses, books: a.books + r.booksRead }), { sheep: 0, curses: 0, books: 0 });
+  $("hall-totals").textContent = records.length ? `${records.length} herder${records.length === 1 ? "" : "s"} retired · ${totals.sheep} sheep carried home · ${totals.books} books read · ${totals.curses} curses uttered` : "";
   grid.innerHTML = records
     .slice(0, 64)
     .map(

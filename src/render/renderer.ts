@@ -198,6 +198,8 @@ export class Renderer {
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
       else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "baa");
       else if (world.finished && s.mode === "penned" && Math.floor(nowMs / 1400 + s.id) % 9 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
+      // The penned flock judges him in unison whenever he passes empty-handed.
+      else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && Math.floor(nowMs / 1000) % 6 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
@@ -394,6 +396,7 @@ export class Renderer {
       carrying: h.carrying >= 0,
       phase: walking ? (nowMs / (stomping ? 300 : 420)) % 1 : phase,
       fury: h.mode === "ranting" ? 1 : world.frustration / 100,
+      ranting: h.mode === "ranting",
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

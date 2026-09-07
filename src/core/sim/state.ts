@@ -38,7 +38,7 @@ export interface SheepState {
   inRiver?: boolean;
 }
 
-export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting";
+export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting" | "gazing";
 
 export interface LibraryState {
   x: number;
@@ -78,7 +78,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze";
   sheepId: number;
   bookId?: string;
 }
@@ -123,6 +123,7 @@ export interface WorldState {
   lastBookPassTick: number;
   stats: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
   lastRantTick: number;
+  lastGazeTick: number;
   /** Fog until this tick (0 = clear). */
   fogUntilTick: number;
   /** Books finished today, in order. */
@@ -278,6 +279,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     lastBookPassTick: -100000,
     stats: { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 },
     lastRantTick: -100000,
+    lastGazeTick: -100000,
     fogUntilTick: 0,
     readingList: [],
     wordUse: {},
@@ -377,6 +379,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (h && typeof h["tripTiles"] !== "number") h["tripTiles"] = 0;
     if (typeof o["lastBookPassTick"] !== "number") o["lastBookPassTick"] = -100000;
     if (typeof o["lastRantTick"] !== "number") o["lastRantTick"] = -100000;
+    if (typeof o["lastGazeTick"] !== "number") o["lastGazeTick"] = -100000;
     if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["wordUse"] || typeof o["wordUse"] !== "object") o["wordUse"] = {};
