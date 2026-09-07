@@ -125,7 +125,7 @@ export const RULES: Rule[] = [
   ...R(0, "breather", ["Sit.", "#bodypart.cap#.", "Moment.", "Rest. Short."]),
 
   // ---------------------------------------------------------------- Tier 1
-  ...R(1, "idle", ["#intensifier.cap# #adj# #target#.", "#oath.cap#, #target#.", "#adj.cap# #intensifier# #noun#.", "#swear.cap#. #adj.cap# #noun#.", "#intensifier.cap# #noun# in my boot."], { minBand: 1 }),
+  ...R(1, "idle", ["#intensifier.cap# #adj# #target#.", "#oath.cap#, #target#.", "#adj.cap# #intensifier# #noun#.", "#swear.cap#. #adj.cap# #noun#.", "#intensifier.cap# #adj# #noun# in my boot."], { minBand: 1 }),
   ...R(1, "idle", [
     "#adj.cap# #target#.", "#adj.cap# #noun#.", "#interj.cap#, #noun#.", "#bodypart.cap# #selfadj#.", "Not again.", "#adj.cap# day.", "More #noun#.",
     "Too #adj#.", "#adj.cap#. #adj.cap#. #adj.cap#.", "#adj.cap# #target#, #adj# #noun#.", "#remaining.cap# more.", "#interj.cap#, #bodypart#.",
@@ -148,7 +148,7 @@ export const RULES: Rule[] = [
   ...R(2, "idle", ["This #intensifier# #target# is #adj#.", "#oath.cap#, my #bodypart#.", "I hate this #intensifier# #target#.", "#swear.cap#. #swear.cap#. #clause.cap#.", "Who put this #intensifier# #target# here?"], { minBand: 2 }),
   ...R(2, "idle", [
     "This #target# is #adj#.", "I do not like #noun.pl#.", "My #bodypart# are #selfadj#.", "This is #adj_noun.a#.", "Why is there #noun.a# in my #bodypart#?",
-    "#remaining.cap# sheep left. #interj.cap#.", "I want to sit down.", "Every #target# is #adj#. Every one.", "There is #noun# in my boot.",
+    "#remaining.cap# sheep left. #interj.cap#.", "I want to sit down.", "Every #target# is #adj#. Every one.", "There is #noun.a# in my boot.",
     "Who put this #target# here?", "#vocative.cap#, you are #adj#.", "You are #insult_np.a#.", "I have carried #penned# sheep and my #bodypart# know it.",
     "The #target# is #adj# and I am #selfadj#.", "#terrain_gripe#", "I am a herder. I herd. I do not #verb#. And yet.", "#clause.cap#.",
     "#clause.cap# and #clause#.", "#exclaim# #clause.cap#.", "Nobody told me about the #noun.pl#.", "I did not sign up for #noun.pl#.",

@@ -91,7 +91,7 @@ export const RULES_5_8: Rule[] = [
     "#vocative.cap#, you #insult#, you #insult#, you thoroughgoing #insult#.", "My #bodypart#, #vocative#, are #adj#, and it is your doing.",
     "Consider the #target#: #adj#, #adj#, and, in the final analysis, #adj#.", "This is the #nth# #target# today to be #adj# at me. I am keeping count.",
     "#oath.cap#. #oath.cap#. I have run out of the polite ones.", "A #adj# #target#, a #adj# sky, and a herder as #adj# as #simile#. Behold the morning.",
-    "#triad.cap#! And I have not yet started on your relatives.", "There is #noun# in my boot #aside#, and #abstract# in my heart.",
+    "#triad.cap#! And I have not yet started on your relatives.", "There is #noun.a# in my boot #aside#, and #abstract# in my heart.",
     "#vocative.cap#, I would call you #insult_np.a# but I have standards, and they are #adj#.", "One could say, #vocative#, that you are #adj#. One would be understating it.",
   ], GROSE),
   ...R(5, "flee", [

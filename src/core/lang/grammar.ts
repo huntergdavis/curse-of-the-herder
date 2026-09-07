@@ -162,7 +162,7 @@ export class Grammar {
   private expand(template: string, ctx: Context, rnd: () => number, depth: number, bandCap: Band): string | null {
     if (depth > MAX_DEPTH) return null;
     // Number agreement: "one #insult.pl# have" reads wrong when one sheep is left.
-    if (ctx.sheepRemaining === 1 && template.includes("#remaining#")) template = singularAfterRemaining(template);
+    if (ctx.sheepRemaining === 1 && /#remaining(\.[a-z]+)*#/.test(template)) template = singularAfterRemaining(template);
     let failed = false;
     const out = template.replace(SLOT, (_m, gateKind: string | undefined, gateNum: string | undefined, symbol: string, mods: string) => {
       let cap = bandCap;
@@ -261,10 +261,11 @@ export class Grammar {
 
 /** Rewrite the clause after #remaining# for a count of one: drop .pl and fix common verbs. */
 function singularAfterRemaining(template: string): string {
-  const i = template.indexOf("#remaining#");
+  const i = template.search(/#remaining(\.[a-z]+)*#/);
   const head = template.slice(0, i);
   let tail = template.slice(i);
-  const clauseEnd = tail.search(/[.!?;]|$/);
+  // A full stop inside a tag ("#insult.pl#") is a modifier, not the end of the clause.
+  const clauseEnd = tail.search(/[.!?;](?![A-Za-z]+#)|$/);
   let clause = tail.slice(0, clauseEnd);
   const rest = tail.slice(clauseEnd);
   clause = clause.replace(/\.pl#/g, "#").replace(/\bare\b/, "is").replace(/\bhave\b/, "has").replace(/\bwere\b/, "was").replace(/\bremain\b/, "remains").replace(/\bdo not\b/, "does not");
