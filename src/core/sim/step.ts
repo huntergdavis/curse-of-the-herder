@@ -699,7 +699,7 @@ function stepRival(w: WorldState, map: GameMap): void {
     r.x += r.dx;
     r.ticksLeft--;
     // On his third pass of the day, halfway across, one of his sheep bolts. It happens to him too.
-    if ((w.rivalsSeen ?? 0) === 3 && r.boltTick === undefined && r.ticksLeft === 90) {
+    if ((w.rivalsSeen ?? 0) === 3 && r.boltTick === undefined && r.ticksLeft === 160) {
       r.boltTick = w.tick;
       addFrustration(w, -10);
       pushEvent(w, { tick: w.tick, kind: "rivalBolt", sheepId: -1 });
@@ -715,9 +715,10 @@ function stepRival(w: WorldState, map: GameMap): void {
   const y = Math.round(h.y) + 3;
   const cx = Math.round(h.x);
   for (let x = cx - 13; x <= cx + 13; x++) if (!isWalkable(tileAt(map, x, y))) return;
-  const fromLeft = keyedUnit(w.seed, "rival-side", w.tick) < 0.5;
+  // He comes from ahead, walking the other way, so they pass each other while the camera still has them both.
+  const ahead = h.facing === 0 ? 1 : h.facing === 2 ? -1 : keyedUnit(w.seed, "rival-side", w.tick) < 0.5 ? 1 : -1;
   const speed = 0.11;
-  w.rival = { x: fromLeft ? cx - 9 : cx + 9, y, dx: fromLeft ? speed : -speed, ticksLeft: Math.ceil(22 / speed) };
+  w.rival = { x: cx + ahead * 11, y, dx: -ahead * speed, ticksLeft: Math.ceil(22 / speed) };
   w.rivalLastTick = w.tick;
   w.rivalsSeen = (w.rivalsSeen ?? 0) + 1;
   addFrustration(w, FRUSTRATION.rival);

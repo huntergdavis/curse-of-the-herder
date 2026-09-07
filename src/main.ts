@@ -178,7 +178,7 @@ async function startSession(world: WorldState): Promise<void> {
   if (params.get("rival")) {
     const w = session.world;
     const cx = Math.round(w.herder.x);
-    w.rival = { x: cx - 9, y: Math.round(w.herder.y) + 3, dx: 0.11, ticksLeft: 200 };
+    w.rival = { x: cx + 11, y: Math.round(w.herder.y) + 3, dx: -0.11, ticksLeft: 200 };
     // ?rival=3 makes this his third pass, so Also Prudence bolts halfway across.
     const nth = Number(params.get("rival"));
     if (nth > 1) w.rivalsSeen = nth - 1;
