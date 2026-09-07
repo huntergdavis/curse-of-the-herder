@@ -89,6 +89,11 @@ export class Grammar {
     if (e.w === ctx.signatureWord) w *= 4;
     // Prefer words from the newest levels a little, so learning shows.
     if (e.level >= ctx.level - 1 && e.level > 0) w *= 1.6;
+    // When he is allowed to be filthy, he is: words at the ceiling band are favoured.
+    if (ctx.band >= 2 && e.band > 0) {
+      const gap = ctx.band - e.band;
+      w *= gap === 0 ? 3.5 : gap === 1 ? 1.8 : 1;
+    }
     return w;
   }
 

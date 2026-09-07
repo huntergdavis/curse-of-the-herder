@@ -221,7 +221,7 @@ function updateHud(force = false): void {
   const mood = w.frustration < 20 ? "Muttering" : w.frustration < 40 ? "Grumbling" : w.frustration < 60 ? "Cursing" : w.frustration < 80 ? "Swearing" : "Unhinged";
   $("hud-frust").textContent = `${mood} · ${Math.round(w.frustration)}`;
   $<HTMLDivElement>("meter-fill").style.width = `${w.frustration}%`;
-  $<HTMLDivElement>("meter").classList.toggle("tremble", w.frustration >= 88);
+  $<HTMLDivElement>("meter").classList.toggle("tremble", w.frustration >= 88 && !w.finished);
   $("hud-mode").textContent = paused ? "Paused" : FAST > 1 ? `×${FAST}` : "";
   $("btn-pause").textContent = paused ? "Resume" : "Pause";
 }
@@ -237,6 +237,7 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "repeatEscape" && w.sheep[e.sheepId]?.flees === 2) toast(`That one has earned a name. It is <strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> now.`);
     if (e.kind === "rainStops") s.renderer.rainStopped(nowMs);
+    if (e.kind === "mishap" && e.detail === "bite" && e.sheepId >= 0) s.bubbles.emote(e.sheepId, "grr", 2.5, nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
     if (e.kind === "bookFound") {
       s.excerptShown = -1;

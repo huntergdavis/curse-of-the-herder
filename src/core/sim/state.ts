@@ -38,7 +38,7 @@ export interface SheepState {
   inRiver?: boolean;
 }
 
-export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting" | "gazing";
+export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting" | "gazing" | "mishap";
 
 export interface LibraryState {
   x: number;
@@ -71,16 +71,21 @@ export interface HerderState {
   /** Tiles walked since he last stood in the pen. */
   tripTiles: number;
   /** Mode to resume after a rant. */
-  rantReturnMode?: HerderMode;
+  rantReturnMode?: HerderMode | undefined;
+  /** Current mishap kind while in mishap mode. */
+  mishap?: string | undefined;
+  gateJammed?: boolean;
 }
 
 export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap";
   sheepId: number;
   bookId?: string;
+  /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
+  detail?: string;
 }
 
 export interface WorldState {
@@ -121,9 +126,10 @@ export interface WorldState {
   lastBreatherTick: number;
   longestLine: string;
   lastBookPassTick: number;
-  stats: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
+  stats: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number; mishaps?: number };
   lastRantTick: number;
   lastGazeTick: number;
+  lastMishapTick: number;
   /** Fog until this tick (0 = clear). */
   fogUntilTick: number;
   /** Books finished today, in order. */
@@ -280,6 +286,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     stats: { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 },
     lastRantTick: -100000,
     lastGazeTick: -100000,
+    lastMishapTick: -100000,
     fogUntilTick: 0,
     readingList: [],
     wordUse: {},
@@ -380,6 +387,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["lastBookPassTick"] !== "number") o["lastBookPassTick"] = -100000;
     if (typeof o["lastRantTick"] !== "number") o["lastRantTick"] = -100000;
     if (typeof o["lastGazeTick"] !== "number") o["lastGazeTick"] = -100000;
+    if (typeof o["lastMishapTick"] !== "number") o["lastMishapTick"] = -100000;
     if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["wordUse"] || typeof o["wordUse"] !== "object") o["wordUse"] = {};

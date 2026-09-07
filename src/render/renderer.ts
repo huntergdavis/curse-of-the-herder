@@ -337,9 +337,10 @@ export class Renderer {
       // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
       else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, (s.id * 13 + Math.floor(nowMs / 23000)) % 9 === 0 ? "achoo" : "baa");
-      else if (world.finished && s.mode === "penned" && Math.floor(nowMs / 1400 + s.id) % 9 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
-      // The penned flock judges him in unison whenever he passes empty-handed.
-      else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && Math.floor(nowMs / 1000) % 6 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
+      // At night one or two sheep snore at a time, gently.
+      else if (world.finished && s.mode === "penned" && s.id % 20 === Math.floor(nowMs / 6000) % 20) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
+      // One penned sheep at a time gives him a look when he passes empty-handed.
+      else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && s.id % 12 === Math.floor(nowMs / 4000) % 12) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
@@ -560,9 +561,9 @@ export class Renderer {
         const px = sx(h.x + 0.5) + Math.cos(a) * T * (2 + (i % 5)) + Math.sin(a * 1.7) * T;
         const py = sy(h.y + 0.5) + Math.sin(a * 0.8) * T * (1.5 + (i % 4)) - T * 0.6;
         const blink = Math.max(0, Math.sin(nowMs / 400 + i * 1.9));
-        ctx.fillStyle = `rgba(255, 240, 140, ${(blink * 0.25 * strength).toFixed(3)})`;
+        ctx.fillStyle = `rgba(255, 240, 140, ${(blink * 0.12 * strength).toFixed(3)})`;
         ctx.beginPath();
-        ctx.arc(px, py, Math.max(3, T * 0.16), 0, Math.PI * 2);
+        ctx.arc(px, py, Math.max(2, T * 0.11), 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = `rgba(255, 250, 200, ${(blink * strength).toFixed(3)})`;
         ctx.beginPath();
@@ -586,6 +587,20 @@ export class Renderer {
     if (!tint.endsWith("0)") && !tint.endsWith("0.000)")) {
       ctx.fillStyle = tint;
       ctx.fillRect(0, 0, W, H);
+    }
+    // A moon rises with the stars.
+    if (hour > 18.4) {
+      const a = Math.min(1, (hour - 18.4) / 1.0);
+      const mx = W * 0.82;
+      const my = H * (0.22 - a * 0.06);
+      ctx.fillStyle = `rgba(255, 250, 225, ${(0.9 * a).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(mx, my, T * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(60, 60, 110, ${(0.9 * a).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(mx - T * 0.32, my - T * 0.12, T * 0.6, 0, Math.PI * 2);
+      ctx.fill();
     }
     // Stars come out after half past six.
     if (hour > 18.5) {
@@ -614,6 +629,7 @@ export class Renderer {
     const walking = h.mode === "toSheep" || h.mode === "toPen";
     const reading = h.mode === "reading" && world.reading;
     const stomping = walking && world.frustration >= 80;
+    const mishap = h.mode === "mishap" ? h.mishap : undefined;
     if (stomping) {
       // Little dust puffs kicked up behind him.
       const ctx = this.ctx;
@@ -626,19 +642,39 @@ export class Renderer {
         ctx.fill();
       }
     }
-    drawHerder(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95), T, {
+    // Mishap staging: sunk in the bog, hopping on one foot, a wasp circling.
+    let mishapY = 0;
+    if (mishap === "bog") mishapY = T * 0.35;
+    const hop = mishap === "stub" || mishap === "nettles" || mishap === "cowpat" || mishap === "molehill" || mishap === "bite" ? Math.abs(Math.sin(nowMs / 140)) * T * 0.25 : 0;
+    if (mishap === "wasp") {
+      const a = nowMs / 180;
+      drawEmote(this.ctx, sx(h.x + 0.5) + Math.cos(a) * T * 0.9, sy(h.y + 0.95) - T * 1.1 + Math.sin(a * 1.3) * T * 0.5, T * 0.7, "bzz");
+    }
+    if (mishap === "bog") {
+      this.ctx.fillStyle = "rgba(90, 65, 40, 0.75)";
+      this.ctx.beginPath();
+      this.ctx.ellipse(sx(h.x + 0.5), sy(h.y + 0.95) - T * 0.05, T * 0.5, T * 0.18, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+    if (mishap === "cowpat") {
+      this.ctx.fillStyle = "#5a4520";
+      this.ctx.beginPath();
+      this.ctx.ellipse(sx(h.x + 0.5) - T * 0.1, sy(h.y + 0.95) + T * 0.05, T * 0.32, T * 0.12, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+    drawHerder(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) + mishapY - hop, T, {
       facing: h.facing,
       walking,
       carrying: h.carrying >= 0,
       phase: walking ? (nowMs / (stomping ? 300 : 420)) % 1 : phase,
-      fury: h.mode === "ranting" ? 1 : world.frustration / 100,
+      fury: h.mode === "ranting" || mishap ? 1 : world.frustration / 100,
       ranting: h.mode === "ranting",
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",
     });
     if (h.carrying >= 0) {
-      drawSheep(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) - T * 1.35, T * 0.8, "carried", h.facing === 2 ? 0 : 2, phase, world.sheep[h.carrying]?.named ?? false);
+      drawSheep(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) - T * 1.35 + mishapY - hop, T * 0.8, "carried", h.facing === 2 ? 0 : 2, phase, world.sheep[h.carrying]?.named ?? false);
     }
   }
 }

@@ -31,6 +31,9 @@ long soak.
 - Menu (New, Hall, Load, Language, end-of-day, Speed 1-100x, fps, Export/Import), mobile layout
 - Word-usage tallies in reading lists, genuine PD excerpts (Grose, Shakespeare, Bierce, Rabelais), river sheep, hourly diary, names over notorious sheep, weekly soak workflow
 - Scandalised villagers by the wells, favourite word on cards
+- Delights: rainbow after rain, fireflies and moon at dusk, sunset band, butterflies, ducks, puddles, whistling and hullos, mud footprints, sun-drifting shadows, trembling meter, name toast, yesterday's stone by the pen, signature-word gags, sneezes
+- Mishaps that spike his anger: bog, nettles, stubbed toe, cowpat, molehill, wasp, biting sheep, jammed gate (each with lines and a pose)
+- Calmer emotes (no more strobing flock at the end), hot moods favour the strongest allowed words
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

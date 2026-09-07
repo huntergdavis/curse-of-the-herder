@@ -27,6 +27,29 @@ const RANT_TICKS = 12; // 3 s of shaking fists at the sky
 const RANT_COOLDOWN = 11 * 60 * 4;
 const GAZE_TICKS = 10; // a calm moment looking at a cloud
 const GAZE_COOLDOWN = 9 * 60 * 4;
+const MISHAP_COOLDOWN = 6 * 60 * 4; // at most one trap every six minutes
+
+/** Traps of the countryside: kind, terrain it lives on, per-new-tile chance, anger, ticks lost. */
+const MISHAPS: { kind: string; terrain: number[] | null; chance: number; anger: number; ticks: number }[] = [
+  { kind: "bog", terrain: [Terrain.Mud], chance: 0.05, anger: 14, ticks: 14 },
+  { kind: "nettles", terrain: [Terrain.Forest], chance: 0.035, anger: 12, ticks: 8 },
+  { kind: "stub", terrain: [Terrain.Rock], chance: 0.04, anger: 12, ticks: 8 },
+  { kind: "cowpat", terrain: [Terrain.Grass, Terrain.Meadow, Terrain.Farm], chance: 0.004, anger: 10, ticks: 6 },
+  { kind: "molehill", terrain: [Terrain.Grass, Terrain.Meadow], chance: 0.003, anger: 9, ticks: 6 },
+  { kind: "wasp", terrain: null, chance: 0.0012, anger: 16, ticks: 10 },
+];
+
+function startMishap(w: WorldState, kind: string, anger: number, ticks: number, sheepId = -1): void {
+  const h = w.herder;
+  w.lastMishapTick = w.tick;
+  w.stats.mishaps = (w.stats.mishaps ?? 0) + 1;
+  addFrustration(w, anger);
+  h.rantReturnMode = h.mode === "mishap" ? h.rantReturnMode : h.mode;
+  h.mode = "mishap";
+  h.mishap = kind;
+  h.restUntilTick = w.tick + ticks;
+  pushEvent(w, { tick: w.tick, kind: "mishap", sheepId, detail: kind });
+}
 
 function pushEvent(w: WorldState, e: Omit<WorldEvent, "seq">): void {
   w.events.push({ ...e, seq: w.eventCount++ });
@@ -337,8 +360,11 @@ function stepHerder(w: WorldState, map: GameMap): void {
     if (!w.reading || w.tick >= w.reading.untilTick) finishReading(w);
     return;
   }
-  if (h.mode === "ranting" || h.mode === "gazing") {
-    if (w.tick >= h.restUntilTick) h.mode = h.rantReturnMode ?? "idle";
+  if (h.mode === "ranting" || h.mode === "gazing" || h.mode === "mishap") {
+    if (w.tick >= h.restUntilTick) {
+      h.mode = h.rantReturnMode ?? "idle";
+      h.mishap = undefined;
+    }
     return;
   }
   if (h.mode === "idle") {
@@ -410,6 +436,17 @@ function stepHerder(w: WorldState, map: GameMap): void {
     h.lastTileY = ty;
     // The walk of shame: past the pen with nothing to show for it.
     h.tripTiles++;
+    // The countryside has opinions too.
+    if (w.tick - w.lastMishapTick > MISHAP_COOLDOWN) {
+      const t = map.terrain[ty * map.size + tx]!;
+      for (const m of MISHAPS) {
+        if (m.terrain && !m.terrain.includes(t)) continue;
+        if (keyedUnit(w.seed, "mishap", m.kind, w.tick) < m.chance) {
+          startMishap(w, m.kind, m.anger, m.ticks);
+          return;
+        }
+      }
+    }
     if (h.carrying < 0 && h.mode === "toSheep" && h.tripTiles > 30 && w.tick - w.lastShameTick > SHAME_COOLDOWN && Math.hypot(tx - map.pen.x, ty - map.pen.y) <= SHAME_RADIUS && h.path.length > 12) {
       w.lastShameTick = w.tick;
       w.stats.shames++;
@@ -486,6 +523,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
         }
         if (planPath(w, map, map.pen.x, map.pen.y)) h.mode = "toPen";
         else h.mode = "idle";
+        // Some of them bite.
+        if (w.tick - w.lastMishapTick > MISHAP_COOLDOWN && keyedUnit(w.seed, "bite", s.id) < 0.09) startMishap(w, "bite", 15, 8, s.id);
       } else if (!planToSheep(w, map, s)) {
         h.mode = "idle";
       }
@@ -507,6 +546,13 @@ function stepHerder(w: WorldState, map: GameMap): void {
       }
     }
     if (h.path.length === 0 && Math.hypot(h.x - map.pen.x, h.y - map.pen.y) < 0.75) {
+      // The gate sticks now and then; he stands there, sheep on shoulders, wrestling it.
+      if (w.tick - w.lastMishapTick > MISHAP_COOLDOWN && !h.gateJammed && keyedUnit(w.seed, "gate", w.sheepPenned) < 0.07) {
+        h.gateJammed = true;
+        startMishap(w, "gate", 12, 12);
+        return;
+      }
+      h.gateJammed = false;
       if (s) {
         s.mode = "penned";
         const k = w.sheepPenned;
