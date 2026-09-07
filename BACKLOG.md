@@ -64,6 +64,7 @@ long soak.
 - Language quality: day-long rule memory (slot-free one-liners said once a day, ~96% distinct lines), longer recent-line window, no predicate "fucking", the Curse capitalised as a vocative, mismatched-noun rule fixed
 - Yan Tan Tethera: the old dales sheep-count as grammar symbols (`#yantan#`, `#yantancount#`), used in pen lines from level 1 ("Yan, tan, tethera, methera. Old counting. Grandfather did it.")
 - Cows: one per village and one by the pen, chewing and swishing, "moo" when he passes, and a line about them every twenty sim-minutes at most ("a cow, standing there with the confidence of a thing nobody has ever tried to carry")
+- He answers the Curse back about half the time ("Say that to my face! You have no face! That is exactly my POINT!")
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

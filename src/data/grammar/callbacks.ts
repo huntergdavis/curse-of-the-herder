@@ -103,6 +103,13 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "streak", ["#pantheon.cap#, five in a row. I know what this is. This is the quiet before the sheep.", "Eight. EIGHT in a row. I am not going to say anything. I am not going to say ANYTHING. …Eight."]),
   ...R(8, "streak", ["Five went in and none of them ran. I did not trust it. I was right not to."], { reg: ["hemingway"] }),
   ...R(12, "streak", ["A run of luck, O Curse, is your favourite joke, and I have laughed at it every time, and I am laughing now, and I hate you."]),
+  // The Curse said something. He heard it.
+  ...R(0, "curseReply", ["Heard that.", "Shut up, sky.", "Not funny."]),
+  ...R(2, "curseReply", ["I heard that. I hear everything. It is the worst part.", "Oh good, it has opinions. The curse has OPINIONS. Nobody asked the curse.", "Yes. Thank you. Very helpful. Go and haunt a cow."]),
+  ...R(4, "curseReply", ["#oath_phrase#, it TALKS now. Of course it talks. Nothing on this #adj# hill knows when to stop.", "Say that to my face! You have no face! That is exactly my POINT!"]),
+  ...R(6, "curseReply", ["Yes, thank you, I am aware that I am cursed. The reminders are not, on the whole, helping with the cursing.", "Heckled by my own affliction. There is a word for that and I will find it in a book and I will use it at you."]),
+  ...R(8, "curseReply", ["The curse spoke. I did not answer. Then I did. It was not a good answer."], { reg: ["hemingway"] }),
+  ...R(10, "curseReply", ["Speak up, O Curse; my #adj# hearing is the one faculty you have not yet ruined, and I should hate for you to feel you had left a job unfinished."]),
   // A cow. Not his. Good.
   ...R(0, "cow", ["Cow. Not mine. Good.", "Moo yourself.", "Big. Not sheep. Fine."]),
   ...R(2, "cow", ["Not you. You are not my problem. Stay that way, you great ambling milk cupboard.", "Look at it. Nobody is trying to carry it anywhere. It has no idea how good it has it.", "Yes, hello, cow. No, I do not want to talk about it. You did the pats, did you? Thought so."]),

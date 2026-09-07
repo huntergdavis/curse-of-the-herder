@@ -489,6 +489,11 @@ function maybeCurseRemarks(s: Session, kind: string, nowMs: number): void {
   if (!pool || keyedUnit(w.seed, "curse-remark", w.tick) > 0.45) return;
   lastCurseMs = nowMs;
   const line = pool[Math.floor(keyedUnit(w.seed, "curse-remark-line", w.tick) * pool.length)] ?? pool[0]!;
+  // He hears it, and about half the time he answers back.
+  if (kind !== "finished" && keyedUnit(w.seed, "curse-reply", w.tick) < 0.55) {
+    const reply = speakKind(w, s.map, "curseReply", { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP, 0.35);
+    if (reply) s.queue.push({ text: reply.text, heat: reply.heat, seconds: reply.seconds, atMs: nowMs + 4500 / Math.max(1, FAST) + 1500 });
+  }
   window.setTimeout(() => {
     const el = $("toast");
     el.innerHTML = `<span class="curse-voice">The Curse:</span> ${escapeHtml(line)}`;
