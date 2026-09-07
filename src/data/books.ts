@@ -102,6 +102,14 @@ export const BOOKS: Book[] = [
     excerpts: ["The present is the key to the past. The hill was here yesterday. It will be here tomorrow. So, I fear, will the sheep.", "Sedimentary: laid down in layers. Like mud on a boot.", "Igneous rock is born of fire. So is my opinion of this boulder.", "Erosion: the slow wearing-away of the land by wind and water. See also: herders."],
   },
   {
+    id: "blacks-law", title: "Black's Law Dictionary", author: "1st edition, 1891 (spirit of)", pack: "legal", register: "legal", when: 0.52, colour: "#2b2b2b",
+    excerpts: ["ESTRAY. A wandering animal whose owner is unknown. The owner is known. The owner is me.", "NUISANCE. That which annoyeth. See: sheep, all.", "The party of the first part (hereinafter The Sheep) shall be carried by the party of the second part (hereinafter The Idiot).", "OBJECTION. Overruled. The hill is not a party to these proceedings and yet."],
+  },
+  {
+    id: "knitting", title: "A Treatise on Knitting", author: "a Lady, 1840 (spirit of)", pack: "knitting", register: "knitting", when: 0.28, colour: "#c97c9c",
+    excerpts: ["Cast on loosely; the sheep did not.", "A dropped stitch, like a dropped sheep, must be gone back for.", "Wool remembers everything you do to it. So, I find, does the sheep.", "Every sheep is a cardigan waiting for a reason."],
+  },
+  {
     id: "burns", title: "Poems, Chiefly in the Scottish Dialect", author: "Robert Burns, 1786 (genuine lines)", pack: "yiddish-scots-aussie", register: "sco", when: 0.75, colour: "#3b5b8c",
     excerpts: ["Wee, sleekit, cow'rin, tim'rous beastie, / O, what a panic's in thy breastie! (To a Mouse)", "The best-laid schemes o' mice an' men / Gang aft agley. (To a Mouse. Also: of herders and sheep.)", "O wad some Pow'r the giftie gie us / To see oursels as ithers see us! (To a Louse)", "Nae man can tether time or tide. (Tam o' Shanter. Nor sheep.)"],
   },

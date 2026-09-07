@@ -1,5 +1,6 @@
 import type { GameMap } from "../core/map/generate";
-import { dayHour, isFoggy, isRaining, isWindy, type WorldState } from "../core/sim/state";
+import { dayHour, hoursElapsed, isFoggy, isRaining, isWindy, type WorldState } from "../core/sim/state";
+import { erudition, levelFor } from "../core/progression";
 import { BOOK_BY_ID } from "../data/books";
 import { dogName, sheepName } from "../core/names";
 import { Deco } from "../core/map/terrain";
@@ -214,6 +215,7 @@ export class Renderer {
   reducedMotion = false;
   /** Multiplier on bubble text for viewing from a distance. */
   fontScale = 1;
+  highContrast = false;
 
   /** When set, the sky follows this hour instead of the world clock (ending fade). */
   hourOverride: number | null = null;
@@ -783,7 +785,7 @@ export class Renderer {
     const line = bubbles.herderLine();
     if (line) {
       const fontPx = Math.max(14 * this.dpr, Math.min(T * 0.42, 30 * this.dpr)) * this.fontScale;
-      drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * 1.45, line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT }, W, H);
+      drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * 1.45, line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT, highContrast: this.highContrast }, W, H);
     }
   }
 
@@ -855,6 +857,7 @@ export class Renderer {
       ranting: h.mode === "ranting" || nearMemorial,
       crookBroken: world.crookBroken,
       windy: isWindy(world) && h.carrying < 0 && !reading,
+      level: levelFor(erudition(world.booksRead, world.sheepPenned, hoursElapsed(world))),
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

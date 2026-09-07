@@ -78,6 +78,7 @@ let session: Session | null = null;
 let paused = false;
 let motionSetting = false;
 let textScale = 1;
+let contrastSetting = false;
 let lastFrameMs = performance.now();
 let lastTickMs = performance.now();
 let lastDrawMs = 0;
@@ -133,6 +134,7 @@ async function startSession(world: WorldState): Promise<void> {
   renderer.hourOverride = null;
   renderer.reducedMotion = motionSetting;
   renderer.fontScale = textScale;
+  renderer.highContrast = contrastSetting;
   repository.setActiveId(world.id);
   // A fresh herder says his first words of the day.
   if (world.tick === 0 && world.events[0]) {
@@ -642,6 +644,17 @@ async function boot(): Promise<void> {
   selText.addEventListener("change", () => {
     repository.setSetting("text", selText.value);
     applyText(selText.value);
+  });
+  const selContrast = $<HTMLSelectElement>("sel-contrast");
+  selContrast.value = repository.getSetting("contrast", "paper");
+  const applyContrast = (v: string): void => {
+    contrastSetting = v === "high";
+    if (session) session.renderer.highContrast = contrastSetting;
+  };
+  applyContrast(selContrast.value);
+  selContrast.addEventListener("change", () => {
+    repository.setSetting("contrast", selContrast.value);
+    applyContrast(selContrast.value);
   });
   const selMotion = $<HTMLSelectElement>("sel-motion");
   const osReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;

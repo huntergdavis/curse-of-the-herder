@@ -120,6 +120,8 @@ export interface HerderPose {
   crookBroken?: boolean;
   /** Windy: one hand on the hat. */
   windy?: boolean;
+  /** Eloquence level 0-12: adds a book, a quill, a scarf, spectacles, a laurel. */
+  level?: number;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -178,6 +180,22 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   // Belt
   ctx.fillStyle = "#3a2f2a";
   ctx.fillRect(-T * 0.24, -T * 0.55 - bob, T * 0.48, T * 0.06);
+  const lvl = p.level ?? 0;
+  // Level 8: a scarf, because a man of letters feels the cold.
+  if (lvl >= 8) {
+    ctx.fillStyle = "#b03a3a";
+    ctx.fillRect(-T * 0.24, -T * 0.95 - bob, T * 0.48, T * 0.09);
+    ctx.fillRect(T * 0.1, -T * 0.92 - bob, T * 0.1, T * 0.3 + Math.sin(p.phase * Math.PI * 2) * T * 0.02);
+    ctx.strokeRect(-T * 0.24, -T * 0.95 - bob, T * 0.48, T * 0.09);
+  }
+  // Level 4: the last book, tucked under the back arm.
+  if (lvl >= 4 && !p.carrying && !p.reading) {
+    ctx.fillStyle = "#7b2d3a";
+    ctx.fillRect(-T * 0.36, -T * 0.78 - bob, T * 0.16, T * 0.22);
+    ctx.strokeRect(-T * 0.36, -T * 0.78 - bob, T * 0.16, T * 0.22);
+    ctx.fillStyle = "#fffdf5";
+    ctx.fillRect(-T * 0.34, -T * 0.76 - bob, T * 0.03, T * 0.18);
+  }
   // Arms
   ctx.strokeStyle = "#e8b98a";
   ctx.lineWidth = Math.max(2, T * 0.1);
@@ -277,6 +295,30 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.moveTo(T * 0.02, -T * (1.17 - p.fury * 0.03) - bob);
   ctx.lineTo(T * 0.16, -T * (1.17 + p.fury * 0.05) - bob);
   ctx.stroke();
+  // Level 6: a quill behind the ear. Level 10: spectacles.
+  if (lvl >= 6) {
+    ctx.strokeStyle = "#f4f1e6";
+    ctx.lineWidth = Math.max(1.5, T * 0.05);
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.16, -T * 1.1 - bob);
+    ctx.lineTo(-T * 0.3, -T * 1.42 - bob);
+    ctx.stroke();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, T * 0.03);
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.16, -T * 1.1 - bob);
+    ctx.lineTo(-T * 0.3, -T * 1.42 - bob);
+    ctx.stroke();
+  }
+  if (lvl >= 10) {
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, T * 0.035);
+    ctx.beginPath();
+    ctx.arc(T * 0.09, -T * 1.1 - bob, T * 0.065, 0, Math.PI * 2);
+    ctx.moveTo(T * 0.155, -T * 1.1 - bob);
+    ctx.lineTo(T * 0.2, -T * 1.12 - bob);
+    ctx.stroke();
+  }
   // Hat: wide brim, tall dome; tilts back when furious and jumps clean off mid-rant.
   ctx.save();
   const hop = p.ranting ? Math.abs(Math.sin(p.phase * Math.PI * 4)) * T * 0.45 : 0;
@@ -294,6 +336,15 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
+  // Level 12: a laurel around the hat. The laureate, unhinged.
+  if (lvl >= 12) {
+    ctx.fillStyle = "#7cb548";
+    for (let k = -3; k <= 3; k++) {
+      ctx.beginPath();
+      ctx.ellipse(k * T * 0.06, -T * 0.1 - Math.abs(k) * T * 0.01, T * 0.045, T * 0.02, k * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
   ctx.restore();
   ctx.restore();
 }
@@ -317,6 +368,8 @@ export interface BubbleStyle {
   /** 0..1 intensity: thicker outline, jagged edge, redder fill. */
   heat: number;
   font: string;
+  /** Pure white on black with a heavy outline, for legibility at a distance or low vision. */
+  highContrast?: boolean;
 }
 
 /** Speech bubble whose tail points at (tx, ty). Returns nothing; clamps to canvas. */
@@ -337,9 +390,9 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   bx = Math.max(8, Math.min(canvasW - bw - 8, bx));
   by = Math.max(8, Math.min(canvasH - bh - 8, by));
   ctx.save();
-  ctx.lineWidth = Math.max(1.5, fontPx * (0.08 + style.heat * 0.08));
-  ctx.strokeStyle = INK;
-  ctx.fillStyle = style.heat > 0.75 ? "#ffe9dc" : style.heat > 0.45 ? "#fff6e6" : "#fffdf5";
+  ctx.lineWidth = Math.max(1.5, fontPx * (0.08 + style.heat * 0.08)) * (style.highContrast ? 1.6 : 1);
+  ctx.strokeStyle = style.highContrast ? "#000000" : INK;
+  ctx.fillStyle = style.highContrast ? "#ffffff" : style.heat > 0.75 ? "#ffe9dc" : style.heat > 0.45 ? "#fff6e6" : "#fffdf5";
   ctx.beginPath();
   let tailBaseY = by + bh;
   if (style.heat > 0.85) {
@@ -378,7 +431,8 @@ export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontP
   ctx.lineTo(tx, tipY);
   ctx.lineTo(tailBaseX + fontPx * 0.5, tailBaseY);
   ctx.stroke();
-  ctx.fillStyle = INK;
+  ctx.fillStyle = style.highContrast ? "#000000" : INK;
+  if (style.highContrast) ctx.font = `bold ${fontPx}px ${style.font}`;
   ctx.textBaseline = "top";
   if (verse) {
     ctx.textAlign = "center";

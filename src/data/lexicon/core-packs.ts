@@ -240,4 +240,46 @@ export const culinary: LexPack = {
   ],
 };
 
-export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord, culinary];
+/** Legalese, from a dictionary found by the road. */
+export const legal: LexPack = {
+  id: "legal",
+  title: "Black's Law Dictionary",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 6,
+  entries: [
+    ins("party of the first part", { reg: ["legal"] }), ins("defendant", { reg: ["legal"] }), ins("respondent", { reg: ["legal"] }), ins("recidivist", { reg: ["legal"] }),
+    ins("absconder", { reg: ["legal"] }), ins("trespasser", { reg: ["legal"] }), ins("public nuisance", { reg: ["legal"] }), ins("attractive nuisance", { reg: ["legal"] }),
+    ins("tortfeasor", { reg: ["legal"] }), ins("vagrant", { reg: ["legal"] }), ins("chattel", { reg: ["legal"] }), ins("encumbrance", { reg: ["legal"] }),
+    ins("liability", { reg: ["legal"] }), ins("breach", { reg: ["legal"], pl: "breaches" }), ins("estray", { reg: ["legal"], gloss: "a wandering domestic animal, in law" }),
+    adj("aforesaid", { reg: ["legal"] }), adj("hereinafter", { reg: ["legal"] }), adj("negligent", { reg: ["legal"] }), adj("wilful", { reg: ["legal"] }),
+    adj("contumacious", { reg: ["legal"], gloss: "stubbornly disobedient to authority" }), adj("in flagrant breach", { reg: ["legal"] }), adj("without prejudice", { reg: ["legal"] }),
+    adj("in contempt", { reg: ["legal"] }), adj("ultra vires", { reg: ["legal"], gloss: "beyond one's powers" }), adj("non-compliant", { reg: ["legal"] }),
+    adj("inadmissible", { reg: ["legal"] }), adj("actionable", { reg: ["legal"] }), adj("hereby dismissed", { reg: ["legal"] }),
+    abs("liability"), abs("negligence"), abs("contempt"), abs("malfeasance"), abs("misadventure"), abs("prior notice"),
+    oath("objection", 0, { reg: ["legal"] }), oath("overruled", 0, { reg: ["legal"] }), oath("I rest my case", 0, { reg: ["legal"] }), oath("case dismissed", 0, { reg: ["legal"] }),
+    threat("serve you with papers"), threat("read you your rights, all of which you have forfeited"), threat("enter you into evidence"), threat("find against you, with costs"),
+  ],
+};
+
+/** Knitting: the threats are the point. */
+export const knitting: LexPack = {
+  id: "knitting",
+  title: "A Treatise on Knitting",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 3,
+  entries: [
+    threat("knit you into a cardigan for a man I do not like"), threat("make you into a tea cosy"), threat("turn you into bed socks for a very cold widow"),
+    threat("card you, spin you and knit you into something regrettable"), threat("make you into a bobble hat and wear you to market"), threat("unravel you and start again"),
+    threat("knit you into a scarf so long it goes twice round the hill"), threat("purl you"), threat("make you into oven gloves"), threat("darn you"),
+    threat("make you a jumper and give it to the dog"), threat("knit you a jumper and make you wear it"),
+    ins("ball of wool", { reg: ["knitting"] }), ins("dropped stitch", { reg: ["knitting"] }), ins("tangle", { reg: ["knitting"] }), ins("unfinished jumper", { reg: ["knitting"] }),
+    ins("bobble", { reg: ["knitting"] }), ins("tea cosy", { reg: ["knitting"] }), ins("skein of trouble", { reg: ["knitting"] }), ins("moth-bait", { reg: ["knitting"] }),
+    adj("knotted", { reg: ["knitting"] }), adj("frayed", { reg: ["knitting"] }), adj("unravelled", { reg: ["knitting"] }), adj("felted", { reg: ["knitting"] }),
+    adj("bobbly", { reg: ["knitting"] }), adj("moth-eaten", { reg: ["knitting"] }), adj("loose-knit", { reg: ["knitting"] }), adj("badly cast on", { reg: ["knitting"] }),
+    sim("a jumper knitted by a distant aunt"), sim("a scarf with no end"), sim("a ball of wool the cat found first"),
+  ],
+};
+
+export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord, culinary, legal, knitting];

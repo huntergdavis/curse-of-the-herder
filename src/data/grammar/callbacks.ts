@@ -97,6 +97,24 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "lastone", ["#pantheon.cap#, one. ONE. Let it be near. Let it be slow. Let it be ASLEEP.", "#oath_phrase#, one left, and the day is nearly done, and my #bodypart# are nearly done, and so, nearly, am I."]),
   ...R(8, "lastone", ["One left. I went to get it. That is all there is to say about the last one until it is in."], { reg: ["hemingway"] }),
   ...R(12, "lastone", ["One sheep between me and the stone. I have never wanted a sheep so much, or a stone."]),
+  // The law.
+  ...R(6, "idle", [
+    "Let the record show that the #target#, hereinafter the #insult#, did wilfully and with malice aforethought be #adj#.",
+    "The party of the first part, hereinafter The Sheep, is in #abstract# of its duties. The party of the second part, hereinafter Me, is #selfadj#.",
+    "Objection! The #target# is leading the witness. The witness is me. I am being led up a hill.",
+    "I find the #target# guilty of being #adj#, and sentence it to be carried. By me. Which is also my sentence.",
+    "#vocative.cap#, you are hereby served. With what, I have not decided. Something #adj#.",
+  ], { reg: ["legal"] }),
+  ...R(6, "caught", ["Got you, #vocative#, and I am entering you into evidence as Exhibit #penned#.", "Caught, you #adj# #insult#, and the court finds against you, with costs, payable in wool."], { reg: ["legal"] }),
+  ...R(6, "flee", ["Objection! The #insult# is absconding! Let the record show it ran like #simile#!"], { reg: ["legal"] }),
+  ...R(6, "penned", ["Case dismissed. Into the pen with you, #vocative#, and consider yourself remanded."], { reg: ["legal"] }),
+  // Knitting.
+  ...R(3, "idle", [
+    "I will #threat#, #vocative#. I have the needles. I have the time. I do not have the sheep, but I will.",
+    "Every one of you is a jumper waiting for a reason, and #vocative#, you are giving me reasons.",
+    "#vocative.cap#, you #adj# #insult#, I shall #threat# and I shall enjoy the purling.",
+  ], { reg: ["knitting"] }),
+  ...R(3, "caught", ["Got you. Hold still. I am measuring you for a tea cosy in my head."], { reg: ["knitting"] }),
   // The kitchen register.
   ...R(5, "idle", [
     "You #adj# #insult#, you would not pass at a wake.",
