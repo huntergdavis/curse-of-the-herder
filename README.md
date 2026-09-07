@@ -72,6 +72,11 @@ in-game titles to real public-domain sources is in
   that jams, and once a day the crook snaps. He eats lunch on a stump at
   half past twelve. His sheepdog follows him all day and helps with
   nothing. Rain, fog and wind come and go; a rainbow follows the rain.
+  The first sheep to bolt three times becomes his nemesis, with a wanted
+  poster and a triumph when it is finally caught; penned sheep plot a
+  jailbreak in whispers before they go; runs of five and eight pennings
+  without a flight are streaks he does not trust. At the pen he sometimes
+  counts the old way: yan, tan, tethera, methera, pip.
 - **Two axes drive every line.** *Eloquence* (level 0–12) comes from
   books; *frustration* (0–100) rises through the day with distance, rain,
   fleeing sheep and the walk of shame, and sets both curse frequency and
@@ -89,7 +94,11 @@ in-game titles to real public-domain sources is in
   chunk cache, procedural sheep and herder sprites, a following camera,
   day tint from dawn to dusk, rain, speech bubbles, wordless sheep emotes.
 - **Life on the map.** Villagers by the wells who gasp and answer back
-  ("Language!"), washing lines, roof cats, chimney smoke, scarecrows he
+  ("Language!"), a neighbour in a blue coat who strolls past every couple
+  of hours with three sheep that follow him in a line (even the dog goes
+  to look), cows that explain the cowpats, loose sheep that drift over to
+  listen while he reads aloud, the Curse itself heckling from the
+  sidelines, washing lines, roof cats, chimney smoke, scarecrows he
   envies, ducks with ducklings, frogs, fish, rabbits that bolt, owls and
   a hedgehog at dusk, butterflies, birds, cloud shadows, rainbows,
   fireflies, shooting stars and a moon. The calendar sets the season:
