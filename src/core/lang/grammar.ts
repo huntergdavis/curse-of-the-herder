@@ -102,7 +102,7 @@ export class Grammar {
       if (!rule.reg?.some((r) => r === "hemingway" || r === "verse")) text = this.applyHeat(text, ctx, rnd);
       if (rule.maxChars && text.length > rule.maxChars) continue;
       if (text.length > 240) continue;
-      if (ctx.recent.includes(text)) continue;
+      if (ctx.recent.some((r) => normaliseLine(r) === normaliseLine(text))) continue;
       if (findBanned(text)) {
         console.error("Curse of the Herder: banned word reached the generator; rule", rule.id);
         continue;
@@ -204,6 +204,11 @@ function singularAfterRemaining(template: string): string {
   clause = clause.replace(/\.pl#/g, "#").replace(/\bare\b/, "is").replace(/\bhave\b/, "has").replace(/\bwere\b/, "was").replace(/\bremain\b/, "remains").replace(/\bdo not\b/, "does not");
   tail = clause + rest;
   return head + tail;
+}
+
+/** Punctuation and case do not make a line new. */
+function normaliseLine(t: string): string {
+  return t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
 function pickIndex(weights: number[], rnd: () => number): number {

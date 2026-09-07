@@ -24,7 +24,7 @@ const SHAME_COOLDOWN = 15 * 60 * 4;
 const BREATHER_TICKS = 80; // 20 s sit-down
 const BREATHER_COOLDOWN = 25 * 60 * 4;
 const RANT_TICKS = 12; // 3 s of shaking fists at the sky
-const RANT_COOLDOWN = 3 * 60 * 4;
+const RANT_COOLDOWN = 11 * 60 * 4;
 
 function pushEvent(w: WorldState, e: Omit<WorldEvent, "seq">): void {
   w.events.push({ ...e, seq: w.eventCount++ });
@@ -374,7 +374,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
   }
 
   // When he is unhinged he stops now and then to shake his fists at the sky.
-  if ((h.mode === "toSheep" || h.mode === "toPen") && w.frustration >= 75 && w.tick - w.lastRantTick > RANT_COOLDOWN && keyedUnit(w.seed, "rant", w.tick) < 0.004) {
+  if ((h.mode === "toSheep" || h.mode === "toPen") && w.frustration >= 75 && w.tick - w.lastRantTick > RANT_COOLDOWN && keyedUnit(w.seed, "rant", w.tick) < 0.002) {
     w.lastRantTick = w.tick;
     h.restUntilTick = w.tick + RANT_TICKS;
     h.rantReturnMode = h.mode;
