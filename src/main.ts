@@ -484,6 +484,33 @@ async function showHall(): Promise<void> {
   const records = await repository.hall();
   const totals = records.reduce((a, r) => ({ sheep: a.sheep + r.sheep, curses: a.curses + r.totalCurses, books: a.books + r.booksRead }), { sheep: 0, curses: 0, books: 0 });
   $("hall-totals").textContent = records.length ? `${records.length} herder${records.length === 1 ? "" : "s"} retired · ${totals.sheep} sheep carried home · ${totals.books} books read · ${totals.curses} curses uttered` : "";
+  // The almanac: patterns across every herder who ever finished.
+  const almanac = $("hall-almanac");
+  if (records.length >= 2) {
+    const wordCount = new Map<string, number>();
+    const sheepCount = new Map<string, number>();
+    const dogCount = new Map<string, number>();
+    for (const r of records) {
+      if (r.favouriteWord) wordCount.set(r.favouriteWord.w, (wordCount.get(r.favouriteWord.w) ?? 0) + r.favouriteWord.n);
+      for (const n of r.namedSheep ?? []) sheepCount.set(n.name, (sheepCount.get(n.name) ?? 0) + n.flees);
+      if (r.dogName) dogCount.set(r.dogName, (dogCount.get(r.dogName) ?? 0) + 1);
+    }
+    const top = (m: Map<string, number>): [string, number] | undefined => [...m.entries()].sort((a, b) => b[1] - a[1])[0];
+    const w = top(wordCount);
+    const sh = top(sheepCount);
+    const dg = top(dogCount);
+    const longest = records.reduce((a, r) => (r.longestLine.length > a.longestLine.length ? r : a), records[0]!);
+    const mostCurses = records.reduce((a, r) => (r.totalCurses > a.totalCurses ? r : a), records[0]!);
+    const parts = [
+      w ? `Favourite word of the valley: <strong>${escapeHtml(w[0])}</strong>` : "",
+      sh ? `Most notorious sheep name: <strong>${escapeHtml(sh[0])}</strong> (${sh[1]} escapes across the years)` : "",
+      dg ? `Most frequent dog: <strong>${escapeHtml(dg[0])}</strong>, no help on ${dg[1]} occasion${dg[1] === 1 ? "" : "s"}` : "",
+      `Loudest day: <strong>${escapeHtml(mostCurses.name)}</strong> (${mostCurses.totalCurses} curses)`,
+      longest.longestLine ? `Longest outburst on record: “${escapeHtml(longest.longestLine)}” — ${escapeHtml(longest.name)}` : "",
+    ].filter(Boolean);
+    almanac.innerHTML = `<h3>The Almanac</h3><ul>${parts.map((x) => `<li>${x}</li>`).join("")}</ul>`;
+    almanac.hidden = false;
+  } else almanac.hidden = true;
   grid.innerHTML = records
     .slice(0, 64)
     .map(

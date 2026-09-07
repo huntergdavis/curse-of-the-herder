@@ -807,6 +807,87 @@ export class Renderer {
       drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, b.text);
     }
 
+    // Washing lines between neighbouring houses; the cloths flap harder in the wind.
+    {
+      const windy = isWindy(world);
+      for (let a = 0; a < this.houses.length; a++) {
+        const h1 = this.houses[a]!;
+        if (Math.abs(h1.x - cam.x) * T > W / 2 + T * 4 || Math.abs(h1.y - cam.y) * T > H / 2 + T * 4) continue;
+        const h2 = this.houses.find((o) => o.y === h1.y && o.x - h1.x === 4);
+        if (!h2) continue;
+        const x1 = sx(h1.x + 0.9);
+        const x2 = sx(h2.x + 0.1);
+        const y = sy(h1.y + 0.55);
+        ctx.strokeStyle = "#5a4634";
+        ctx.lineWidth = Math.max(1, T * 0.025);
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.quadraticCurveTo((x1 + x2) / 2, y + T * 0.12, x2, y);
+        ctx.stroke();
+        const cols = ["#f4f1e6", "#c97c7c", "#7f9bd1", "#e0b33c"];
+        for (let k = 0; k < 3; k++) {
+          const t = 0.25 + k * 0.25;
+          const cx0 = x1 + (x2 - x1) * t;
+          const cy0 = y + T * 0.1 * Math.sin(Math.PI * t);
+          const flap = Math.sin(nowMs / (windy ? 90 : 500) + k * 1.7) * T * (windy ? 0.14 : 0.03);
+          ctx.fillStyle = cols[(k + a) % 4]!;
+          ctx.beginPath();
+          ctx.moveTo(cx0 - T * 0.09, cy0);
+          ctx.lineTo(cx0 + T * 0.09, cy0);
+          ctx.lineTo(cx0 + T * 0.09 + flap, cy0 + T * 0.22);
+          ctx.lineTo(cx0 - T * 0.09 + flap, cy0 + T * 0.22);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+    }
+
+    // A cat on one roof per village, tail swaying, watching everything and helping with none of it.
+    for (const v of this.map.villages) {
+      if (Math.abs(v.x - cam.x) * T > W / 2 + T * 4 || Math.abs(v.y - cam.y) * T > H / 2 + T * 4) continue;
+      const roof = this.houses.find((o) => Math.abs(o.x - v.x) <= 3 && Math.abs(o.y - v.y) <= 3);
+      if (!roof) continue;
+      const cxp = sx(roof.x + 0.62);
+      const cyp = sy(roof.y + 0.3);
+      ctx.fillStyle = "#3a3532";
+      ctx.beginPath();
+      ctx.ellipse(cxp, cyp, T * 0.11, T * 0.07, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cxp + T * 0.1, cyp - T * 0.05, T * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cxp + T * 0.06, cyp - T * 0.09);
+      ctx.lineTo(cxp + T * 0.08, cyp - T * 0.15);
+      ctx.lineTo(cxp + T * 0.1, cyp - T * 0.09);
+      ctx.moveTo(cxp + T * 0.11, cyp - T * 0.09);
+      ctx.lineTo(cxp + T * 0.13, cyp - T * 0.15);
+      ctx.lineTo(cxp + T * 0.15, cyp - T * 0.09);
+      ctx.fill();
+      ctx.strokeStyle = "#3a3532";
+      ctx.lineWidth = Math.max(1, T * 0.03);
+      ctx.beginPath();
+      ctx.moveTo(cxp - T * 0.1, cyp);
+      ctx.quadraticCurveTo(cxp - T * 0.2, cyp - T * 0.1 + Math.sin(nowMs / 600 + v.x) * T * 0.06, cxp - T * 0.22, cyp - T * 0.02);
+      ctx.stroke();
+      ctx.fillStyle = "#e0b33c";
+      ctx.beginPath();
+      ctx.arc(cxp + T * 0.08, cyp - T * 0.06, T * 0.012, 0, Math.PI * 2);
+      ctx.arc(cxp + T * 0.12, cyp - T * 0.06, T * 0.012, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // The village bell at noon and at six: a "dong" over the well for a minute.
+    {
+      const minute = (hourNow % 1) * 60;
+      if ((Math.floor(hourNow) === 12 || Math.floor(hourNow) === 18) && minute < 1.2) {
+        for (const v of this.map.villages) {
+          if (Math.abs(v.x - cam.x) * T > W / 2 + T * 2 || Math.abs(v.y - cam.y) * T > H / 2 + T * 2) continue;
+          if (Math.floor(nowMs / 1000) % 3 === 0) drawEmote(ctx, sx(v.x + 0.5) + T * 0.4, sy(v.y) - T * 0.6, T * 0.9, "dong");
+        }
+      }
+    }
+
     // Chimney smoke: a few soft puffs drifting up and to the right from each house.
     for (const hse of this.houses) {
       if (Math.abs(hse.x - cam.x) * T > W / 2 + T * 2 || Math.abs(hse.y - cam.y) * T > H / 2 + T * 2) continue;

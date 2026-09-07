@@ -83,7 +83,7 @@ export const BOOKS: Book[] = [
   },
   {
     id: "boatswain", title: "The Boatswain's Book of Oaths", author: "Bosun Anon", pack: "nautical", register: "nautical", when: 0.9, colour: "#1e5f74",
-    excerpts: ["Ten thousand thundering typhoons! (For when one typhoon will not do.)", "Blistering barnacles: a general-purpose oath, good in all weathers.", "A landlubber is anyone who is not you. Including sheep.", "Alliterate. It doubles the force and halves the thought."],
+    excerpts: ["Ten thousand thundering typhoons! (For when one typhoon will not do.)", "Blistering barnacles: a general-purpose oath, good in all weathers.", "“Shiver my timbers if I do.” (Captain Marryat, Jacob Faithful, 1834: the phrase's first known appearance in print.)", "A landlubber is anyone who is not you. Including sheep.", "Alliterate. It doubles the force and halves the thought."],
   },
   {
     id: "devils-dictionary", title: "The Devil's Dictionary", author: "Ambrose Bierce, 1911 (genuine entries)", pack: "baroque-latinate", register: "baroque", when: 0.8, colour: "#4a2c5a",

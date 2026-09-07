@@ -75,6 +75,10 @@
       #hall header { display: flex; justify-content: space-between; align-items: center; }
       #hall h2 { margin: 0; }
       #hall .hall-sub { margin: 4px 0 12px; opacity: 0.75; }
+      .almanac { background: var(--paper-2); border: 2px solid var(--ink); border-radius: 12px; padding: 8px 14px; margin: 0 0 14px; }
+      .almanac h3 { margin: 0 0 6px; font-size: 15px; }
+      .almanac ul { margin: 0; padding-left: 18px; font-size: 13px; }
+      .almanac li { margin: 2px 0; }
       #hall-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
       .hall-card { background: var(--paper-2); border: 2px solid var(--ink); border-radius: 12px; padding: 8px 10px 10px; }
       .hall-card .stone { width: 190px; margin-top: 6px; }
@@ -180,6 +184,7 @@
       <header><h2>Hall of Herders</h2><button id="btn-hall-close">Close</button></header>
       <p class="hall-sub">Every herder who penned the last sheep, and what he said when he did.</p>
       <p class="hall-sub" id="hall-totals"></p>
+      <section id="hall-almanac" class="almanac" hidden></section>
       <div id="hall-grid"></div>
       <p id="hall-empty">No herder has finished a day yet. Leave one running; the Hall fills itself.</p>
     </section>
