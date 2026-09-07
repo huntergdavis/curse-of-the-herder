@@ -150,7 +150,7 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "caught", ["Got you, you #adj.own# #insult.own#. You come off like a puffball and you smell worse."], { reg: ["fungi"] }),
   // The law.
   ...R(6, "idle", [
-    "Let the record show that the #target#, hereinafter the #insult#, did wilfully and with malice aforethought be #adj#.",
+    "Let the record show that the #target#, hereinafter the #insult#, did wilfully and with malice aforethought be #adj.own#.",
     "The party of the first part, hereinafter The Sheep, is in #abstract# of its duties. The party of the second part, hereinafter Me, is #selfadj#.",
     "Objection! The #target# is leading the witness. The witness is me. I am being led up a hill.",
     "I find the #target# guilty of being #adj#, and sentence it to be carried. By me. Which is also my sentence.",

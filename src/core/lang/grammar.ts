@@ -86,7 +86,7 @@ export class Grammar {
     if (active) w *= 3;
     // Foreign words and rhyme-pack fillers read as broken in ordinary English slots;
     // keep them mostly for the ten minutes after the book that taught them.
-    if (!active && e.lang && e.lang !== "en") w *= 0.25;
+    if (!active && e.lang && e.lang !== "en") w *= 0.1;
     if (!active && e.reg?.some((r) => r === "verse" || r.startsWith("rhyme:"))) w *= 0.3;
     if (e.w === ctx.signatureWord) w *= 4;
     // Prefer words from the newest levels a little, so learning shows.
@@ -171,9 +171,10 @@ export class Grammar {
       }
       const wantAllit = mods.includes(".allit");
       const wantOwn = mods.includes(".own");
+      const wantPl = mods.includes(".pl");
       const sylMatch = /\.syl(\d)/.exec(mods);
       const wantSyl = sylMatch ? Number(sylMatch[1]) : 0;
-      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit, wantSyl, wantOwn);
+      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit, wantSyl, wantOwn, wantPl);
       if (value === null) {
         failed = true;
         return "";
@@ -183,7 +184,7 @@ export class Grammar {
     return failed ? null : out;
   }
 
-  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false, syl = 0, own = false): { text: string; entry?: LexEntry } | null {
+  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false, syl = 0, own = false, plural = false): { text: string; entry?: LexEntry } | null {
     const contextual = contextSymbol(symbol, ctx, rnd);
     if (contextual !== null) return { text: contextual };
     const nt = this.nonTerminals.get(symbol);
@@ -213,6 +214,11 @@ export class Grammar {
     if (POS_SET.has(symbol as Pos)) {
       let pool = (this.byPos.get(symbol) ?? []).filter((e) => this.entryAllowed(e, ctx, cap));
       if (pool.length === 0) return null;
+      if (plural) {
+        // "ye afternoon" is nobody's idea of a plural.
+        const countable = pool.filter((e) => e.pl !== "-");
+        if (countable.length) pool = countable;
+      }
       if (own && this.currentRuleReg.length) {
         const mine = pool.filter((e) => e.reg?.some((r) => this.currentRuleReg.includes(r)));
         if (mine.length === 0) return null;
@@ -292,7 +298,7 @@ function applyModifiers(text: string, mods: string, entry?: LexEntry): string {
         t = t.toUpperCase();
         break;
       case "a":
-        t = withArticle(t);
+        t = entry?.pl === "-" ? t : withArticle(t);
         break;
       case "the":
         t = "the " + t;

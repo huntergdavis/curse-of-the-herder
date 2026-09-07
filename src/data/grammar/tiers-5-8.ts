@@ -173,7 +173,7 @@ export const RULES_5_8: Rule[] = [
     "I have words in four tongues for you, #vocative#, and the kindest is #insult#.", "#oath.cap#, #clause#, and #oath#, #clause#.",
     "Every language has a word for you, #vocative#. Today's is #insult#.", "#oath.cap#. #interj.cap#. #oath.cap#. I have run out of English.",
     "A #target# like this deserves a foreign oath: #oath#.", "#clause.cap#. #oath.cap#. #clause.cap#. #oath.cap#. It is a rhythm now.",
-    "#vocative.cap#, espèce de #insult#, #clause#.", "Herr #target.cap#, you #intensifier# #adj# #insult#, #clause#.",
+    "#vocative.cap#, sacré #insult#, #clause#.", "Herr #target.cap#, you #intensifier# #adj# #insult#, #clause#.",
     "#oath.cap#! The #target# is #adj#, the sky is #adj#, and I am #selfadj# in several languages.", "You #insult#, #vocative#. You #adj#, #adj# #insult#. #oath.cap#.",
     "#interj.cap#. #oath.cap#. #remaining.cap# sheep, and no word in any tongue for how #adj# I am.", "#oath.cap#, and I mean that in the original.",
     "Signor #target.cap#, #clause#; #oath#.", "#poly_oaths# That is what I think of this #target#.",
@@ -208,16 +208,16 @@ export const RULES_5_8: Rule[] = [
 
   // ---------------------------------------------------------------- Tier 8: Hemingway
   ...R(8, "idle", [
-    "The #target# was #adj#. It was a bad #target#. I went up.", "I carried it and it was heavy and the #target# was long and that was the day.",
+    "The #target# was #adj.own#. It was a bad #target#. I went up.", "I carried it and it was heavy and the #target# was long and that was the day.",
     "It bit me. That is all there is to say about sheep.", "There were #remaining# sheep. There had been more. I did not think about the ones before.",
-    "The #noun# was #adj# and the #noun# was #adj# and I was not.", "I #verb.ed#. I #verb.ed# again. The #target# did not care and I did not ask it to.",
+    "The #noun# was #adj.own# and the #noun# was #adj.own# and I was not.", "I #verb.ed#. I #verb.ed# again. The #target# did not care and I did not ask it to.",
     "#hem_short#. #hem_short#. #hem_short#.", "A man carries a sheep. Then he carries another. There is no more to it than that.",
     "The #target# was there #time#. I was there too. Neither of us said anything.", "I did not think about the #noun#. I thought about the #noun# instead. It was the same.",
-    "#remaining.cap# sheep. #penned.cap# in. The #noun# does not count them and neither should I.", "It was #adj# and it was #time# and I was tired in the way that is not tiredness.",
+    "#remaining.cap# sheep. #penned.cap# in. The #noun# does not count them and neither should I.", "It was #adj.own# and it was #time# and I was tired in the way that is not tiredness.",
     "The #noun# did not help. Nothing helps. You carry the sheep or you do not.", "I said nothing to the #target#. The #target# had said nothing to me. We understood each other.",
-    "The rain came and the #noun# was #adj# with it and I walked in it because that was what there was.", "I wanted #noun.a#. There was no #noun#. There was a #target#.",
-    "The #target# was #adj#. I had known #adj# #target.pl# before. This one was more #adj#, but not by much.", "You do not talk to a sheep. You carry it. Talking is for the #noun#.",
-    "I had #verb.ed# all morning. The morning was #adj#. It had not asked me.", "The #noun# was good. It was the only good thing. I did not tell it so.",
+    "The rain came and the #noun# was #adj.own# with it and I walked in it because that was what there was.", "I wanted #noun.a#. There was no #noun#. There was a #target#.",
+    "The #target# was #adj.own#. I had known #adj.own# #target.pl# before. This one was more #adj.own#, but not by much.", "You do not talk to a sheep. You carry it. Talking is for the #noun#.",
+    "I had #verb.ed# all morning. The morning was #adj.own#. It had not asked me.", "The #noun# was good. It was the only good thing. I did not tell it so.",
   ], HEM),
   ...R(8, "flee", [
     "It ran. They do that. I went after it because that is the work.", "The sheep ran and I did not run. I walked. It would stop. They always stop.",
@@ -228,7 +228,7 @@ export const RULES_5_8: Rule[] = [
     "It stopped and I took it. That was all. There was nothing fine about it.", "I lifted it and my #bodypart# said something and I did not listen.",
   ], HEM),
   ...R(8, "penned", [
-    "In. #penned.cap# now. I did not feel anything about it.", "I put it in the pen and closed the gate. The gate was #adj#. I stood there a while.",
+    "In. #penned.cap# now. I did not feel anything about it.", "I put it in the pen and closed the gate. The gate was #adj.own#. I stood there a while.",
     "One more in. The #noun# was the same as before. I went back out.", "That was #penned#. I would not think about #remaining#. I thought about #remaining#.",
   ], HEM),
   ...R(8, "absurd", [
@@ -239,11 +239,11 @@ export const RULES_5_8: Rule[] = [
     "It was #vocative#. It was always #vocative#. I knew it before I saw it.", "#vocative.cap# ran again. I had named it and that had changed nothing.",
     "Twice. I had a name for it. The name was #vocative# and the name was not enough.", "#vocative.cap#. I said the name out loud. The #target# heard it and did not care.",
   ], HEM),
-  ...R(8, "book", ["A book. I sat and read it. The words were #adj#. I kept them.", "There was a book in the box. I read it because it was there. That is why anyone reads.", "I read. It was #time#. The sheep waited or they did not."], HEM),
+  ...R(8, "book", ["A book. I sat and read it. The words were #adj.own#. I kept them.", "There was a book in the box. I read it because it was there. That is why anyone reads.", "I read. It was #time#. The sheep waited or they did not."], HEM),
   ...R(8, "dusk", ["The light went. #remaining.cap# sheep were out in it. So was I.", "It got dark the way it always does, slowly and then all at once, and the sheep were still out."], HEM),
-  ...R(8, "breather", ["I sat down. The #noun# was #adj# under me. I did not get up for a while.", "I sat. That was all I did. It was enough for now."], HEM),
+  ...R(8, "breather", ["I sat down. The #noun# was #adj.own# under me. I did not get up for a while.", "I sat. That was all I did. It was enough for now."], HEM),
   ...R(8, "walkOfShame", ["I passed the pen with nothing. The sheep inside watched. I let them.", "Empty hands past the gate. I did not look in. I knew what was in there."], HEM),
   ...R(8, "rain", ["It rained. It had been going to rain all day. Now it rained.", "The rain came down on the #target# and on me. It did not choose."], HEM),
   ...R(8, "finished", ["They were all in. #penned.cap#. I stood at the gate and it was done and I did not feel what I thought I would feel.", "The last one was in. It was #time#. I sat down on the #noun# and that was the end of it."], HEM),
-  ...R(8, "epitaph", ["He carried them. That was all.", "It was heavy. He went up.", "#penned.cap# sheep. One man. Done.", "The #noun# was #adj#.", "He did not ask how."], { ...HEM, maxChars: 80 }),
+  ...R(8, "epitaph", ["He carried them. That was all.", "It was heavy. He went up.", "#penned.cap# sheep. One man. Done.", "The #noun# was #adj.own#.", "He did not ask how."], { ...HEM, maxChars: 80 }),
 ];
