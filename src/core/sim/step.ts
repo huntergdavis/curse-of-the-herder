@@ -470,6 +470,17 @@ function stepHerder(w: WorldState, map: GameMap): void {
     h.lastTileY = ty;
     // The walk of shame: past the pen with nothing to show for it.
     h.tripTiles++;
+    // A scarecrow nearby gets a remark, not more than once in a quarter hour.
+    if (w.tick - w.lastScarecrowTick > 15 * 60 * 4) {
+      outer: for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+        const i = (ty + dy) * map.size + (tx + dx);
+        if (map.deco[i] === Deco.Scarecrow) {
+          w.lastScarecrowTick = w.tick;
+          pushEvent(w, { tick: w.tick, kind: "scarecrow", sheepId: -1 });
+          break outer;
+        }
+      }
+    }
     // Once a day, somewhere after lunch, the crook gives up.
     if (!w.crookBroken && w.tick > 5 * TICKS_PER_HOUR && h.carrying < 0 && w.tick - w.lastMishapTick > MISHAP_COOLDOWN && keyedUnit(w.seed, "crook", w.tick) < 0.0015) {
       w.crookBroken = true;
