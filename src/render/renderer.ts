@@ -7,9 +7,15 @@ import type { Bubbles } from "./bubbles";
 import type { Camera } from "./camera";
 import { CHUNK, ChunkCache } from "./chunks";
 import { dayTint } from "./palette";
-import { drawBubble, drawEmote, drawHerder, drawSheep } from "./sprites";
+import { drawBubble, drawEmote, drawHerder, drawSheep, setShadowSkew } from "./sprites";
+import { Terrain } from "../core/map/terrain";
+import { keyedUnit } from "../core/rng";
 
 export const BUBBLE_FONT = '"Patrick Hand", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
+
+function walkingHerder(world: WorldState): boolean {
+  return world.herder.mode === "toSheep" || world.herder.mode === "toPen";
+}
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -53,11 +59,25 @@ export class Renderer {
     for (const v of this.villagers) if (Math.hypot(v.x - x, v.y - y) < 11) v.shockedUntil = nowMs + 2600;
   }
 
+  /** A calm herder passing close by gets a wave, and gives one back. */
+  private greetings(world: WorldState, nowMs: number): { x: number; y: number } | null {
+    const h = world.herder;
+    if (world.frustration >= 30) return null;
+    for (const v of this.villagers) {
+      if (Math.hypot(v.x - h.x, v.y - h.y) < 3.2) {
+        if (nowMs > v.shockedUntil) v.shockedUntil = -nowMs; // negative marks a wave
+        return v;
+      }
+    }
+    return null;
+  }
+
   private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
     const ctx = this.ctx;
     const px = sx(v.x + 0.5);
     const py = sy(v.y + 0.95);
     const shocked = nowMs < v.shockedUntil;
+    const waving = v.shockedUntil < 0 && nowMs + v.shockedUntil < 2500;
     const bob = Math.sin(nowMs / 900 + v.variant) * T * 0.01;
     ctx.fillStyle = "rgba(0,0,0,0.18)";
     ctx.beginPath();
@@ -84,6 +104,11 @@ export class Renderer {
       ctx.lineTo(px - T * 0.03, py - T * 0.7 - bob);
       ctx.moveTo(px + T * 0.14, py - T * 0.5 - bob);
       ctx.lineTo(px + T * 0.03, py - T * 0.7 - bob);
+    } else if (waving) {
+      ctx.moveTo(px - T * 0.16, py - T * 0.55 - bob);
+      ctx.lineTo(px - T * 0.22, py - T * 0.35 - bob);
+      ctx.moveTo(px + T * 0.16, py - T * 0.55 - bob);
+      ctx.lineTo(px + T * 0.3 + Math.sin(nowMs / 120) * T * 0.05, py - T * 0.95 - bob);
     } else {
       ctx.moveTo(px - T * 0.16, py - T * 0.55 - bob);
       ctx.lineTo(px - T * 0.22, py - T * 0.35 - bob);
@@ -92,6 +117,7 @@ export class Renderer {
     }
     ctx.stroke();
     if (shocked) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "!");
+    else if (waving) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "hullo");
   }
 
   resize(): void {
@@ -119,6 +145,15 @@ export class Renderer {
 
   /** When set, the sky follows this hour instead of the world clock (ending fade). */
   hourOverride: number | null = null;
+  /** Wall ms when the rain last stopped; a rainbow follows for a while. */
+  rainbowFromMs = -1e9;
+  /** Recent muddy footprints, world coords. */
+  private prints: { x: number; y: number; atMs: number }[] = [];
+  private lastPrint = { x: -1, y: -1 };
+
+  rainStopped(nowMs: number): void {
+    this.rainbowFromMs = nowMs;
+  }
 
   draw(world: WorldState, cam: Camera, bubbles: Bubbles, nowMs: number): void {
     const ctx = this.ctx;
@@ -153,7 +188,84 @@ export class Renderer {
       }
     }
 
+    const h = world.herder;
+    const hourNow = this.hourOverride ?? dayHour(world);
+    setShadowSkew(Math.max(-0.6, Math.min(0.6, (hourNow - 13.5) * 0.14)));
+
+    // Footprints in the mud: remember where he stepped, fade them out.
+    {
+      const tx = Math.round(h.x);
+      const ty = Math.round(h.y);
+      if ((tx !== this.lastPrint.x || ty !== this.lastPrint.y) && this.map.terrain[ty * this.map.size + tx] === Terrain.Mud) {
+        this.lastPrint = { x: tx, y: ty };
+        this.prints.push({ x: h.x + 0.5 + (this.prints.length % 2 ? 0.12 : -0.12), y: h.y + 0.95, atMs: nowMs });
+        if (this.prints.length > 40) this.prints.shift();
+      }
+      for (const p of this.prints) {
+        const age = (nowMs - p.atMs) / 60_000;
+        if (age > 1) continue;
+        ctx.fillStyle = `rgba(60, 40, 20, ${(0.35 * (1 - age)).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.ellipse(sx(p.x), sy(p.y), T * 0.09, T * 0.13, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Ducks paddle in slow circles on water near the camera; butterflies dither over flowers.
+    {
+      const x0 = Math.max(0, Math.floor(cam.x - W / (2 * T)) - 1);
+      const x1 = Math.min(this.map.size - 1, Math.ceil(cam.x + W / (2 * T)) + 1);
+      const y0 = Math.max(0, Math.floor(cam.y - H / (2 * T)) - 1);
+      const y1 = Math.min(this.map.size - 1, Math.ceil(cam.y + H / (2 * T)) + 1);
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const i = y * this.map.size + x;
+          const t = this.map.terrain[i];
+          if (t === Terrain.Water) {
+            if (((x * 73 + y * 151) % 97) !== 3) continue; // roughly one duck per hundred water tiles
+            const a = nowMs / 4000 + x;
+            const dx = Math.cos(a) * 0.35;
+            const dy = Math.sin(a) * 0.2;
+            const px = sx(x + 0.5 + dx);
+            const py = sy(y + 0.5 + dy);
+            ctx.fillStyle = "#6b4a2b";
+            ctx.beginPath();
+            ctx.ellipse(px, py, T * 0.14, T * 0.09, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#3f7a3a";
+            ctx.beginPath();
+            ctx.arc(px + (Math.cos(a) < 0 ? -1 : 1) * T * 0.11, py - T * 0.09, T * 0.06, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#e0b33c";
+            ctx.fillRect(px + (Math.cos(a) < 0 ? -1 : 1) * T * 0.16 - T * 0.02, py - T * 0.1, T * 0.05, T * 0.025);
+            ctx.strokeStyle = "rgba(255,255,255,0.35)";
+            ctx.lineWidth = Math.max(1, T * 0.02);
+            ctx.beginPath();
+            ctx.moveTo(px - T * 0.2, py + T * 0.12);
+            ctx.lineTo(px - T * 0.45, py + T * 0.22);
+            ctx.moveTo(px + T * 0.2, py + T * 0.12);
+            ctx.lineTo(px + T * 0.45, py + T * 0.22);
+            ctx.stroke();
+          } else if (this.map.deco[i] === Deco.Flowers && hourNow < 17.5) {
+            const u = keyedUnit(this.map.seed, "bfly", x, y);
+            if (u > 0.5) continue;
+            const a = nowMs / 1300 + u * 20;
+            const px = sx(x + 0.5 + Math.sin(a) * 0.35 + Math.sin(a * 2.7) * 0.1);
+            const py = sy(y + 0.2 + Math.cos(a * 1.3) * 0.25);
+            const flap = Math.abs(Math.sin(nowMs / 90 + u * 9));
+            ctx.fillStyle = u < 0.2 ? "#f2c14e" : u < 0.35 ? "#f4f1e6" : "#b58cf0";
+            ctx.beginPath();
+            ctx.ellipse(px - T * 0.06 * flap, py, T * 0.06 * flap, T * 0.05, 0, 0, Math.PI * 2);
+            ctx.ellipse(px + T * 0.06 * flap, py, T * 0.06 * flap, T * 0.05, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+    }
+
     // Villagers by their wells.
+    const greeted = this.greetings(world, nowMs);
+    if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
     for (const v of this.villagers) {
       if (Math.abs(v.x - cam.x) * T > W / 2 + T * 2 || Math.abs(v.y - cam.y) * T > H / 2 + T * 2) continue;
       this.drawVillager(v, sx, sy, T, nowMs);
@@ -164,7 +276,6 @@ export class Renderer {
     const visibleSheep = world.sheep
       .filter((s) => s.mode !== "carried" && Math.abs(s.x - cam.x) * T < W / 2 + T * 2 && Math.abs(s.y - cam.y) * T < H / 2 + T * 2)
       .sort((a, b) => a.y - b.y);
-    const h = world.herder;
     let herderDrawn = false;
     for (const s of visibleSheep) {
       if (!herderDrawn && s.y > h.y) {
@@ -202,6 +313,9 @@ export class Renderer {
       else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && Math.floor(nowMs / 1000) % 6 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
+
+    // Whistling while he works, when the day has not yet got to him.
+    if (walkingHerder(world) && world.frustration < 18 && Math.floor(nowMs / 1000) % 11 < 3) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "♪");
 
     // The stone beside the pen, once the day is done.
     if (world.finished) {
@@ -374,6 +488,7 @@ export class Renderer {
   }
 
   private drawHerder(world: WorldState, sx: (x: number) => number, sy: (y: number) => number, T: number, phase: number, nowMs: number): void {
+    void walkingHerder;
     const h = world.herder;
     const walking = h.mode === "toSheep" || h.mode === "toPen";
     const reading = h.mode === "reading" && world.reading;

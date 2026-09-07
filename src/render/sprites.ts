@@ -2,6 +2,12 @@ import { INK } from "./palette";
 
 type Ctx = CanvasRenderingContext2D;
 
+/** Horizontal shadow offset as a fraction of a tile; set once per frame from the hour. */
+let shadowSkew = 0;
+export function setShadowSkew(v: number): void {
+  shadowSkew = v;
+}
+
 export type SheepPose = "idle" | "walk" | "carried" | "asleep" | "fled";
 
 /** Draw a sheep centred at (x, y) with body width ~T. `phase` 0..1 animates. */
@@ -12,10 +18,10 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
   ctx.scale(flip, 1);
   ctx.lineWidth = Math.max(1, T * 0.05);
   ctx.strokeStyle = INK;
-  // Shadow
+  // Shadow (drifts with the sun)
   ctx.fillStyle = "rgba(0,0,0,0.18)";
   ctx.beginPath();
-  ctx.ellipse(0, T * 0.32, T * 0.36, T * 0.12, 0, 0, Math.PI * 2);
+  ctx.ellipse(shadowSkew * T * flip, T * 0.32, T * (0.36 + Math.abs(shadowSkew) * 0.3), T * 0.12, 0, 0, Math.PI * 2);
   ctx.fill();
   const bob = pose === "walk" ? Math.sin(phase * Math.PI * 2) * T * 0.04 : 0;
   // Legs
@@ -127,10 +133,10 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.strokeStyle = INK;
   const stride = p.walking ? Math.sin(p.phase * Math.PI * 2) : 0;
   const bob = p.walking ? Math.abs(Math.cos(p.phase * Math.PI * 2)) * T * 0.05 : 0;
-  // Shadow
+  // Shadow (drifts with the sun)
   ctx.fillStyle = "rgba(0,0,0,0.2)";
   ctx.beginPath();
-  ctx.ellipse(0, 0, T * 0.3, T * 0.1, 0, 0, Math.PI * 2);
+  ctx.ellipse(shadowSkew * T * flip * 1.4, 0, T * (0.3 + Math.abs(shadowSkew) * 0.5), T * 0.1, 0, 0, Math.PI * 2);
   ctx.fill();
   // Legs
   ctx.strokeStyle = "#3b3a4a";

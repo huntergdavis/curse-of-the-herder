@@ -8,6 +8,7 @@ import { repository } from "./persist/db";
 import { BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
 import { makeHallRecord, tasteOfPack, type HallRecord } from "./core/hall";
+import { sheepName } from "./core/names";
 import { catchUpPlan, shouldRecover } from "./runtime/liveness";
 import { startUpdatePolling } from "./update/automatic-update";
 import { Bubbles } from "./render/bubbles";
@@ -30,6 +31,8 @@ const FRAME_MIN_MS = 1000 / FPS_CAP;
 void TICKS_PER_HOUR;
 /** `?clean=1` caps filth at F1 for shared displays; the toolbar setting persists; `?filth=max` removes the frustration gate for testing. */
 let BAND_CAP: Band = params.get("clean") ? 1 : (Number(repository.getSetting("band", "4")) as Band);
+/** `?hour=17.8` pins the sky to an hour (development screenshots). */
+const HOUR_PIN = params.get("hour") ? Number(params.get("hour")) : null;
 /** `?cam=x,y` pins the camera to a tile (development screenshots). */
 const CAM_PIN = (() => {
   const v = params.get("cam");
@@ -214,6 +217,7 @@ function updateHud(force = false): void {
   const mood = w.frustration < 20 ? "Muttering" : w.frustration < 40 ? "Grumbling" : w.frustration < 60 ? "Cursing" : w.frustration < 80 ? "Swearing" : "Unhinged";
   $("hud-frust").textContent = `${mood} · ${Math.round(w.frustration)}`;
   $<HTMLDivElement>("meter-fill").style.width = `${w.frustration}%`;
+  $<HTMLDivElement>("meter").classList.toggle("tremble", w.frustration >= 88);
   $("hud-mode").textContent = paused ? "Paused" : FAST > 1 ? `×${FAST}` : "";
   $("btn-pause").textContent = paused ? "Resume" : "Pause";
 }
@@ -227,6 +231,8 @@ function handleEvents(s: Session, nowMs: number): void {
     const u = speakForEvent(w, s.map, e, s.recent, BAND_CAP);
     if (u) say(s, u.text, u.heat, u.seconds, nowMs, false, u);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
+    if (e.kind === "repeatEscape" && w.sheep[e.sheepId]?.flees === 2) toast(`That one has earned a name. It is <strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> now.`);
+    if (e.kind === "rainStops") s.renderer.rainStopped(nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
     if (e.kind === "bookFound") {
       s.excerptShown = -1;
@@ -496,6 +502,7 @@ function frame(nowMs: number): void {
   } else {
     w.lastWallMs = Date.now();
   }
+  if (HOUR_PIN !== null && !w.finished) s.renderer.hourOverride = HOUR_PIN;
   if (w.finished) {
     if (!s.endHandled) onFinished(s);
     const t = Math.min(1, (nowMs - s.finishedAtMs) / END_FADE_MS);
