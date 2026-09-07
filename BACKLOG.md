@@ -42,6 +42,7 @@ long soak.
 - Lunch beat, frustration arc rebalanced (mean 28 at 09:00 to 87 at 17:00), English-only verb slots, ?weather pin
 - Boulder sheep, the black sheep, miscounting, reduced-motion and text-size settings, culinary pack and bonus books (Cook's Oracle, Geology, Burns, Bierce, Rabelais), Molière and Cervantes lines, CONTRIBUTING and PR template
 - Milestone beats (halfway, ten to go, one to go), named sheep on Hall records, rule-recency variety control
+- Herder flourishes by level (book, quill, scarf, spectacles, laurel), legal and knitting registers, high-contrast bubbles, `.own` register slots
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -72,9 +73,8 @@ long soak.
 - [ ] Workday FPS mode; heap slope test nightly; weekly true 9-hour soak.
 - [ ] Sound, off by default: sheep, wind, grumble, page turn. (Decision so far: it is a silent screensaver; revisit if asked.)
 - [ ] Settings panel, keyboard shortcuts (space pause, N new, H hall).
-- [ ] Bonus books still to write: fungi, anatomy, law, knitting (cookery and geology done).
+- [ ] Bonus books still to write: fungi, anatomy (cookery, geology, law, knitting done).
 - [ ] Flyting duel beat (herder vs. named sheep, alternating lines).
-- [ ] Accessibility: high-contrast bubble option (reduced motion and text size done).
 - [ ] README screenshots and a 20 s GIF of a late-day rant.
 - [ ] `?size=1000` board option; ring radii scale.
 - [ ] Boundary-check script once `core/` stabilises.
