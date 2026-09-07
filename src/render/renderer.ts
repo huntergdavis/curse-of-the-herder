@@ -18,6 +18,33 @@ function walkingHerder(world: WorldState): boolean {
   return world.herder.mode === "toSheep" || world.herder.mode === "toPen";
 }
 
+/** Word-wrap `text` to `maxWidth` with the context's current font; at most `maxLines`, the last ending in an ellipsis if cut. */
+export function fitLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let line = "";
+  for (const w of words) {
+    const trial = line ? `${line} ${w}` : w;
+    if (ctx.measureText(trial).width <= maxWidth || !line) line = trial;
+    else {
+      lines.push(line);
+      line = w;
+    }
+    if (lines.length === maxLines) break;
+  }
+  if (lines.length < maxLines && line) lines.push(line);
+  if (lines.length === maxLines && (line || words.length > 0)) {
+    // Did we consume everything? If not, mark the last line.
+    const consumed = lines.join(" ");
+    if (consumed.length < text.replace(/\s+/g, " ").trim().length) {
+      let last = lines[maxLines - 1]!;
+      while (last.length > 1 && ctx.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1).trimEnd();
+      lines[maxLines - 1] = `${last}…`;
+    }
+  }
+  return lines;
+}
+
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
   private chunks: ChunkCache | null = null;
@@ -1326,35 +1353,49 @@ export class Renderer {
         ctx.beginPath();
         ctx.ellipse(gx, gy, T * 0.4, T * 0.1, 0, 0, Math.PI * 2);
         ctx.fill();
+        // The stone: wide enough to carry a name and a few short lines, all measured and clipped so nothing runs off it.
+        const hw = T * 0.44;
+        const shoulder = gy - T * 0.62;
+        const stone = (): void => {
+          ctx.beginPath();
+          ctx.moveTo(gx - hw, gy);
+          ctx.lineTo(gx - hw, shoulder);
+          ctx.arc(gx, shoulder, hw, Math.PI, 0);
+          ctx.lineTo(gx + hw, gy);
+          ctx.closePath();
+        };
         ctx.fillStyle = "#b3afa5";
         ctx.strokeStyle = "#2b2620";
         ctx.lineWidth = Math.max(1, T * 0.05);
-        ctx.beginPath();
-        ctx.moveTo(gx - T * 0.32, gy);
-        ctx.lineTo(gx - T * 0.32, gy - T * 0.6);
-        ctx.arc(gx, gy - T * 0.6, T * 0.32, Math.PI, 0);
-        ctx.lineTo(gx + T * 0.32, gy);
-        ctx.closePath();
+        stone();
         ctx.fill();
         ctx.stroke();
         if (T >= 40 && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 9) {
+          ctx.save();
+          stone();
+          ctx.clip();
           ctx.fillStyle = "rgba(43,38,32,0.85)";
-          ctx.font = `${Math.max(8, T * 0.16)}px "Patrick Hand", cursive`;
           ctx.textAlign = "center";
-          ctx.fillText(this.memorial.name, gx, gy - T * 0.55);
-          const words = this.memorial.epitaph.split(" ");
-          let line = "";
-          let ly = gy - T * 0.36;
-          for (const wd of words) {
-            if ((line + " " + wd).trim().length > 14) {
-              ctx.fillText(line, gx, ly);
-              ly += T * 0.17;
-              line = wd;
-            } else line = (line + " " + wd).trim();
-            if (ly > gy - T * 0.05) break;
+          const maxW = hw * 1.7;
+          // Name: shrink until it fits on one line.
+          let nameSize = T * 0.13;
+          ctx.font = `600 ${nameSize}px "Nunito", sans-serif`;
+          while (nameSize > 6 && ctx.measureText(this.memorial.name).width > maxW) {
+            nameSize -= 1;
+            ctx.font = `600 ${nameSize}px "Nunito", sans-serif`;
           }
-          if (line && ly <= gy - T * 0.05) ctx.fillText(line, gx, ly);
+          ctx.fillText(this.memorial.name, gx, gy - T * 0.86);
+          // Epitaph: measured wrap, at most four lines, the last one ending in an ellipsis if it must.
+          const epSize = Math.max(7, T * 0.12);
+          ctx.font = `${epSize}px "Patrick Hand", cursive`;
+          const lines = fitLines(ctx, `“${this.memorial.epitaph}”`, maxW, 4);
+          let ly = gy - T * 0.68;
+          for (const ln of lines) {
+            ctx.fillText(ln, gx, ly);
+            ly += T * 0.14;
+          }
           ctx.textAlign = "left";
+          ctx.restore();
         }
       }
     }

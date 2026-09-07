@@ -117,7 +117,7 @@ long soak.
 
 - [ ] Auto-update (`version.json` poll, SW cache name check script).
 - [ ] Workday FPS mode; heap slope test nightly; weekly true 9-hour soak.
-- [ ] Sound, off by default: sheep, wind, grumble, page turn. (Decision so far: it is a silent screensaver; revisit if asked.)
+- Sound: decided, never. It is a silent screensaver.
 - [ ] Settings panel, keyboard shortcuts (space pause, N new, H hall).
 - [ ] Flyting duel beat (herder vs. named sheep, alternating lines).
 - [ ] README screenshots and a 20 s GIF of a late-day rant.
