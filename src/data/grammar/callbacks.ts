@@ -103,6 +103,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "streak", ["#pantheon.cap#, five in a row. I know what this is. This is the quiet before the sheep.", "Eight. EIGHT in a row. I am not going to say anything. I am not going to say ANYTHING. …Eight."]),
   ...R(8, "streak", ["Five went in and none of them ran. I did not trust it. I was right not to."], { reg: ["hemingway"] }),
   ...R(12, "streak", ["A run of luck, O Curse, is your favourite joke, and I have laughed at it every time, and I am laughing now, and I hate you."]),
+  // A cow. Not his. Good.
+  ...R(0, "cow", ["Cow. Not mine. Good.", "Moo yourself.", "Big. Not sheep. Fine."]),
+  ...R(2, "cow", ["Not you. You are not my problem. Stay that way, you great ambling milk cupboard.", "Look at it. Nobody is trying to carry it anywhere. It has no idea how good it has it.", "Yes, hello, cow. No, I do not want to talk about it. You did the pats, did you? Thought so."]),
+  ...R(4, "cow", ["#oath_phrase#, a cow, standing there with the confidence of a thing nobody has ever tried to carry.", "Do not look at me like that, you #adj# four-legged dairy, I know what you left on the path and so does my #body_part#."]),
+  ...R(6, "cow", ["Observe the cow, #vocative#: large, slow, unhurried, and not once in its life mistaken for a rooftop ornament. Learn something."]),
+  ...R(8, "cow", ["The cow looked at me. It had never been carried anywhere. I did not envy it. I did, a little."], { reg: ["hemingway"] }),
   // The old counting, as his grandfather did it.
   ...R(1, "penned", ["#yantancount.cap#. Old counting. Grandfather did it. Grandfather also miserable."], { weight: 0.5 }),
   ...R(2, "penned", ["#yantan.cap#. That is what the old shepherds would have called you, #vocative#. It means #penned#. It also means get IN.", "#yantancount.cap#. That is the old counting. My grandfather did it, and it did not make him any happier either."], { weight: 0.6 }),

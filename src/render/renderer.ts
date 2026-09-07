@@ -32,7 +32,7 @@ export class Renderer {
   /** Villagers stand by their wells; each remembers when it last heard something. */
   private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }[] = [];
   /** Cows: one per village and one by the pen, chewing, explaining the cowpats. */
-  private cows: { x: number; y: number; facing: number; variant: number }[] = [];
+  private cows: { x: number; y: number; facing: number; variant: number; lastTick?: number }[] = [];
 
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
@@ -385,6 +385,8 @@ export class Renderer {
   wanted: string | null = null;
   /** Called when the wind takes the hat, so the herder can have words. */
   onHatLost: (() => void) | null = null;
+  /** He has walked up to a cow; the caller may have him say something about it. */
+  onCowNear: (() => void) | null = null;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
   private arrivals: { id: number; atMs: number }[] = [];
   /** The herder's signature word, drawn in colour when it appears in a bubble. */
@@ -881,6 +883,10 @@ export class Renderer {
     for (const c of this.cows) {
       if (Math.abs(c.x - cam.x) * T > W + T * 2 || Math.abs(c.y - cam.y) * T > H + T * 2) continue;
       const near = Math.hypot(c.x - h.x, c.y - h.y) < 3.5;
+      if (near && !world.finished && world.tick - (c.lastTick ?? -1e9) > 4800 && (h.mode === "toSheep" || h.mode === "toPen")) {
+        c.lastTick = world.tick;
+        this.onCowNear?.();
+      }
       this.drawCow(sx(c.x + 0.5), sy(c.y + 0.95), T, c.facing, c.variant, nowMs, true);
       if (near && Math.floor(nowMs / 1000) % 6 < 2) drawEmote(ctx, sx(c.x + 0.5) + T * 0.4, sy(c.y) - T * 0.35, T * 0.8, "moo");
     }

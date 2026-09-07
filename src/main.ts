@@ -136,6 +136,11 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   renderer.setSeason(world.season);
+  renderer.onCowNear = () => {
+    if (!session || session.world.herder.carrying < 0 && keyedUnit(session.world.seed, "cow-say", session.world.tick) > 0.6) return;
+    const u = speakKind(session.world, session.map, "cow", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.3);
+    if (u) say(session, u.text, u.heat, u.seconds, performance.now(), false, u);
+  };
   renderer.onHatLost = () => {
     if (!session) return;
     const u = speakKind(session.world, session.map, "hat", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.35);
