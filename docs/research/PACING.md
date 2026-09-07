@@ -81,6 +81,13 @@ believable time, and the overview minimap is legible. If we want the
 - Frame budget: 30 FPS while visible, with a "workday" mode (15 FPS,
   no particles) selectable for laptops.
 
+## Measured (2026-09-07)
+
+`npm run pace -- --seeds 5` on a 512 board: 8.15–8.77 h (median 8.4 h),
+60/60 sheep every seed, 12–27 flights, frustration 70–92 at the end.
+Raw content without the governor is ~5.5 h; the governor supplies the
+rest. About 20 of 24 books get read.
+
 ## Research backlog
 
 - **R-PACE-01** Build the offline pacing simulator (headless sim, no

@@ -122,6 +122,7 @@ export class Renderer {
       // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
       else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "baa");
+      else if (world.finished && s.mode === "penned" && Math.floor(nowMs / 1400 + s.id) % 9 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
@@ -290,13 +291,26 @@ export class Renderer {
     const h = world.herder;
     const walking = h.mode === "toSheep" || h.mode === "toPen";
     const reading = h.mode === "reading" && world.reading;
+    const stomping = walking && world.frustration >= 80;
+    if (stomping) {
+      // Little dust puffs kicked up behind him.
+      const ctx = this.ctx;
+      for (let k = 0; k < 3; k++) {
+        const t = ((nowMs / 700 + k / 3) % 1);
+        const back = h.facing === 0 ? -1 : h.facing === 2 ? 1 : 0;
+        ctx.fillStyle = `rgba(150, 130, 100, ${(0.35 * (1 - t)).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(sx(h.x + 0.5) + back * T * (0.25 + t * 0.5) + (k - 1) * T * 0.08, sy(h.y + 0.95) - t * T * 0.25, T * (0.05 + t * 0.09), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
     drawHerder(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95), T, {
       facing: h.facing,
       walking,
       carrying: h.carrying >= 0,
-      phase: walking ? (nowMs / 420) % 1 : phase,
+      phase: walking ? (nowMs / (stomping ? 300 : 420)) % 1 : phase,
       fury: world.frustration / 100,
-      resting: h.mode === "resting",
+      resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",
     });

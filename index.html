@@ -66,8 +66,8 @@
       .hall-card .longest { font-family: var(--hand-font); font-size: 13px; margin-top: 6px; opacity: 0.85; }
       /* Screensaver mode: chrome fades when the mouse has been still for a while. */
       .panel { transition: opacity 0.8s ease; }
-      body.quiet #toolbar, body.quiet #line, body.quiet #toast { opacity: 0; pointer-events: none; }
-      body.quiet #hud, body.quiet #minimap-wrap { opacity: 0.55; }
+      body.quiet #toolbar, body.quiet #toast { opacity: 0; pointer-events: none; }
+      body.quiet #hud, body.quiet #minimap-wrap, body.quiet #line { opacity: 0.55; }
       body.quiet { cursor: none; }
       @media (max-width: 720px) { #line { display: none; } #minimap { width: 100px; height: 100px; } #hud { min-width: 0; } }
     </style>
