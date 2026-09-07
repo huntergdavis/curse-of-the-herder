@@ -27,6 +27,8 @@ long soak.
 - Quiet screensaver mode, ?cam dev parameter, memory soak script, full-day end-to-end test
 - Chimney smoke, birds, bleats, snoring flock, stomp dust, sitting by the stone
 - Automatic update (version.json), pack-level word gating fix (124 → 2,338 words)
+- Hotter/earlier language (stinger pack, faster interval, earlier bands), reading lists with taught words, REAL_BOOKS map
+- Menu (New, Hall, Load, Language, end-of-day, Speed 1-100x, fps, Export/Import), mobile layout
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -42,7 +44,9 @@ long soak.
 - [ ] Simulation in a Web Worker behind a versioned protocol (main thread stays smooth during 4-hour catch-ups). Deferred: at 1× the sim costs ~nothing on the main thread; only the rare long catch-up janks for a few seconds.
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
 - [ ] Auto-update via version.json poll and a service worker.
-- [ ] Reduced-motion mode; a Settings panel for fps/band/end-of-day instead of toolbar selects.
+- [ ] Reduced-motion mode.
+- [ ] Usage tracking: which learned words he actually used, per book and per target, for the reading list (R-REAL-05).
+- [ ] Real PD excerpts for the real-titled books with edition cited (R-REAL-04).
 
 ## P1 — Presentation
 
