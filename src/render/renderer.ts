@@ -147,6 +147,7 @@ export class Renderer {
   hourOverride: number | null = null;
   /** Wall ms when the rain last stopped; a rainbow follows for a while. */
   rainbowFromMs = -1e9;
+  private lastRainTick = -1e9;
   /** Recent muddy footprints, world coords. */
   private prints: { x: number; y: number; atMs: number }[] = [];
   private lastPrint = { x: -1, y: -1 };
@@ -208,6 +209,31 @@ export class Renderer {
         ctx.beginPath();
         ctx.ellipse(sx(p.x), sy(p.y), T * 0.09, T * 0.13, 0, 0, Math.PI * 2);
         ctx.fill();
+      }
+    }
+
+    // Puddles gather on grass while it rains and linger a while after.
+    {
+      const sinceRain = world.rainUntilTick ? 0 : (world.tick - this.lastRainTick) * 0.25;
+      if (isRaining(world)) this.lastRainTick = world.tick;
+      const wet = isRaining(world) ? 1 : Math.max(0, 1 - sinceRain / 600);
+      if (wet > 0) {
+        const x0 = Math.max(0, Math.floor(cam.x - W / (2 * T)) - 1);
+        const x1 = Math.min(this.map.size - 1, Math.ceil(cam.x + W / (2 * T)) + 1);
+        const y0 = Math.max(0, Math.floor(cam.y - H / (2 * T)) - 1);
+        const y1 = Math.min(this.map.size - 1, Math.ceil(cam.y + H / (2 * T)) + 1);
+        ctx.fillStyle = `rgba(90, 140, 200, ${(0.35 * wet).toFixed(3)})`;
+        for (let y = y0; y <= y1; y++) {
+          for (let x = x0; x <= x1; x++) {
+            const i = y * this.map.size + x;
+            const t = this.map.terrain[i];
+            if ((t !== Terrain.Grass && t !== Terrain.Meadow && t !== Terrain.Road) || this.map.deco[i] !== Deco.None) continue;
+            if (((x * 37 + y * 101) % 23) !== 5) continue;
+            ctx.beginPath();
+            ctx.ellipse(sx(x + 0.5), sy(y + 0.6), T * 0.3 * wet, T * 0.14 * wet, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
       }
     }
 
@@ -307,7 +333,7 @@ export class Renderer {
       }
       // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
-      else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "baa");
+      else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, (s.id * 13 + Math.floor(nowMs / 23000)) % 9 === 0 ? "achoo" : "baa");
       else if (world.finished && s.mode === "penned" && Math.floor(nowMs / 1400 + s.id) % 9 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
       // The penned flock judges him in unison whenever he passes empty-handed.
       else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && Math.floor(nowMs / 1000) % 6 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
