@@ -44,6 +44,7 @@ long soak.
 - Milestone beats (halfway, ten to go, one to go), named sheep on Hall records, rule-recency variety control
 - Herder flourishes by level (book, quill, scarf, spectacles, laurel), legal and knitting registers, high-contrast bubbles, `.own` register slots
 - Villagers answer back, dog thoughts, dawn forecast, anatomy and fungi books, cloud shadows, book ban-list test
+- Delighters round: arrival hop and cheer, dog at his feet at the end, shooting stars, shouting mouth, signature word in red, gossiping sheep, frogs, dusk hedgehog, swinging gate
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
