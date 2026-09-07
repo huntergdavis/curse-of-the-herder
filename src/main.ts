@@ -116,6 +116,7 @@ function hideOverlay(): void {
 if (params.has("debug")) {
   (window as unknown as { __curse: unknown }).__curse = {
     camera: () => (session ? { x: session.camera.x, y: session.camera.y } : null),
+    chunkAt: () => (session ? session.renderer.debugChunkAt(Math.round(session.world.herder.x), Math.round(session.world.herder.y)) : null),
     diag: () => {
       if (!session) return null;
       const w = session.world;
@@ -195,6 +196,8 @@ async function startSession(world: WorldState): Promise<void> {
   };
   if (params.get("hat")) renderer.hatPeriod = 10;
   if (params.get("wave")) renderer.forceWave = true;
+  const chunkParam = params.get("chunks");
+  if (chunkParam === "canvas" || chunkParam === "direct" || chunkParam === "offscreen") renderer.forceChunkMode(chunkParam);
   if (params.get("rest")) {
     // Screenshot hook: he sits down for a while, and the dog has an idea about a stick.
     const w = session.world;

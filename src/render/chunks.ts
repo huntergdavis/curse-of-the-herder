@@ -167,6 +167,17 @@ export class ChunkCache {
     return surface;
   }
 
+  debugProbe(cx: number, cy: number): unknown {
+    const e = this.cache.get(cy * 4096 + cx);
+    if (!e) return null;
+    const pc = probeContext();
+    if (!pc || !e.probe) return { probe: e.probe };
+    pc.clearRect(0, 0, 1, 1);
+    pc.drawImage(e.surface as CanvasImageSource, e.probe.x, e.probe.y, 1, 1, 0, 0, 1, 1);
+    const d = pc.getImageData(0, 0, 1, 1).data;
+    return { probe: e.probe, got: [d[0], d[1], d[2], d[3]], surfaceW: e.surface.width, px: this.px };
+  }
+
   /** Every so often re-read one cached chunk's probe pixel; a canvas the browser has blanked comes back wrong. */
   recheck(): boolean {
     if (this.cache.size === 0) return true;

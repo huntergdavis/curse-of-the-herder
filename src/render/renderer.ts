@@ -115,14 +115,58 @@ export class Renderer {
   debugMap(): GameMap {
     return this.map;
   }
-  debugChunks(): { mode: string; cached: number; tilePx: number; mapSize: number; sameMap: boolean } {
-    return { mode: this.chunkMode, cached: this.chunks?.size ?? -1, tilePx: this.chunks?.tilePx ?? -1, mapSize: this.chunks?.map.size ?? -1, sameMap: this.chunks?.map === this.map };
+  /** Debug: the chunk surface under a world tile as a PNG data URL, plus the map's terrain rows for that chunk. */
+  async debugChunkAt(wx: number, wy: number): Promise<{ cx: number; cy: number; png: string | null; rows: string[]; probe: unknown }> {
+    const cx = Math.floor(wx / CHUNK);
+    const cy = Math.floor(wy / CHUNK);
+    const rows: string[] = [];
+    for (let y = 0; y < CHUNK; y++) {
+      let r = "";
+      for (let x = 0; x < CHUNK; x++) r += String(this.map.terrain[(cy * CHUNK + y) * this.map.size + cx * CHUNK + x] ?? "?");
+      rows.push(r);
+    }
+    const chunks = this.ensureChunks();
+    const surface = chunks.get(cx, cy);
+    let png: string | null = null;
+    if (surface) {
+      if ("convertToBlob" in surface) {
+        const blob = await (surface as OffscreenCanvas).convertToBlob({ type: "image/png" });
+        png = await new Promise<string>((res) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.readAsDataURL(blob); });
+      } else png = (surface as HTMLCanvasElement).toDataURL("image/png");
+    }
+    return { cx, cy, png, rows, probe: chunks.debugProbe(cx, cy) };
   }
+
+  debugChunks(): Record<string, unknown> {
+    return { mode: this.chunkMode, cached: this.chunks?.size ?? -1, tilePx: this.chunks?.tilePx ?? -1, mapSize: this.chunks?.map.size ?? -1, sameMap: this.chunks?.map === this.map, creations: this.dbgCreations, purges: this.dbgPurges, drops: this.dbgDrops, resizes: this.dbgResizes, lastProbe: this.dbgProbe, frames: this.dbgFrames, blits: this.dbgBlits };
+  }
+  private dbgCreations = 0;
+  private dbgPurges = 0;
+  private dbgDrops = 0;
+  private dbgResizes = 0;
+  private dbgFrames = 0;
+  private dbgBlits = "";
+  private dbgProbe = "";
 
   setMap(map: GameMap): void {
     this.map = map;
     this.dropChunks();
     this.indexHouses();
+    this.resetWorldState();
+  }
+
+  /** Per-world memory that must not leak from one herder to the next (tick-based timers especially: a new world starts at tick 0). */
+  private resetWorldState(): void {
+    this.lastRainTick = -1e9;
+    this.lastHenTick = -1e9;
+    this.finaleStartMs = -1;
+    this.arrivals = [];
+    this.stick.until = 0;
+    this.stick.restKey = -1;
+    this.dog.init = false;
+    this.dog.reactUntil = 0;
+    this.rivalNow = null;
+    this.screenProbeMisses = 0;
   }
 
   private indexHouses(): void {
@@ -490,11 +534,18 @@ export class Renderer {
     // Chunks are cached at most 64 px a tile (a 16-tile chunk is then 4 MB) and upscaled on big screens;
     // at 96 px a retina laptop kept 200 MB of canvases and browsers start dropping them.
     this.chunkTilePx = Math.min(64, this.tilePx);
+    this.dbgResizes++;
     this.purgeChunks();
   }
 
   /** How the chunk layer is being produced: cached offscreen, cached on-DOM canvases, or painted every frame. */
   private chunkMode: "offscreen" | "canvas" | "direct" = "offscreen";
+  /** Force a terrain mode (`?chunks=canvas|direct`) for testing. */
+  forceChunkMode(mode: "offscreen" | "canvas" | "direct"): void {
+    this.chunkMode = mode;
+    this.chunkRetryAtMs = 0;
+    this.purgeChunks();
+  }
   private chunkRetryAtMs = 0;
   private lastRecheckMs = 0;
 
@@ -505,12 +556,14 @@ export class Renderer {
 
   /** Drop the cache entries but keep the canvases for the next cache of the same size. */
   private dropChunks(): void {
+    this.dbgDrops++;
     if (this.chunks) this.surfacePool = this.chunks.release();
     this.chunks = null;
   }
 
   /** Really free the canvases: size or mode changed, or the browser showed us stale pixels. */
   private purgeChunks(): void {
+    this.dbgPurges++;
     this.chunks?.dispose();
     this.chunks = null;
     for (const sf of this.surfacePool) {
@@ -534,6 +587,7 @@ export class Renderer {
       const visible = (Math.ceil(this.width / chunkPx) + 2) * (Math.ceil(this.height / chunkPx) + 2);
       this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 6, this.season, this.chunkMode === "offscreen", this.surfacePool);
       this.surfacePool = [];
+      this.dbgCreations++;
     }
     return this.chunks;
   }
@@ -655,11 +709,19 @@ export class Renderer {
     const c1y = Math.floor((cam.y + H / (2 * T)) / chunkWorld) + 1;
     const maxChunk = Math.ceil(this.map.size / chunkWorld);
     const chunkDraw = chunkWorld * T;
+    this.dbgFrames++;
+    this.dbgBlits = `c=${Math.max(0, c0x)}..${Math.min(maxChunk - 1, c1x)},${Math.max(0, c0y)}..${Math.min(maxChunk - 1, c1y)} draw=${chunkDraw} T=${T} offX=${offX} offY=${offY} cam=${cam.x.toFixed(1)},${cam.y.toFixed(1)}`;
     for (let cy = Math.max(0, c0y); cy <= Math.min(maxChunk - 1, c1y); cy++) {
       for (let cx = Math.max(0, c0x); cx <= Math.min(maxChunk - 1, c1x); cx++) {
         const live = this.chunks ?? chunks;
         const surface = this.chunkMode === "direct" ? null : live.get(cx, cy);
-        if (surface) ctx.drawImage(surface as CanvasImageSource, sx(cx * chunkWorld), sy(cy * chunkWorld), chunkDraw + 0.5, chunkDraw + 0.5);
+        if (surface) {
+          // Plain bilinear for the chunk blit: Chromium's high-quality path caches a resampled copy of the source canvas
+          // and can keep showing the old island after the canvas is repainted for a new one.
+          ctx.imageSmoothingQuality = "low";
+          ctx.drawImage(surface as CanvasImageSource, sx(cx * chunkWorld), sy(cy * chunkWorld), chunkDraw + 0.5, chunkDraw + 0.5);
+          ctx.imageSmoothingQuality = "high";
+        }
         else {
           if (live.broken && this.chunkMode !== "direct") this.demoteChunks(nowMs);
           live.paintDirect(ctx, cx, cy, sx(cx * chunkWorld), sy(cy * chunkWorld), T);
@@ -678,6 +740,7 @@ export class Renderer {
       const y1 = Math.floor(cam.y + H / (2 * T)) - 2;
       const tile = chunks.plainTileIn(x0, y0, x1, y1, (x, y) => Math.hypot(x - h.x, y - h.y) < 3);
       const pc = probeContext();
+      this.dbgProbe = `tile=${tile ? `${tile.x},${tile.y},t${tile.t}` : "none"} pc=${!!pc} range=${x0}..${x1},${y0}..${y1}`;
       if (tile && pc) {
         try {
           pc.clearRect(0, 0, 1, 1);
@@ -685,6 +748,7 @@ export class Renderer {
           const d = pc.getImageData(0, 0, 1, 1).data;
           const [r, g, b] = chunks.colourOf(tile.t);
           const ok = Math.abs(d[0]! - r) <= 28 && Math.abs(d[1]! - g) <= 28 && Math.abs(d[2]! - b) <= 28;
+          this.dbgProbe += ` got=${d[0]},${d[1]},${d[2]} exp=${r},${g},${b} ok=${ok} at=${Math.floor(sx(tile.x + 0.5))},${Math.floor(sy(tile.y + 0.5))}`;
           this.screenProbeMisses = ok ? 0 : this.screenProbeMisses + 1;
           if (this.screenProbeMisses >= 2) {
             this.screenProbeMisses = 0;
@@ -721,9 +785,11 @@ export class Renderer {
 
     // Puddles gather on grass while it rains and linger a while after.
     {
-      const sinceRain = world.rainUntilTick ? 0 : (world.tick - this.lastRainTick) * 0.25;
+      // Seconds since the last rain in this world; the tick memory is reset per world (see setMap) and wetness is clamped,
+      // because a stale tick from a previous herder once made this ~50 and painted the island with fifteen-tile puddles.
       if (isRaining(world)) this.lastRainTick = world.tick;
-      const wet = this.season === "winter" ? 0 : isRaining(world) ? 1 : Math.max(0, 1 - sinceRain / 600);
+      const sinceRain = Math.max(0, (world.tick - this.lastRainTick) * 0.25);
+      const wet = this.season === "winter" ? 0 : isRaining(world) ? 1 : Math.max(0, Math.min(1, 1 - sinceRain / 600));
       if (wet > 0) {
         const x0 = Math.max(0, Math.floor(cam.x - W / (2 * T)) - 1);
         const x1 = Math.min(this.map.size - 1, Math.ceil(cam.x + W / (2 * T)) + 1);
