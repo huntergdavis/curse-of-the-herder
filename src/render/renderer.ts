@@ -70,6 +70,7 @@ export class Renderer {
             const j = (y + oy) * n + (x + ox);
             if (this.map.terrain[j] !== Terrain.Grass || this.map.deco[j] !== Deco.None) { ok = false; break; }
           }
+          if (this.cows.some((c) => Math.hypot(c.x - x, c.y - y) < 4)) continue;
           if (ok) { this.cows.push({ x, y, facing: (k + a) % 2 === 0 ? 0 : 2, variant: (k * 5 + a) % 3 }); break; }
         }
       }
