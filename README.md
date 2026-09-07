@@ -21,6 +21,8 @@ sentence structures. Filthy, never cruel.
 
 ![A village: Tupsley's signpost, a little free library, and a sheep on a roof](docs/img/village-roof-sheep.png)
 
+![Winter in Tupsley: snow, grey trees, washing on the line, scarecrows in the field](docs/img/winter-village.png)
+
 ![Dusk: the tombstone card at the end of a day](docs/img/ending.png)
 
 ## Running it
@@ -90,7 +92,9 @@ in-game titles to real public-domain sources is in
   ("Language!"), washing lines, roof cats, chimney smoke, scarecrows he
   envies, ducks with ducklings, frogs, fish, rabbits that bolt, owls and
   a hedgehog at dusk, butterflies, birds, cloud shadows, rainbows,
-  fireflies, shooting stars and a moon.
+  fireflies, shooting stars and a moon. The calendar sets the season:
+  a herder who wakes in December gets snow, grey trees and visible
+  breath; October turns the trees gold; each season has its own lines.
 - **Persistence.** IndexedDB. Start a new herder whenever; load any
   herder in progress; the Hall of Herders keeps every retired one with
   his epitaph, reading list, favourite word, sheep of the day, the

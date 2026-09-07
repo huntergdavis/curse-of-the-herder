@@ -1234,6 +1234,7 @@ export class Renderer {
       windy: isWindy(world) && h.carrying < 0 && !reading,
       level: levelFor(erudition(world.booksRead, world.sheepPenned, hoursElapsed(world))),
       shouting: this.shoutingNow,
+      winter: this.season === "winter",
       tired: Math.max(0, Math.min(1, (dayHour(world) - 14) / 4)),
       lantern: (this.hourOverride ?? dayHour(world)) > 17.9,
       resting: h.mode === "resting" || h.mode === "done",

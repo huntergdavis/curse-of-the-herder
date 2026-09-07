@@ -125,6 +125,7 @@ export interface HerderPose {
   level?: number;
   /** Mid-shout: an open mouth. */
   shouting?: boolean;
+  winter?: boolean;
   /** 0..1 how late and tired: he stoops. */
   tired?: number;
   /** After sundown he carries a lantern in the crook hand. */
@@ -191,8 +192,8 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.fillStyle = "#3a2f2a";
   ctx.fillRect(-T * 0.24, -T * 0.55 - bob, T * 0.48, T * 0.06);
   const lvl = p.level ?? 0;
-  // Level 8: a scarf, because a man of letters feels the cold.
-  if (lvl >= 8) {
+  // Level 8: a scarf, because a man of letters feels the cold. In winter, everyone does.
+  if (lvl >= 8 || p.winter) {
     ctx.fillStyle = "#b03a3a";
     ctx.fillRect(-T * 0.24, -T * 0.95 - bob, T * 0.48, T * 0.09);
     ctx.fillRect(T * 0.1, -T * 0.92 - bob, T * 0.1, T * 0.3 + Math.sin(p.phase * Math.PI * 2) * T * 0.02);

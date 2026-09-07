@@ -49,6 +49,7 @@ long soak.
 - Scarecrows with remarks, owls, ducklings, grazing sheep, jumping fish, rabbits that bolt, vocabulary pop
 - Hall Almanac across herders, Marryat line, washing lines, roof cats, village bell
 - Highlights of the day on cards, milestone cheers
+- Seasons from the calendar (palette, snow, breath, lines), a word for yesterday's herder at dawn
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -87,7 +88,6 @@ long soak.
 ## P3 — Someday
 
 - [ ] Multiple herders on one board (a cursed family).
-- [ ] Seasons: a herder started in December gets snow.
 - [ ] Shareable "curse card" image export from the Hall (client-side canvas → PNG; download is user-initiated).
 - [ ] Localised UI (the herder stays English-first; his French is a feature).
 - [ ] A sheepdog who is no help at all.

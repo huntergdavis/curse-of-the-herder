@@ -117,7 +117,7 @@ async function startSession(world: WorldState): Promise<void> {
     world,
     map,
     renderer,
-    minimap: new Minimap(map, 160),
+    minimap: new Minimap(map, 160, world.season),
     camera,
     bubbles: new Bubbles(),
     nextIdleCurseTick: world.tick + nextIdleCurseTicks(world),

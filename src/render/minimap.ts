@@ -1,11 +1,12 @@
 import type { GameMap } from "../core/map/generate";
 import type { WorldState } from "../core/sim/state";
-import { TERRAIN_COLOR } from "./palette";
+import { seasonalTerrain } from "./palette";
 
 /** A once-rendered thumbnail of the board plus live markers. */
 export class Minimap {
   private base: HTMLCanvasElement;
-  constructor(private map: GameMap, private px: number) {
+  constructor(private map: GameMap, private px: number, season = "summer") {
+    const colours = seasonalTerrain(season);
     this.base = document.createElement("canvas");
     this.base.width = px;
     this.base.height = px;
@@ -16,7 +17,7 @@ export class Minimap {
       for (let x = 0; x < px; x++) {
         const wx = Math.floor((x / px) * n);
         const wy = Math.floor((y / px) * n);
-        const hex = TERRAIN_COLOR[map.terrain[wy * n + wx]!]!;
+        const hex = colours[map.terrain[wy * n + wx]!]!;
         const v = parseInt(hex.slice(1), 16);
         const o = (y * px + x) * 4;
         img.data[o] = (v >> 16) & 255;
