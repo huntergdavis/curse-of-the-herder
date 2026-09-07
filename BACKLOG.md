@@ -29,6 +29,7 @@ long soak.
 - Automatic update (version.json), pack-level word gating fix (124 → 2,338 words)
 - Hotter/earlier language (stinger pack, faster interval, earlier bands), reading lists with taught words, REAL_BOOKS map
 - Menu (New, Hall, Load, Language, end-of-day, Speed 1-100x, fps, Export/Import), mobile layout
+- Word-usage tallies in reading lists, genuine PD excerpts (Grose, Shakespeare, Bierce, Rabelais), river sheep, hourly diary, names over notorious sheep, weekly soak workflow
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -45,14 +46,13 @@ long soak.
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
 - [ ] Auto-update via version.json poll and a service worker.
 - [ ] Reduced-motion mode.
-- [ ] Usage tracking: which learned words he actually used, per book and per target, for the reading list (R-REAL-05).
-- [ ] Real PD excerpts for the real-titled books with edition cited (R-REAL-04).
+- [ ] Real PD excerpts for the remaining real-titled books (Molière, Cervantes, Burns, Smollett) with edition cited (R-REAL-04).
 
 ## P1 — Presentation
 
 - [ ] Sheep walk animation while wandering; flee dash.
 - [ ] Villages: a villager or two; smoke from chimneys.
-- [ ] Better absurd-location staging: sheep drawn *on* the rock / mid-river (roof sheep done).
+- [ ] Sheep on a boulder or a cliff ledge (roof and river sheep done).
 - [ ] Tombstone rises beside the pen in the world (not only on the card).
 - [ ] Pen fills with sleeping sheep in rows; night sky with stars during the fade.
 - [ ] Export/Import of a herder and of the Hall as JSON.
