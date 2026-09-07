@@ -40,6 +40,7 @@ long soak.
 - First words at dawn, crown for thrice-escaped sheep, dog on Hall records, Burns bonus book
 - Sheep temperaments (dozy, curious, stubborn), the crook breaking once a day, sheep of the day, wind weather
 - Lunch beat, frustration arc rebalanced (mean 28 at 09:00 to 87 at 17:00), English-only verb slots, ?weather pin
+- Boulder sheep, the black sheep, miscounting, reduced-motion and text-size settings, culinary pack and bonus books (Cook's Oracle, Geology, Burns, Bierce, Rabelais), Molière and Cervantes lines, CONTRIBUTING and PR template
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -54,13 +55,11 @@ long soak.
 - [ ] Simulation in a Web Worker behind a versioned protocol (main thread stays smooth during 4-hour catch-ups). Deferred: at 1× the sim costs ~nothing on the main thread; only the rare long catch-up janks for a few seconds.
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
 - [ ] Auto-update via version.json poll and a service worker.
-- [ ] Reduced-motion mode.
-- [ ] Real PD excerpts for the remaining real-titled books (Molière, Cervantes, Burns, Smollett) with edition cited (R-REAL-04).
+- [ ] Real PD excerpts for Smollett/Marryat (nautical) with edition cited (R-REAL-04; Molière, Cervantes, Burns done).
 
 ## P1 — Presentation
 
 - [ ] Sheep walk animation while wandering; flee dash.
-- [ ] Sheep on a boulder or a cliff ledge (roof and river sheep done).
 - [ ] Tombstone rises beside the pen in the world (not only on the card).
 - [ ] Pen fills with sleeping sheep in rows; night sky with stars during the fade.
 - [ ] Export/Import of a herder and of the Hall as JSON.
@@ -72,9 +71,9 @@ long soak.
 - [ ] Workday FPS mode; heap slope test nightly; weekly true 9-hour soak.
 - [ ] Sound, off by default: sheep, wind, grumble, page turn. (Decision so far: it is a silent screensaver; revisit if asked.)
 - [ ] Settings panel, keyboard shortcuts (space pause, N new, H hall).
-- [ ] Bonus books (fungi, geology, anatomy, cookery, law, knitting).
+- [ ] Bonus books still to write: fungi, anatomy, law, knitting (cookery and geology done).
 - [ ] Flyting duel beat (herder vs. named sheep, alternating lines).
-- [ ] Accessibility: reduced-motion mode, high-contrast bubble option, font-size setting.
+- [ ] Accessibility: high-contrast bubble option (reduced motion and text size done).
 - [ ] README screenshots and a 20 s GIF of a late-day rant.
 - [ ] `?size=1000` board option; ring radii scale.
 - [ ] Boundary-check script once `core/` stabilises.
@@ -84,7 +83,6 @@ long soak.
 - [ ] Multiple herders on one board (a cursed family).
 - [ ] Seasons: a herder started in December gets snow.
 - [ ] Shareable "curse card" image export from the Hall (client-side canvas → PNG; download is user-initiated).
-- [ ] Community lexicon contributions via PR with the curation checklist as a PR template.
 - [ ] Localised UI (the herder stays English-first; his French is a feature).
 - [ ] A sheepdog who is no help at all.
 

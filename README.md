@@ -103,6 +103,7 @@ in-game titles to real public-domain sources is in
   [PACING](docs/research/PACING.md) ·
   [ART](docs/research/ART.md)
 - [CREDITS.md](CREDITS.md): third-party sources.
+- [CONTRIBUTING.md](CONTRIBUTING.md): how to add words and sentence shapes.
 
 Inspired by, and borrowing runtime lessons from,
 [The Grind 2](https://github.com/huntergdavis/the-grind-2).
