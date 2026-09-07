@@ -3,6 +3,7 @@ import { fnv1a } from "./rng";
 import { LEVEL_NAMES, erudition, levelFor } from "./progression";
 import { dayHour, hoursElapsed, type WorldState } from "./sim/state";
 import { BOOK_BY_ID } from "../data/books";
+import { dogName } from "./names";
 import type { LexEntry } from "./lang/types";
 
 export const HALL_SCHEMA = 1;
@@ -26,6 +27,7 @@ export interface HallRecord {
   longestLine: string;
   epitaph: string;
   signatureWord: string;
+  dogName?: string | undefined;
   /** Most-used lexicon word and its favourite target. */
   favouriteWord?: { w: string; n: number; mostly: string } | undefined;
   /** What he read, in order, and a taste of what each book gave him. */
@@ -70,6 +72,7 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     longestLine: w.longestLine,
     epitaph,
     signatureWord,
+    dogName: dogName(w.seed),
     favouriteWord: (() => {
       const top = Object.entries(w.wordUse).sort((a, b) => b[1].n - a[1].n)[0];
       if (!top || top[1].n < 2) return undefined;

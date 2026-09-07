@@ -94,6 +94,10 @@ export const BOOKS: Book[] = [
     excerpts: ["...you ninny lobcocks, you gaping changelings, you codsheads, you loggerheads, you noddy-peaks, you bloated wind-bags...", "He that hath patience may compass anything. (Rabelais did not herd sheep.)", "The appetite grows by eating. So does the list.", "A list of nine insults is a list of nine insults. Rabelais would have made it forty."],
   },
   {
+    id: "burns", title: "Poems, Chiefly in the Scottish Dialect", author: "Robert Burns, 1786 (genuine lines)", pack: "yiddish-scots-aussie", register: "sco", when: 0.75, colour: "#3b5b8c",
+    excerpts: ["Wee, sleekit, cow'rin, tim'rous beastie, / O, what a panic's in thy breastie! (To a Mouse)", "The best-laid schemes o' mice an' men / Gang aft agley. (To a Mouse. Also: of herders and sheep.)", "O wad some Pow'r the giftie gie us / To see oursels as ithers see us! (To a Louse)", "Nae man can tether time or tide. (Tam o' Shanter. Nor sheep.)"],
+  },
+  {
     id: "notes", title: "Notes on the Curse", author: "the herder before you", pack: null, register: null, when: 0.97, colour: "#5a3b1e",
     excerpts: ["Day one: sixty sheep. Day one thousand: sixty sheep.", "The words get better. The sheep do not.", "I learned Latin. It did not help. It was beautiful.", "Whoever reads this: the last one is on the rock. It is always on the rock."],
   },

@@ -11,7 +11,7 @@ export function setShadowSkew(v: number): void {
 export type SheepPose = "idle" | "walk" | "carried" | "asleep" | "fled";
 
 /** Draw a sheep centred at (x, y) with body width ~T. `phase` 0..1 animates. */
-export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: SheepPose, facing: number, phase: number, named: boolean): void {
+export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: SheepPose, facing: number, phase: number, named: boolean, crowned = false): void {
   const flip = facing === 2 ? -1 : 1;
   ctx.save();
   ctx.translate(x, y);
@@ -74,7 +74,21 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
     ctx.arc(T * 0.415, -T * 0.05 + bob, T * 0.02, 0, Math.PI * 2);
     ctx.fill();
   }
-  if (named) {
+  if (crowned) {
+    // Three escapes: royalty.
+    ctx.fillStyle = "#e0b33c";
+    ctx.beginPath();
+    ctx.moveTo(T * 0.22, -T * 0.16 + bob);
+    ctx.lineTo(T * 0.24, -T * 0.32 + bob);
+    ctx.lineTo(T * 0.31, -T * 0.22 + bob);
+    ctx.lineTo(T * 0.37, -T * 0.34 + bob);
+    ctx.lineTo(T * 0.43, -T * 0.22 + bob);
+    ctx.lineTo(T * 0.5, -T * 0.32 + bob);
+    ctx.lineTo(T * 0.5, -T * 0.16 + bob);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (named) {
     // A little red ribbon: this one has a name and a reputation.
     ctx.fillStyle = "#c94f4f";
     ctx.beginPath();

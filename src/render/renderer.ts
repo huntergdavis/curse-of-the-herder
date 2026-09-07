@@ -465,7 +465,7 @@ export class Renderer {
           ctx.stroke();
         }
       }
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : 0.5)), T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named);
+      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : 0.5)), T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3);
       if (s.named && s.mode === "loose" && T >= 32) {
         ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
         ctx.textAlign = "center";
