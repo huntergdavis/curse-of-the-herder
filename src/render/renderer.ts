@@ -624,7 +624,7 @@ export class Renderer {
       if (world.rival && Math.abs(world.rival.x - h.x) < 9) {
         const r = world.rival;
         const back = r.dx > 0 ? -1 : 1;
-        const bx = r.x + 0.5 + back * 4.3 + Math.sin(nowMs / 700) * 0.3;
+        const bx = r.x + 0.5 + back * 5.8 + Math.sin(nowMs / 700) * 0.3;
         const by = r.y + 0.3;
         d.vx = (bx - d.x) * 0.05;
         d.vy = (by - d.y) * 0.05;
@@ -981,13 +981,13 @@ export class Renderer {
       const facing: 0 | 2 = r.dx > 0 ? 0 : 2;
       const back = r.dx > 0 ? -1 : 1;
       for (let k = 3; k >= 1; k--) {
-        drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
+        drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.6), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
         if (T >= 32) {
           // His sheep have names too. They are not interesting names. That is the point.
           ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
           ctx.textAlign = "center";
           ctx.fillStyle = "rgba(43,38,32,0.8)";
-          ctx.fillText(["Patience", "Prudence", "Also Prudence"][k - 1]!, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5) + T * 0.62);
+          ctx.fillText(["Patience", "Prudence", "Also Prudence"][k - 1]!, sx(r.x + 0.5 + back * k * 1.6), sy(r.y + 0.5) + T * 0.62);
           ctx.textAlign = "left";
         }
       }
@@ -996,7 +996,7 @@ export class Renderer {
       if ("finale" in r) {
         if (Math.abs(r.x - h.x) < 3) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "sixty?");
       } else if (beat < 2) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "hullo!");
-      else if (beat === 5) drawEmote(ctx, sx(r.x + 0.5 + back * 1.15) + T * 0.3, sy(r.y) - T * 0.2, T * 0.7, "baa");
+      else if (beat === 5) drawEmote(ctx, sx(r.x + 0.5 + back * 1.6) + T * 0.3, sy(r.y) - T * 0.2, T * 0.7, "baa");
     }
 
     // Summer afternoons: a "phew" now and then.
