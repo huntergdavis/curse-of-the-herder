@@ -47,6 +47,7 @@ const FILTH_MAX = params.get("filth") === "max";
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const canvas = $<HTMLCanvasElement>("game");
+wireMinimapLook();
 const overlay = $<HTMLDivElement>("overlay");
 const overlayCard = $<HTMLDivElement>("overlay-card");
 
@@ -105,6 +106,11 @@ function showOverlay(html: string): void {
 
 function hideOverlay(): void {
   overlay.hidden = true;
+}
+
+/** Test hook: `?debug=1` exposes the camera position. */
+if (params.has("debug")) {
+  (window as unknown as { __curse: { camera: () => { x: number; y: number } | null } }).__curse = { camera: () => (session ? { x: session.camera.x, y: session.camera.y } : null) };
 }
 
 async function startSession(world: WorldState): Promise<void> {
@@ -469,6 +475,35 @@ function maybeQuoteBook(s: Session, nowMs: number): void {
   const filled = grammar.expandTemplate(frame.replace("{q}", "QUOTEHERE"), ctx) ?? frame.replace("{q}", "QUOTEHERE");
   const text = filled.replace("QUOTEHERE", `“${excerpt}”`);
   say(s, text, Math.min(0.6, w.frustration / 100), 5 + text.length * 0.04, nowMs);
+}
+
+/** A viewer steering the camera from the minimap: where they point, whether the button is down, and how long to hold after release. */
+const look = { at: null as { x: number; y: number } | null, pressed: false, holdUntil: 0, returning: false };
+const LOOK_HOLD_MS = 2000;
+
+function wireMinimapLook(): void {
+  const el = $<HTMLCanvasElement>("minimap");
+  const point = (ev: PointerEvent): void => {
+    if (!session) return;
+    look.at = session.minimap.worldAt(el, ev.clientX, ev.clientY);
+  };
+  el.addEventListener("pointerdown", (ev) => {
+    ev.preventDefault();
+    el.setPointerCapture(ev.pointerId);
+    look.pressed = true;
+    point(ev);
+  });
+  el.addEventListener("pointermove", (ev) => {
+    if (look.pressed) point(ev);
+  });
+  const release = (): void => {
+    if (!look.pressed) return;
+    look.pressed = false;
+    look.holdUntil = performance.now() + LOOK_HOLD_MS;
+  };
+  el.addEventListener("pointerup", release);
+  el.addEventListener("pointercancel", release);
+  el.addEventListener("lostpointercapture", release);
 }
 
 let lastDiaryHour = -1;
@@ -854,8 +889,20 @@ function frame(nowMs: number): void {
   const lx = next ? (next.x - h.x) * 0.25 : 0;
   const ly = next ? (next.y - h.y) * 0.25 : 0;
   // At high fast-forward the herder outruns an eased camera; scale the easing and snap if he gets away.
+  const looking = look.at !== null && (look.pressed || nowMs < look.holdUntil);
   if (CAM_PIN) s.camera.snap(CAM_PIN.x, CAM_PIN.y);
-  else {
+  else if (looking && look.at) {
+    // A viewer is looking elsewhere: ease there quickly and stay until the hold runs out.
+    s.camera.follow(look.at.x, look.at.y, dt * 6);
+    look.returning = true;
+  } else if (look.returning) {
+    // Glide back to the herder; no snapping while we are far away on purpose.
+    s.camera.follow(h.x + lx, h.y + ly, dt * 3);
+    if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) < 1) {
+      look.returning = false;
+      look.at = null;
+    }
+  } else {
     s.camera.follow(h.x + lx, h.y + ly, dt * Math.min(FAST, 12));
     if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) > 8) s.camera.snap(h.x, h.y);
   }
@@ -863,7 +910,9 @@ function frame(nowMs: number): void {
   if (!document.hidden && nowMs - lastDrawMs >= FRAME_MIN_MS - 1) {
     lastDrawMs = nowMs;
     s.renderer.draw(w, s.camera, s.bubbles, nowMs);
-    if ((nowMs | 0) % 4 === 0) s.minimap.draw($<HTMLCanvasElement>("minimap"), w);
+    if (looking || look.returning || (nowMs | 0) % 4 === 0) {
+      s.minimap.draw($<HTMLCanvasElement>("minimap"), w, { x: s.camera.x, y: s.camera.y, w: s.renderer.width / s.renderer.tilePx, h: s.renderer.height / s.renderer.tilePx, looking });
+    }
   }
   updateHud();
 }

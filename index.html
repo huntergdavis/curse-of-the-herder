@@ -52,7 +52,7 @@
       .rl-when { opacity: 0.6; font-size: 11px; margin-left: 4px; }
       .rl-taught { display: block; font-family: var(--hand-font); opacity: 0.85; }
       #minimap-wrap { right: 12px; bottom: 12px; padding: 6px; line-height: 0; }
-      #minimap { width: 160px; height: 160px; border-radius: 6px; image-rendering: auto; }
+      #minimap { width: 160px; height: 160px; border-radius: 6px; image-rendering: auto; cursor: crosshair; touch-action: none; }
       #line { left: 12px; bottom: 12px; max-width: 46vw; font-family: var(--hand-font); font-size: calc(16px * var(--caption-scale, 1)); opacity: 0.9; }
       #line .label { font-family: var(--hud-font); font-size: 12px; opacity: 0.6; display: block; }
       #toast { left: 50%; top: 14px; transform: translateX(-50%); font-size: 15px; background: #fff3c4; animation: drop 0.4s ease-out; }
@@ -178,7 +178,7 @@
       </div>
       <p class="menu-foot">Space pauses · N new herder · H Hall · M menu · The toolbar fades when the mouse is still.</p>
     </section>
-    <div id="minimap-wrap" class="panel"><canvas id="minimap" width="160" height="160"></canvas></div>
+    <div id="minimap-wrap" class="panel"><canvas id="minimap" width="160" height="160" title="Click or drag to look around the island. The view returns to the herder two seconds after you let go."></canvas></div>
     <div id="line" class="panel" aria-live="polite"><span class="label">Last heard</span><span id="line-text">…</span></div>
     <div id="toast" class="panel" hidden></div>
     <div id="overlay"><div class="card" id="overlay-card"><h1>Curse of the Herder</h1><p>Waking the herder and laying out the pasture…</p></div></div>

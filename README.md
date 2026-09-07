@@ -115,6 +115,9 @@ in-game titles to real public-domain sources is in
   fireflies, shooting stars and a moon. The calendar sets the season:
   a herder who wakes in December gets snow, grey trees and visible
   breath; October turns the trees gold; each season has its own lines.
+- **Looking around.** The minimap shows the viewport as a reticle. Click
+  or hold-and-drag on it to look anywhere on the island; the view glides
+  back to the herder two seconds after you let go.
 - **Persistence.** IndexedDB. Start a new herder whenever; load any
   herder in progress; the Hall of Herders keeps every retired one with
   his epitaph, reading list, favourite word, sheep of the day, the

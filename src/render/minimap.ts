@@ -29,7 +29,15 @@ export class Minimap {
     ctx.putImageData(img, 0, 0);
   }
 
-  draw(target: HTMLCanvasElement, world: WorldState): void {
+  /** World coordinates for a point on the minimap canvas (CSS pixels relative to its box). */
+  worldAt(target: HTMLCanvasElement, clientX: number, clientY: number): { x: number; y: number } {
+    const r = target.getBoundingClientRect();
+    const u = Math.max(0, Math.min(1, (clientX - r.left) / Math.max(1, r.width)));
+    const v = Math.max(0, Math.min(1, (clientY - r.top) / Math.max(1, r.height)));
+    return { x: u * this.map.size, y: v * this.map.size };
+  }
+
+  draw(target: HTMLCanvasElement, world: WorldState, view?: { x: number; y: number; w: number; h: number; looking: boolean }): void {
     const ctx = target.getContext("2d")!;
     const px = this.px;
     if (target.width !== px || target.height !== px) {
@@ -66,5 +74,28 @@ export class Minimap {
     ctx.strokeStyle = "#fffdf5";
     ctx.lineWidth = 1;
     ctx.stroke();
+    // The viewport: a reticle showing what the screen is looking at. Gold while a viewer is steering it.
+    if (view) {
+      const x0 = view.x * s - (view.w * s) / 2;
+      const y0 = view.y * s - (view.h * s) / 2;
+      const w = Math.max(8, view.w * s);
+      const hh = Math.max(8, view.h * s);
+      const tick = Math.min(6, w / 3);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(0,0,0,0.45)";
+      ctx.strokeRect(x0, y0, w, hh);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = view.looking ? "#ffd37a" : "#fffdf5";
+      ctx.strokeRect(x0, y0, w, hh);
+      // Corner ticks, so it reads as a reticle and not a stray box.
+      ctx.beginPath();
+      for (const [cx, cy, dx, dy] of [[x0, y0, 1, 1], [x0 + w, y0, -1, 1], [x0, y0 + hh, 1, -1], [x0 + w, y0 + hh, -1, -1]] as const) {
+        ctx.moveTo(cx - dx * tick * 0.6, cy);
+        ctx.lineTo(cx + dx * tick, cy);
+        ctx.moveTo(cx, cy - dy * tick * 0.6);
+        ctx.lineTo(cx, cy + dy * tick);
+      }
+      ctx.stroke();
+    }
   }
 }

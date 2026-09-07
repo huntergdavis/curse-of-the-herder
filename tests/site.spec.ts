@@ -45,3 +45,19 @@ test("a whole compressed day ends with every sheep penned and a Hall record", as
   await expect(page.locator("#hall-grid .hall-card").first()).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("the minimap steers the camera and it comes back", async ({ page }) => {
+  await page.goto("/curse-of-the-herder/?new=1&seed=look&debug=1");
+  await page.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
+  await page.waitForTimeout(1500);
+  const cam = async (): Promise<{ x: number; y: number }> => page.evaluate(() => (window as unknown as { __curse: { camera: () => { x: number; y: number } } }).__curse.camera());
+  const before = await cam();
+  const box = (await page.locator("#minimap").boundingBox())!;
+  await page.mouse.click(box.x + 8, box.y + 8);
+  await page.waitForTimeout(1200);
+  const away = await cam();
+  expect(Math.hypot(away.x - before.x, away.y - before.y)).toBeGreaterThan(40);
+  await page.waitForTimeout(6000);
+  const back = await cam();
+  expect(Math.hypot(back.x - away.x, back.y - away.y)).toBeGreaterThan(40);
+});
