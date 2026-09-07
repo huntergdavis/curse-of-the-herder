@@ -34,6 +34,8 @@ export interface HallRecord {
   rivalName?: string | undefined;
   /** The sheep that ate his lunch, if one did. */
   lunchThief?: string | undefined;
+  /** Clock time the dog herded a sheep, if it ever did. */
+  dogHelpedAt?: string | undefined;
   /** The sheep with the most escapes, if any escaped twice or more. */
   sheepOfTheDay?: { name: string; flees: number } | undefined;
   /** The sheep he declared his personal enemy, if any earned it. */
@@ -90,6 +92,7 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     jailbreaks: w.jailbreaks,
     rivalsSeen: w.rivalsSeen,
     rivalName: rivalName(w.seed),
+    dogHelpedAt: w.dogHelpedTick !== undefined ? fmtClock(dayHour({ ...w, tick: w.dogHelpedTick })) : undefined,
     lunchThief: (() => {
       const t = w.sheep.find((o) => o.thief);
       return t ? sheepName(w.seed, t.id) : undefined;

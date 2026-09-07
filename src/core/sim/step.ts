@@ -727,6 +727,7 @@ function stepDogHelps(w: WorldState): void {
   if (d < 4 || d > 9) return;
   if (keyedUnit(w.seed, "dog-helps", w.tick) > 0.01) return;
   w.dogHelped = true;
+  w.dogHelpedTick = w.tick;
   s.tx = Math.round(h.x) + (s.x < h.x ? -1 : 1);
   s.ty = Math.round(h.y);
   s.speed = 2.2;

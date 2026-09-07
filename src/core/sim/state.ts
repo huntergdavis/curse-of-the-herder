@@ -157,6 +157,7 @@ export interface WorldState {
   /** When lunch began, and when (if) a sheep helped itself to it. */
   /** Once a day, late on, the dog does its job. */
   dogHelped?: boolean | undefined;
+  dogHelpedTick?: number | undefined;
   lunchTick?: number | undefined;
   lunchStolenTick?: number | undefined;
   /** A jailbreak in the planning: the sheep whispers at the gate before it goes. */
