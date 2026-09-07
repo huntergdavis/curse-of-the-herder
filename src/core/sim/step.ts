@@ -696,11 +696,14 @@ function stepHerder(w: WorldState, map: GameMap): void {
 function stepRival(w: WorldState, map: GameMap): void {
   const r = w.rival;
   if (r) {
+    // He stops dead when one of his own runs. It is a new feeling for him.
+    if (r.pauseUntil !== undefined && w.tick < r.pauseUntil) return;
     r.x += r.dx;
     r.ticksLeft--;
     // On his third pass of the day, halfway across, one of his sheep bolts. It happens to him too.
     if ((w.rivalsSeen ?? 0) === 3 && r.boltTick === undefined && r.ticksLeft === 112) {
       r.boltTick = w.tick;
+      r.pauseUntil = w.tick + 24;
       addFrustration(w, -10);
       pushEvent(w, { tick: w.tick, kind: "rivalBolt", sheepId: -1 });
     }

@@ -152,7 +152,7 @@ export interface WorldState {
   lastJailbreakTick: number;
   jailbreaks: number;
   /** A neighbouring herder strolling past with a flock that behaves. */
-  rival?: { x: number; y: number; dx: number; ticksLeft: number; boltTick?: number } | undefined;
+  rival?: { x: number; y: number; dx: number; ticksLeft: number; boltTick?: number; pauseUntil?: number } | undefined;
   rivalLastTick?: number | undefined;
   /** When lunch began, and when (if) a sheep helped itself to it. */
   /** He stopped at a village well for a drink of water, which is not ale. */

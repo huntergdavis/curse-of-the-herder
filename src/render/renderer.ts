@@ -1191,8 +1191,10 @@ export class Renderer {
     const rivalNow = world.rival ?? finaleRival;
     if (rivalNow) {
       const r = rivalNow;
-      const facing: 0 | 2 = r.dx > 0 ? 0 : 2;
       const back = r.dx > 0 ? -1 : 1;
+      const stopped = "pauseUntil" in r && r.pauseUntil !== undefined && world.tick < r.pauseUntil;
+      // While stopped he has turned to look back at the one that ran.
+      const facing: 0 | 2 = stopped ? (back > 0 ? 0 : 2) : r.dx > 0 ? 0 : 2;
       // Once in a day, the last in the line makes a break for it, downhill and away.
       const boltT = "boltTick" in r && r.boltTick !== undefined ? Math.min(60, world.tick - r.boltTick) : -1;
       for (let k = 3; k >= 1; k--) {
@@ -1210,12 +1212,14 @@ export class Renderer {
           ctx.textAlign = "left";
         }
       }
-      if (boltT >= 0 && Math.floor(nowMs / 1000) % 3 === 1) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "…!");
+      if (stopped) {
+        if (Math.floor(nowMs / 900) % 2 === 0) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "Also Prudence!");
+      } else if (boltT >= 0 && Math.floor(nowMs / 1000) % 3 === 1) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "…!");
       // Villagers greet him by name. They have never once greeted our man.
       for (const v of this.villagers) {
         if (Math.hypot(v.x - r.x, v.y - r.y) < 6 && Math.floor(nowMs / 1000) % 4 === 2) drawEmote(ctx, sx(v.x + 0.5) + T * 0.3, sy(v.y) - T * 0.9, T * 0.8, "Morning!");
       }
-      drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: true, carrying: false, phase, fury: 0, resting: false, coat: "#4a6a8a" });
+      drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: !stopped, carrying: false, phase, fury: stopped ? 0.5 : 0, resting: false, coat: "#4a6a8a" });
       const beat = Math.floor(nowMs / 1000) % 9;
       if ("finale" in r) {
         if (Math.abs(r.x - h.x) < 3) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "sixty?");
