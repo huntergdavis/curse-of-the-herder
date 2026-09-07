@@ -1,5 +1,5 @@
 import type { GameMap } from "../core/map/generate";
-import { dayHour, isFoggy, isRaining, type WorldState } from "../core/sim/state";
+import { dayHour, isFoggy, isRaining, isWindy, type WorldState } from "../core/sim/state";
 import { BOOK_BY_ID } from "../data/books";
 import { dogName, sheepName } from "../core/names";
 import { Deco } from "../core/map/terrain";
@@ -712,6 +712,25 @@ export class Renderer {
       }
     }
 
+    // Wind: leaves and petals stream across the screen.
+    if (isWindy(world)) {
+      const dir = 1;
+      for (let i = 0; i < 26; i++) {
+        const speed = 0.9 + (i % 5) * 0.25;
+        const px = ((i * 7919) % 1000) / 1000 * W + ((nowMs * speed * 0.35 * dir) % (W + T * 2)) - T;
+        const py = ((i * 104729) % 1000) / 1000 * H + Math.sin(nowMs / 400 + i) * T * 0.4;
+        const x = ((px % (W + T * 2)) + W + T * 2) % (W + T * 2) - T;
+        ctx.fillStyle = i % 3 === 0 ? "rgba(240, 170, 90, 0.7)" : i % 3 === 1 ? "rgba(120, 170, 70, 0.7)" : "rgba(244, 200, 220, 0.75)";
+        ctx.save();
+        ctx.translate(x, py);
+        ctx.rotate(nowMs / 150 + i);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, T * 0.09, T * 0.045, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
     // Fog: a soft white veil that thins toward the herder.
     if (isFoggy(world)) {
       const g = ctx.createRadialGradient(sx(h.x + 0.5), sy(h.y + 0.5), T * 3, sx(h.x + 0.5), sy(h.y + 0.5), Math.max(W, H) * 0.7);
@@ -811,6 +830,7 @@ export class Renderer {
       fury: h.mode === "ranting" || mishap ? 1 : world.frustration / 100,
       ranting: h.mode === "ranting" || nearMemorial,
       crookBroken: world.crookBroken,
+      windy: isWindy(world) && h.carrying < 0 && !reading,
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

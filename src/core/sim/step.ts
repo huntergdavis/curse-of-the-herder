@@ -351,6 +351,10 @@ function stepWeather(w: WorldState): void {
     w.fogUntilTick = 0;
     pushEvent(w, { tick: w.tick, kind: "fogLifts", sheepId: -1 });
   }
+  if (w.windUntilTick && w.tick >= w.windUntilTick) {
+    w.windUntilTick = 0;
+    pushEvent(w, { tick: w.tick, kind: "windDrops", sheepId: -1 });
+  }
   if (w.tick >= w.nextWeatherTick) {
     const u = keyedUnit(w.seed, "weather", w.tick);
     if (u < 0.45 && !w.rainUntilTick) {
@@ -360,10 +364,14 @@ function stepWeather(w: WorldState): void {
     } else if (u < 0.62 && !w.fogUntilTick && !w.rainUntilTick) {
       w.fogUntilTick = w.tick + 6 * 60 * 4 + Math.floor(keyedUnit(w.seed, "fog-len", w.tick) * 10 * 60 * 4);
       pushEvent(w, { tick: w.tick, kind: "fog", sheepId: -1 });
+    } else if (u < 0.8 && !w.windUntilTick && !w.fogUntilTick) {
+      w.windUntilTick = w.tick + 5 * 60 * 4 + Math.floor(keyedUnit(w.seed, "wind-len", w.tick) * 9 * 60 * 4);
+      pushEvent(w, { tick: w.tick, kind: "wind", sheepId: -1 });
     }
     w.nextWeatherTick = w.tick + 30 * 60 * 4 + Math.floor(keyedUnit(w.seed, "weather-gap", w.tick) * 50 * 60 * 4);
   }
   if (w.rainUntilTick && w.tick % 4 === 0) addFrustration(w, FRUSTRATION.rainPerMinute / 60);
+  if (w.windUntilTick && w.tick % 4 === 0) addFrustration(w, FRUSTRATION.rainPerMinute / 90);
 }
 
 function stepHerder(w: WorldState, map: GameMap): void {

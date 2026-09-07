@@ -82,6 +82,11 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // Wind.
+  ...R(0, "wind", ["Wind.", "Hat! Hat!", "#oath.cap#. Wind.", "Windy. Wool everywhere."]),
+  ...R(2, "wind", ["The wind is up. My hat has opinions about that.", "Wind. Now the sheep smell reaches me before the sheep do.", "#oath.cap#, hold on to your hats. I have one hat. I am holding on to it."]),
+  ...R(4, "wind", ["#oath_phrase#, a gale! The sheep are ballooning! My hat is #adj# with ambition!", "#pantheon.cap#, the wind has come to take my hat and my temper, and it may have the hat."]),
+  ...R(8, "wind", ["The wind came up. I held my hat. The sheep did not hold anything. They never do."], { reg: ["hemingway"] }),
   // The crook breaks. Once. It is a whole thing.
   ...R(0, "crook", ["Crook. Broke.", "No. No no. Crook.", "#swear.cap#. Stick. Broke."]),
   ...R(2, "crook", ["My crook. My CROOK. Twenty years, and it snaps on a Tuesday, on a hill, for nothing.", "The crook has broken. I now have two sticks and no crook. This is not an improvement.", "#oath.cap#. That crook was my grandfather's. He would have snapped it too, to be fair."]),

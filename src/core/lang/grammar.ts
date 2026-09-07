@@ -143,7 +143,7 @@ export class Grammar {
     const weights = rules.map((r) => {
       let w = r.weight ?? 1;
       const gap = ctx.level - r.tier;
-      w *= gap <= 0 ? 3 : gap === 1 ? 2 : gap === 2 ? 1 : 0.4;
+      w *= gap <= 0 ? 3 : gap === 1 ? 2 : gap === 2 ? 1 : gap === 3 ? 0.5 : 0.15;
       if (r.reg && ctx.registers.length && r.reg.some((x) => ctx.registers.includes(x))) w *= 3;
       return w;
     });

@@ -127,6 +127,7 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   started: "dawn",
   curious: "curious",
   dozy: "dozy",
+  wind: "wind",
 };
 
 function holdSeconds(text: string, heat: number): number {

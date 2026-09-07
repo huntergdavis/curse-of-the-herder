@@ -85,7 +85,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
@@ -137,6 +137,8 @@ export interface WorldState {
   crookBroken: boolean;
   /** Fog until this tick (0 = clear). */
   fogUntilTick: number;
+  /** Wind until this tick (0 = still). */
+  windUntilTick: number;
   /** Books finished today, in order. */
   readingList: { bookId: string; tick: number }[];
   /** Word → [times used, target label → count]. Capped to learned words. */
@@ -297,6 +299,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     lastMishapTick: -100000,
     crookBroken: false,
     fogUntilTick: 0,
+    windUntilTick: 0,
     readingList: [],
     wordUse: {},
   };
@@ -356,6 +359,10 @@ export function isFoggy(world: WorldState): boolean {
   return world.fogUntilTick > world.tick;
 }
 
+export function isWindy(world: WorldState): boolean {
+  return world.windUntilTick > world.tick;
+}
+
 export function hoursElapsed(world: WorldState): number {
   return world.tick / TICKS_PER_HOUR;
 }
@@ -399,6 +406,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["lastMishapTick"] !== "number") o["lastMishapTick"] = -100000;
     if (typeof o["crookBroken"] !== "boolean") o["crookBroken"] = false;
     if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
+    if (typeof o["windUntilTick"] !== "number") o["windUntilTick"] = 0;
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["wordUse"] || typeof o["wordUse"] !== "object") o["wordUse"] = {};
     if (!o["stats"]) o["stats"] = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };

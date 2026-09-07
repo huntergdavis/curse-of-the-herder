@@ -116,6 +116,8 @@ export interface HerderPose {
   ranting?: boolean;
   /** The crook is in two pieces since this afternoon. */
   crookBroken?: boolean;
+  /** Windy: one hand on the hat. */
+  windy?: boolean;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -211,6 +213,12 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(-T * 0.28, -T * 1.2 - bob);
     ctx.moveTo(T * 0.2, -T * 0.85 - bob);
     ctx.lineTo(T * 0.28, -T * 1.2 - bob);
+  } else if (p.windy) {
+    // One hand clamped on the hat, the other out for balance.
+    ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(-T * 0.34, -T * 0.6 - bob);
+    ctx.moveTo(T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(T * 0.14, -T * 1.22 - bob);
   } else if (p.fury > 0.6 && !p.walking) {
     // Fists shaking at the sky.
     const shake = Math.sin(p.phase * Math.PI * 8) * T * 0.04;
