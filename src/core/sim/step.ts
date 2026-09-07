@@ -642,12 +642,46 @@ function stepHerder(w: WorldState, map: GameMap): void {
   void moved;
 }
 
+/** Once or twice a day, a penned sheep gets out. It was IN. */
+function stepJailbreak(w: WorldState, map: GameMap): void {
+  if (w.finished || w.jailbreaks >= 2 || w.sheepPenned < 12) return;
+  if (w.tick - w.lastJailbreakTick < 90 * 60 * 4) return;
+  if (w.tick < 3 * TICKS_PER_HOUR) return;
+  if (keyedUnit(w.seed, "jailbreak", w.tick) > 0.0003) return;
+  const h = w.herder;
+  // Not while he is standing right there.
+  if (Math.hypot(h.x - map.pen.x, h.y - map.pen.y) < 6) return;
+  const penned = w.sheep.filter((s) => s.mode === "penned" && !s.black);
+  const s = penned[Math.floor(keyedUnit(w.seed, "jailbreak-who", w.tick) * penned.length)];
+  if (!s) return;
+  // Out through the gate and a little way off; it becomes notorious.
+  const gx = map.pen.x;
+  const gy = map.pen.y + 3;
+  s.mode = "loose";
+  s.x = gx;
+  s.y = gy;
+  s.tx = gx + (keyedUnit(w.seed, "jb-dx", w.tick) < 0.5 ? -4 : 4);
+  s.ty = gy + 3;
+  s.speed = 2.5;
+  s.homeX = Math.round(s.tx);
+  s.homeY = Math.round(s.ty);
+  s.flees++;
+  s.named = true;
+  w.sheepPenned--;
+  w.jailbreaks++;
+  w.lastJailbreakTick = w.tick;
+  w.stats.flees++;
+  addFrustration(w, 18);
+  pushEvent(w, { tick: w.tick, kind: "jailbreak", sheepId: s.id });
+}
+
 /** Advance the world by one tick. Mutates and returns the same object. */
 export function step(w: WorldState, map: GameMap): WorldState {
   w.tick++;
   w.frustration = clampFrustration(frustrationDrift(w.frustration, frustrationBaseline(w.tick / TICKS_PER_HOUR), TICK_SECONDS / 60));
   if (w.registers.length && w.tick % 40 === 0) w.registers = w.registers.filter((r) => r.untilTick > w.tick);
   stepWeather(w);
+  stepJailbreak(w, map);
   govern(w);
   stepSheep(w, map);
   stepHerder(w, map);

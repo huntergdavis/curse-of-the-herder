@@ -97,6 +97,22 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "idle", ["Spring. Everything is growing, including the distance between me and the sheep.", "Lambs, somewhere, are being sweet. These are not lambs. These are opinions with wool.", "The flowers are out. The sheep are eating them. Nature is a circle and I am walking round it."], { season: "spring", weight: 0.7 }),
   ...R(2, "idle", ["Summer. The sun is a cowpat in the sky and I am the boot.", "Hot. The sheep are wearing wool in this. By choice. I have questions.", "Midsummer, and the sheep have found the one patch of shade and are not sharing."], { season: "summer", weight: 0.7 }),
   ...R(4, "idle", ["#oath.cap#, the heat! I am a stew and the sheep are the dumplings and none of us asked to be lunch."], { season: "summer", weight: 0.7 }),
+  // Jailbreak. It was in. It was IN.
+  ...R(0, "jailbreak", ["IN. It was IN.", "Pen. Out. HOW.", "#swear.cap#! Out!", "No. No. NO."]),
+  ...R(2, "jailbreak", [
+    "It was in. It was IN THE PEN. I put it there. I watched it go in. And now it is over THERE.",
+    "#vocative.cap#, you were penned. Penned is a place. You cannot leave a place. That is what penned MEANS.",
+    "The fence is four feet high. The sheep is two feet high. Explain this to me, somebody. Anybody. #dog.cap#.",
+    "One got out. One got OUT. Sixty was bad enough when they were all going one way.",
+  ]),
+  ...R(4, "jailbreak", [
+    "#oath_phrase#! It has JUMPED THE FENCE! A sheep! The fence I built! For SHEEP!",
+    "#pantheon.cap#, I carried that one home on my own two shoulders and it has let itself out like a lodger.",
+    "#vocative.cap#! Back! You #intensifier# #adj# #insult#, you were FINISHED, you were DONE, you were IN!",
+  ]),
+  ...R(8, "jailbreak", ["It had been in. Now it was out. I had not thought a sheep could do that. I know better now, and it does not help."], { reg: ["hemingway"] }),
+  ...R(10, "jailbreak", ["Let the record reflect that the pen, which is a closed system, has produced an open sheep, and that the laws of the universe have been amended without consulting the herder."]),
+  ...R(11, "jailbreak", ["It was in the pen at three; / At half past it was running free; / I do not know the how or why; / I only know I want to cry."], { reg: ["verse"] }),
   // The scarecrow has the better job.
   ...R(0, "scarecrow", ["Scarecrow. Lucky.", "Stands. All day. Lucky.", "Hat. Nice hat."]),
   ...R(2, "scarecrow", ["The scarecrow has the better job. He stands in one place and nothing runs from him.", "Evening, scarecrow. No? Fine. You and the sheep can not-talk together.", "I envy the scarecrow. Nobody expects him to catch anything."]),

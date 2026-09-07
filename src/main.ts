@@ -290,6 +290,11 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "mishap" && e.detail === "wasp") s.renderer.dogReact("wasp", nowMs);
     if (e.kind === "mishap" && e.detail === "bite") s.renderer.dogReact("bite", nowMs);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.renderer.dogReact("flee", nowMs);
+    if (e.kind === "jailbreak") {
+      s.renderer.dogReact("flee", nowMs);
+      s.bubbles.emote(e.sheepId, "!", 3, nowMs);
+      toast(`<strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> has jumped the fence. It was in. It was <em>in</em>.`);
+    }
     if (e.kind === "bookFound") s.renderer.dogReact("book", nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
     if (e.kind === "bookFound") {

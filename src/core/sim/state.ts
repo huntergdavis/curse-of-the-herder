@@ -89,7 +89,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */
@@ -143,6 +143,8 @@ export interface WorldState {
   crookBroken: boolean;
   hadLunch: boolean;
   lastScarecrowTick: number;
+  lastJailbreakTick: number;
+  jailbreaks: number;
   /** Fog until this tick (0 = clear). */
   fogUntilTick: number;
   /** Wind until this tick (0 = still). */
@@ -335,6 +337,8 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     crookBroken: false,
     hadLunch: false,
     lastScarecrowTick: -100000,
+    lastJailbreakTick: -100000,
+    jailbreaks: 0,
     fogUntilTick: 0,
     windUntilTick: 0,
     readingList: [],
@@ -445,6 +449,8 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["crookBroken"] !== "boolean") o["crookBroken"] = false;
     if (typeof o["hadLunch"] !== "boolean") o["hadLunch"] = false;
     if (typeof o["lastScarecrowTick"] !== "number") o["lastScarecrowTick"] = -100000;
+    if (typeof o["lastJailbreakTick"] !== "number") o["lastJailbreakTick"] = -100000;
+    if (typeof o["jailbreaks"] !== "number") o["jailbreaks"] = 0;
     if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
     if (typeof o["windUntilTick"] !== "number") o["windUntilTick"] = 0;
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
