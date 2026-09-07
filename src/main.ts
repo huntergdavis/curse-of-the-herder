@@ -169,6 +169,7 @@ async function startSession(world: WorldState): Promise<void> {
     if (u) say(session, u.text, u.heat, u.seconds, performance.now(), true, u);
   };
   if (params.get("hat")) renderer.hatPeriod = 10;
+  if (params.get("wave")) renderer.forceWave = true;
   if (params.get("rest")) {
     // Screenshot hook: he sits down for a while, and the dog has an idea about a stick.
     const w = session.world;

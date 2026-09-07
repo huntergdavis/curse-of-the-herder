@@ -467,6 +467,8 @@ export class Renderer {
   wanted: string | null = null;
   /** Called when the wind takes the hat, so the herder can have words. */
   onHatLost: (() => void) | null = null;
+  /** Screenshot hook: hold the wave pose. */
+  forceWave = false;
   /** He has walked up to a cow; the caller may have him say something about it. */
   onCowNear: (() => void) | null = null;
   /** The hens have just scattered in front of him. */
@@ -1782,7 +1784,7 @@ export class Renderer {
       tired: Math.max(0, Math.min(1, (dayHour(world) - 14) / 4)),
       lantern: (this.hourOverride ?? dayHour(world)) > 17.9,
       resting: h.mode === "resting" || h.mode === "done",
-      wave: !!world.rival && Math.abs(world.rival.x - h.x) < 5 && Math.abs(world.rival.y - h.y) < 6 && h.carrying < 0 && h.mode !== "reading" && h.mode !== "mishap",
+      wave: this.forceWave || (!!world.rival && Math.abs(world.rival.x - h.x) < 5 && Math.abs(world.rival.y - h.y) < 6 && h.carrying < 0 && h.mode !== "reading" && h.mode !== "mishap"),
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",
     });
