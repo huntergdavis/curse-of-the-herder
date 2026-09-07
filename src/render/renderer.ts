@@ -533,6 +533,38 @@ export class Renderer {
       }
     }
 
+    // Hay in a corner of the pen, and a water trough.
+    {
+      const bx = sx(this.map.pen.x - 1 + 0.5);
+      const by = sy(this.map.pen.y - 1 + 0.5);
+      if (Math.abs(this.map.pen.x - cam.x) * T < W && Math.abs(this.map.pen.y - cam.y) * T < H) {
+        ctx.fillStyle = "#d9b25a";
+        ctx.strokeStyle = "#2b2620";
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        ctx.beginPath();
+        ctx.roundRect(bx - T * 0.35, by - T * 0.3, T * 0.5, T * 0.32, T * 0.05);
+        ctx.fill();
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(120, 90, 30, 0.6)";
+        ctx.beginPath();
+        for (let k = 0; k < 4; k++) {
+          ctx.moveTo(bx - T * 0.3 + k * T * 0.12, by - T * 0.28);
+          ctx.lineTo(bx - T * 0.27 + k * T * 0.12, by - T * 0.02);
+        }
+        ctx.stroke();
+        const tx = sx(this.map.pen.x + 1 + 0.5);
+        const ty = sy(this.map.pen.y + 1 + 0.5);
+        ctx.fillStyle = "#8a6238";
+        ctx.strokeStyle = "#2b2620";
+        ctx.beginPath();
+        ctx.roundRect(tx - T * 0.3, ty - T * 0.12, T * 0.6, T * 0.24, T * 0.04);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#4f8fc9";
+        ctx.fillRect(tx - T * 0.26, ty - T * 0.08, T * 0.52, T * 0.12);
+      }
+    }
+
     // The pen gate swings open as he arrives with a sheep.
     if (h.carrying >= 0 && Math.hypot(h.x - this.map.pen.x, h.y - (this.map.pen.y + 2)) < 3) {
       const gx = sx(this.map.pen.x + 0.5);
@@ -1005,6 +1037,8 @@ export class Renderer {
       windy: isWindy(world) && h.carrying < 0 && !reading,
       level: levelFor(erudition(world.booksRead, world.sheepPenned, hoursElapsed(world))),
       shouting: this.shoutingNow,
+      tired: Math.max(0, Math.min(1, (dayHour(world) - 14) / 4)),
+      lantern: (this.hourOverride ?? dayHour(world)) > 17.9,
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

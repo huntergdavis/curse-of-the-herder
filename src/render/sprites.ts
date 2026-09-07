@@ -124,6 +124,10 @@ export interface HerderPose {
   level?: number;
   /** Mid-shout: an open mouth. */
   shouting?: boolean;
+  /** 0..1 how late and tired: he stoops. */
+  tired?: number;
+  /** After sundown he carries a lantern in the crook hand. */
+  lantern?: boolean;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -156,7 +160,10 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
   ctx.lineWidth = Math.max(1, T * 0.05);
   ctx.strokeStyle = INK;
   const stride = p.walking ? Math.sin(p.phase * Math.PI * 2) : 0;
-  const bob = p.walking ? Math.abs(Math.cos(p.phase * Math.PI * 2)) * T * 0.05 : 0;
+  // Late in the day he stoops: the whole upper body drops and leans forward.
+  const stoop = (p.tired ?? 0) * T * 0.09;
+  ctx.translate(stoop * 0.6 * (p.facing === 2 ? -1 : 1) * 0, 0);
+  const bob = (p.walking ? Math.abs(Math.cos(p.phase * Math.PI * 2)) * T * 0.05 : 0) - stoop;
   // Shadow (drifts with the sun)
   ctx.fillStyle = "rgba(0,0,0,0.2)";
   ctx.beginPath();
@@ -255,6 +262,27 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(T * 0.3 + stride * T * 0.06, -T * 0.5 - bob);
   }
   ctx.stroke();
+  // A lantern after sundown, hung from the crook hand.
+  if (p.lantern && !p.carrying && !p.reading) {
+    const hx = T * 0.3 + stride * T * 0.06;
+    ctx.strokeStyle = "#3a2f2a";
+    ctx.lineWidth = Math.max(1, T * 0.03);
+    ctx.beginPath();
+    ctx.moveTo(hx, -T * 0.5 - bob);
+    ctx.lineTo(hx + T * 0.04, -T * 0.3 - bob);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255, 210, 120, 0.25)";
+    ctx.beginPath();
+    ctx.arc(hx + T * 0.04, -T * 0.18 - bob, T * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffd37a";
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, T * 0.04);
+    ctx.beginPath();
+    ctx.roundRect(hx - T * 0.04, -T * 0.3 - bob, T * 0.16, T * 0.2, T * 0.03);
+    ctx.fill();
+    ctx.stroke();
+  }
   // Crook (in the front hand when not carrying); leans on the ground while sitting. Half a crook after it breaks.
   if (!p.carrying && !p.reading && p.crookBroken) {
     ctx.strokeStyle = "#8a6238";
