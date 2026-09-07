@@ -207,13 +207,16 @@ async function startSession(world: WorldState): Promise<void> {
     }
   }
   if (params.get("rival")) {
+    // Screenshot hook: three seconds in, once he is walking, the neighbour appears ahead of him, coming the other way.
     const w = session.world;
-    const cx = Math.round(w.herder.x);
-    const ahead = w.herder.facing === 2 ? -1 : 1;
-    w.rival = { x: cx + ahead * 5, y: Math.round(w.herder.y) + 2, dx: -ahead * 0.16, ticksLeft: 138 };
-    // ?rival=3 makes this his third pass, so Also Prudence bolts halfway across.
-    const nth = Number(params.get("rival"));
-    if (nth > 1) w.rivalsSeen = nth - 1;
+    window.setTimeout(() => {
+      const cx = Math.round(w.herder.x);
+      const ahead = w.herder.facing === 2 ? -1 : 1;
+      w.rival = { x: cx + ahead * 6, y: Math.round(w.herder.y) + 2, dx: -ahead * 0.16, ticksLeft: 138 };
+      // ?rival=3 makes this his third pass, so Also Prudence bolts partway across.
+      const nth = Number(params.get("rival"));
+      if (nth > 1) w.rivalsSeen = nth - 1;
+    }, 3000);
   }
   const enemy = world.sheep.find((sh) => sh.nemesis);
   renderer.wanted = enemy ? sheepName(world.seed, enemy.id) : world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
