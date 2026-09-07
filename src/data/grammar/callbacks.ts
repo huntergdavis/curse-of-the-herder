@@ -177,6 +177,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "cow", ["#oath_phrase#, a cow, standing there with the confidence of a thing nobody has ever tried to carry.", "Do not look at me like that, you #adj# four-legged dairy, I know what you left on the path and so does my #body_part#."]),
   ...R(6, "cow", ["Observe the cow, #vocative#: large, slow, unhurried, and not once in its life mistaken for a rooftop ornament. Learn something."]),
   ...R(8, "cow", ["The cow looked at me. It had never been carried anywhere. I did not envy it. I did, a little."], { reg: ["hemingway"] }),
+  // The flyting: the sheep answers back, and he cannot let that stand.
+  ...R(2, "flytingReply", ["Did you just BAA at me? You BAA at me? I have a CROOK.", "Oh, it has opinions. It has a whole baa of opinions.", "Say that again. Go on. Say it to my face, which is right here, because I am CARRYING you."]),
+  ...R(4, "flytingReply", ["#oath_phrase#, it answers back! Sixty of you and this one has a MOUTH on it!", "A baa. A single baa, in reply to all that. Economical. Infuriating. #vocative#, I will have the last word if it takes all night."]),
+  ...R(6, "flytingReply", ["Was that a rebuttal? I have been rebutted by a #adj# sheep. Note the hour, #vocative#; I want it on the stone.", "Sirrah, thou baa-est at thy betters. I am thy better. It is a low bar and I am over it."]),
+  ...R(8, "flytingReply", ["It baa'd. I heard it. I did not have an answer ready. I have one now and it is too late."], { reg: ["hemingway"] }),
+  ...R(10, "flytingReply", ["A monosyllable, in reply to a paragraph. There is a lesson in that, #vocative#, and I refuse to learn it."]),
   // The old counting, as his grandfather did it.
   ...R(1, "penned", ["#yantancount.cap#. Old counting. Grandfather did it. Grandfather also miserable."], { weight: 0.5 }),
   ...R(2, "penned", ["#yantan.cap#. That is what the old shepherds would have called you, #vocative#. It means #penned#. It also means get IN.", "#yantancount.cap#. That is the old counting. My grandfather did it, and it did not make him any happier either."], { weight: 0.6 }),

@@ -476,13 +476,18 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "caught" && w.sheep[e.sheepId]?.named && u) {
       const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
       if (level >= 2) {
-        const salts = [101, 202];
+        // A duel in three beats: he insults it, it baas back, he cannot let that stand, it baas louder, he gets the last word.
         let at = nowMs + u.seconds * 1000 + 400;
-        for (const salt of salts) {
-          const line = speakForEvent(w, s.map, { ...e, kind: "repeatEscape", seq: e.seq * 10 + salt }, { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP);
+        const beats: { kind: "repeatEscape" | "flytingReply"; salt: number; heat: number; emote: string }[] = [
+          { kind: "repeatEscape", salt: 101, heat: 0.15, emote: "baa?" },
+          { kind: "flytingReply", salt: 303, heat: 0.25, emote: "BAA!" },
+          { kind: "repeatEscape", salt: 202, heat: 0.35, emote: "meh." },
+        ];
+        for (const b of beats) {
+          const line = speakForEvent(w, s.map, { ...e, kind: b.kind, seq: e.seq * 10 + b.salt }, { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP);
           if (!line) continue;
-          s.queue.push({ text: line.text, heat: Math.min(1, line.heat + (salt === 101 ? 0.15 : 0.3)), seconds: line.seconds, sheepId: e.sheepId, emote: salt === 101 ? "!" : "?!", atMs: at });
-          at += line.seconds * 1000 + 400;
+          s.queue.push({ text: line.text, heat: Math.min(1, line.heat + b.heat), seconds: line.seconds, sheepId: e.sheepId, emote: b.emote, atMs: at });
+          at += line.seconds * 1000 + 600;
         }
       }
     }
@@ -764,6 +769,7 @@ function onFinished(s: Session): void {
   const w = s.world;
   const epitaph = speakEpitaph(w, s.map, { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP);
   say(s, epitaph.text, 1, END_FADE_MS / 1000, performance.now(), true);
+  s.renderer.epitaph = { name: w.name, text: epitaph.text };
   s.finishedAtMs = performance.now();
   const vocabulary = grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP));
   const record = makeHallRecord(w, epitaph.text, vocabulary, signatureWord(w.seed), (id) => grammar.packEntries(id));

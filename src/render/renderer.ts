@@ -160,6 +160,7 @@ export class Renderer {
     this.lastRainTick = -1e9;
     this.lastHenTick = -1e9;
     this.finaleStartMs = -1;
+    this.epitaph = null;
     this.arrivals = [];
     this.stick.until = 0;
     this.stick.restKey = -1;
@@ -669,6 +670,8 @@ export class Renderer {
 
   /** Epitaph of the herder before this one, carved on a stone by the pen. */
   memorial: { name: string; epitaph: string } | null = null;
+  /** This herder's own last words, engraved on the stone that rises at the end of the day. */
+  epitaph: { name: string; text: string } | null = null;
 
   draw(world: WorldState, cam: Camera, bubbles: Bubbles, nowMs: number): void {
     const ctx = this.ctx;
@@ -1365,9 +1368,22 @@ export class Renderer {
       }
       const moving = s.mode === "loose" && (Math.abs(s.tx - s.x) > 1e-3 || Math.abs(s.ty - s.y) > 1e-3);
       const grazing = !moving && s.mode !== "carried" && Math.floor(nowMs / 1000 + s.id * 5) % 9 < 4;
-      const pose = s.mode === "penned" ? (world.finished ? "asleep" : grazing ? "graze" : "idle") : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : grazing && !s.absurd ? "graze" : "idle";
+      const dashing = moving && s.speed > 1.5;
+      const pose = s.mode === "penned" ? (world.finished ? "asleep" : grazing ? "graze" : "idle") : dashing ? "fled" : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : grazing && !s.absurd ? "graze" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
-      const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
+      // Legs keep time with the ground covered: a dawdle at 0.6 tiles/s, a blur at 2.5.
+      const walkPhase = moving ? (nowMs / Math.max(140, 700 / Math.max(0.4, s.speed)) + s.id * 0.13) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
+      // Dust behind a bolting sheep.
+      if (dashing && !this.reducedMotion) {
+        const back = facing === 0 ? -1 : 1;
+        for (let k = 0; k < 3; k++) {
+          const t = ((nowMs / 450 + k / 3 + s.id * 0.31) % 1);
+          ctx.fillStyle = `rgba(150, 130, 100, ${(0.35 * (1 - t)).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(sx(s.x + 0.5) + back * T * (0.35 + t * 0.6), sy(s.y + 0.95) - t * T * 0.2 - k * T * 0.03, T * (0.05 + t * 0.09), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
       // Spring: some sheep have a lamb at heel.
       if (this.season === "spring" && s.id % 5 === 0 && s.mode !== "carried") {
         const lx = sx(s.x + 0.5) - T * 0.45;
@@ -1552,33 +1568,83 @@ export class Renderer {
       }
     }
 
-    // The stone beside the pen, once the day is done.
-    if (world.finished) {
+    // The stone beside the pen, once the day is done: it rises out of the ground during the fade, with his last words on it.
+    if (world.finished && this.finaleStartMs >= 0) {
       const gx = sx(this.map.pen.x + 3.2);
       const gy = sy(this.map.pen.y + 0.9);
+      const rise = Math.max(0, Math.min(1, (nowMs - this.finaleStartMs - 1500) / 2600));
+      const eased = 1 - Math.pow(1 - rise, 3);
+      const hw = T * 0.44;
+      const height = T * 1.05;
       ctx.fillStyle = "rgba(0,0,0,0.2)";
       ctx.beginPath();
-      ctx.ellipse(gx, gy, T * 0.45, T * 0.12, 0, 0, Math.PI * 2);
+      ctx.ellipse(gx, gy, T * 0.5 * (0.4 + 0.6 * eased), T * 0.12, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#a9a59b";
-      ctx.strokeStyle = "#2b2620";
-      ctx.lineWidth = Math.max(1, T * 0.05);
+      // Dirt heaped either side while it comes up.
+      ctx.fillStyle = "#6b4a2b";
       ctx.beginPath();
-      ctx.moveTo(gx - T * 0.36, gy);
-      ctx.lineTo(gx - T * 0.36, gy - T * 0.7);
-      ctx.arc(gx, gy - T * 0.7, T * 0.36, Math.PI, 0);
-      ctx.lineTo(gx + T * 0.36, gy);
-      ctx.closePath();
+      ctx.ellipse(gx - hw * 0.9, gy + T * 0.02, T * 0.22, T * 0.07 * (0.3 + eased), 0, 0, Math.PI * 2);
+      ctx.ellipse(gx + hw * 0.9, gy + T * 0.02, T * 0.2, T * 0.06 * (0.3 + eased), 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.stroke();
-      ctx.strokeStyle = "rgba(43,38,32,0.45)";
-      ctx.lineWidth = Math.max(1, T * 0.035);
-      ctx.beginPath();
-      for (let k = 0; k < 3; k++) {
-        ctx.moveTo(gx - T * 0.2, gy - T * 0.55 + k * T * 0.14);
-        ctx.lineTo(gx + T * 0.2, gy - T * 0.55 + k * T * 0.14);
+      if (rise > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(gx - T, gy - T * 2, T * 2, T * 2); // only what is above ground shows
+        ctx.clip();
+        const dy = (1 - eased) * height; // still buried by this much
+        const shoulder = gy - T * 0.62 + dy;
+        const stone = (): void => {
+          ctx.beginPath();
+          ctx.moveTo(gx - hw, gy + dy + T * 0.2);
+          ctx.lineTo(gx - hw, shoulder);
+          ctx.arc(gx, shoulder, hw, Math.PI, 0);
+          ctx.lineTo(gx + hw, gy + dy + T * 0.2);
+          ctx.closePath();
+        };
+        ctx.fillStyle = "#a9a59b";
+        ctx.strokeStyle = "#2b2620";
+        ctx.lineWidth = Math.max(1, T * 0.05);
+        stone();
+        ctx.fill();
+        ctx.stroke();
+        if (this.epitaph && T >= 40) {
+          ctx.save();
+          stone();
+          ctx.clip();
+          ctx.fillStyle = "rgba(43,38,32,0.85)";
+          ctx.textAlign = "center";
+          const maxW = hw * 1.7;
+          ctx.font = `600 ${Math.max(6, T * 0.1)}px "Nunito", sans-serif`;
+          ctx.fillText("HERE LIES", gx, gy + dy - T * 0.92);
+          let nameSize = T * 0.13;
+          ctx.font = `600 ${nameSize}px "Nunito", sans-serif`;
+          while (nameSize > 6 && ctx.measureText(this.epitaph.name).width > maxW) {
+            nameSize -= 1;
+            ctx.font = `600 ${nameSize}px "Nunito", sans-serif`;
+          }
+          ctx.fillText(this.epitaph.name, gx, gy + dy - T * 0.76);
+          ctx.font = `${Math.max(7, T * 0.12)}px "Patrick Hand", cursive`;
+          const lines = fitLines(ctx, `“${this.epitaph.text}”`, maxW, 4);
+          let ly = gy + dy - T * 0.58;
+          for (const ln of lines) {
+            ctx.fillText(ln, gx, ly);
+            ly += T * 0.14;
+          }
+          ctx.textAlign = "left";
+          ctx.restore();
+        }
+        ctx.restore();
+        // Puffs of dust while it is still moving.
+        if (rise < 1 && !this.reducedMotion) {
+          for (let k = 0; k < 4; k++) {
+            const t = ((nowMs / 600 + k / 4) % 1);
+            ctx.fillStyle = `rgba(120, 95, 60, ${(0.35 * (1 - t) * (1 - rise)).toFixed(3)})`;
+            ctx.beginPath();
+            ctx.arc(gx + (k - 1.5) * T * 0.3, gy - t * T * 0.4, T * (0.06 + t * 0.1), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
       }
-      ctx.stroke();
     }
 
     // Emotes above sheep.
@@ -1945,7 +2011,8 @@ export class Renderer {
     const line = bubbles.herderLine();
     if (line) {
       const fontPx = Math.max(14 * this.dpr, Math.min(T * 0.42, 30 * this.dpr)) * this.fontScale;
-      drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * 1.45, line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT, highContrast: this.highContrast, highlight: this.signatureWord }, W, H);
+      // Anchor above the hat, higher still when a sheep is on his shoulders, so the bubble never covers either.
+      drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * (h.carrying >= 0 ? 1.95 : 1.55), line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT, highContrast: this.highContrast, highlight: this.signatureWord }, W, H);
     }
   }
 

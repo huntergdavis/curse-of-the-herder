@@ -79,6 +79,7 @@ long soak.
 - He waves back at the neighbour, stiffly, whenever he passes within five tiles and his hands are free (`?wave=1` holds the pose; `?rival=1` now spawns him three seconds in, within waving distance)
 - New book and register: *Three Men in a Boat* (Jerome K. Jerome, 1889, genuine excerpts) with a `jerome` pack of Victorian idler's outrage ("I like herding: it fascinates me. I can sit and look at a sheep for hours. It is the carrying I object to.")
 - Easter egg: *Crib Notes: Dungeon Crawler Carl* (a summary, no text quoted) with a `crawler` pack and register: "Goddamnit, Donut!" as his oath, unnamed sheep addressed as Donut while the register is hot, achievement announcements, a 🏆 toast on reading, and Donut and Mongo in the sheep-name pool
+- Speech bubbles never cover the herder or the sheep on his shoulders: the anchor sits higher (higher still when carrying), the jagged shout envelope is measured including its spikes, and a bubble too tall to fit above him shrinks its type instead of sliding down onto him
 - Visual nits: the level-6 quill (a cream stroke off the back of the head) and the book's white page edge are gone and the beard sits under the chin; every "…" indicator (addressed sheep, dog reactions, penned sheep, gossip, jailbreak plotting) is gone because text bubbles already carry the scene; the moon is a true crescent (one path) instead of a cream disc with a blue disc over it
 - Dog fixes: motion rates scale with the fast-forward factor and it snaps to heel if left more than a few tiles behind (it could not keep up at 100×); emote bubbles come from the head end on whichever side it faces (they were coming out of the wrong end when it faced left); the sprite has a snout and a floppy ear so it stops reading as a cat
 - Minimap reticle and look-around: the minimap shows the viewport as a reticle (gold while steering); click or hold-and-drag on it to look anywhere on the island; the view glides back to the herder two seconds after release. Playwright test covers it via `?debug=1`
@@ -104,14 +105,13 @@ long soak.
 - [x] Phones get the look-around: a Map button in the toolbar (narrow screens only) pops a 200 px minimap; drag on it to look, it glides back two seconds after release.
 - [ ] Read a full simulated day as a script once per release and cut the weakest templates.
 - [ ] Template audit: `self` target facet so "I am #adj#" only draws adjectives that fit a person.
-- [ ] Flyting as a real duel: escalating sheep emotes and the herder reacting (needs a new shape now the "…" indicator is gone).
-- [ ] Tombstone rises beside the pen in the world during the end fade.
-- [ ] Sheep walk animation while wandering; flee dash.
+- [x] Flyting as a real duel: when a notorious sheep is caught he insults it, it answers "baa?", he cannot let that stand ("Did you just BAA at me? I have a CROOK."), it answers "BAA!", he gets the last word, it says "meh."
+- [x] Tombstone rises out of the ground beside the pen during the end fade, dirt heaped either side, dust while it moves, HERE LIES, his name and his last words engraved (measured wrap).
+- [x] Sheep legs keep time with speed (a dawdle when wandering, a blur when bolting); bolting sheep use a stretched "fled" pose with dust behind them.
 
 ## P2 — Nice to have
 
-- [ ] README screenshots and a 20 s GIF of a late-day rant.
-- [ ] A second Jerome-style book for levels 7–8.
+- [ ] README screenshots refreshed and a 20 s GIF (P0 for 1.0).
 
 ## Decided
 

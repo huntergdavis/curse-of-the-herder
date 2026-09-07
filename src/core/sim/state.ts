@@ -95,7 +95,7 @@ export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak" | "streak" | "reread" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival" | "rivalGone" | "lunchStolen" | "thiefCaught" | "dogHelps" | "rivalBolt" | "drink";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts" | "gaze" | "mishap" | "curious" | "dozy" | "wind" | "windDrops" | "lunch" | "black" | "milestone" | "scarecrow" | "jailbreak" | "streak" | "reread" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival" | "rivalGone" | "lunchStolen" | "thiefCaught" | "dogHelps" | "rivalBolt" | "drink" | "flytingReply";
   sheepId: number;
   bookId?: string;
   /** For mishaps: bog | nettles | stub | cowpat | wasp | bite | gate | molehill */

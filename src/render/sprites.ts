@@ -25,11 +25,11 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
   ctx.beginPath();
   ctx.ellipse(shadowSkew * T * flip, T * 0.32, T * (0.36 + Math.abs(shadowSkew) * 0.3), T * 0.12, 0, 0, Math.PI * 2);
   ctx.fill();
-  const bob = pose === "walk" ? Math.sin(phase * Math.PI * 2) * T * 0.04 : 0;
+  const bob = pose === "walk" ? Math.sin(phase * Math.PI * 2) * T * 0.04 : pose === "fled" ? Math.abs(Math.sin(phase * Math.PI * 2)) * T * 0.09 : 0;
   // Legs
   ctx.strokeStyle = "#3a2f2a";
   ctx.lineWidth = Math.max(1.5, T * 0.08);
-  const legSwing = pose === "walk" ? Math.sin(phase * Math.PI * 2) * T * 0.08 : 0;
+  const legSwing = pose === "walk" ? Math.sin(phase * Math.PI * 2) * T * 0.08 : pose === "fled" ? Math.sin(phase * Math.PI * 2) * T * 0.16 : 0;
   ctx.beginPath();
   for (const [lx, s] of [[-0.18, 1], [0.18, -1], [-0.08, -1], [0.08, 1]] as const) {
     ctx.moveTo(lx * T, T * 0.12 + bob);
@@ -445,26 +445,42 @@ export interface BubbleStyle {
 export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontPx: number, style: BubbleStyle, canvasW: number, canvasH: number): void {
   // Verse uses " / " as a hard line break and is centred; prose wraps.
   const verse = text.includes(" / ");
-  const lines = verse ? text.split(" / ").flatMap((l) => wrapText(l, 44)) : wrapText(text, 40);
+  const jagged = style.heat > 0.85;
+  // Lay the bubble out; if the whole envelope (spikes included) cannot sit above the anchor, shrink the type until it can,
+  // so a long shout never sits on top of the herder or the sheep on his shoulders.
+  const layout = (fp: number): { lines: string[]; bw: number; bh: number; extra: number; lineH: number } => {
+    const ls = verse ? text.split(" / ").flatMap((l) => wrapText(l, 44)) : wrapText(text, 40);
+    ctx.font = `${fp}px ${style.font}`;
+    const lh = fp * 1.22;
+    let ww = 0;
+    for (const l of ls) ww = Math.max(ww, ctx.measureText(l).width);
+    const bwid = ww + fp * 0.8 * 2;
+    const bhgt = ls.length * lh + fp * 0.55 * 2;
+    // The jagged shout envelope reaches beyond the text box by this much above and below.
+    const ex = jagged ? bhgt / 2 + Math.hypot(bwid / 2, bhgt / 2) * 0.28 + fp * 0.2 + fp * 0.8 - bhgt / 2 : 0;
+    return { lines: ls, bw: bwid, bh: bhgt, extra: ex, lineH: lh };
+  };
+  let lay = layout(fontPx);
+  while (fontPx > 10 && ty - fontPx * 1.1 - lay.extra - lay.bh - lay.extra < 8) {
+    fontPx -= 1;
+    lay = layout(fontPx);
+  }
+  const { lines, bw, bh, extra, lineH } = lay;
   ctx.font = `${fontPx}px ${style.font}`;
-  const lineH = fontPx * 1.22;
-  let w = 0;
-  for (const l of lines) w = Math.max(w, ctx.measureText(l).width);
   const padX = fontPx * 0.8;
   const padY = fontPx * 0.55;
-  const bw = w + padX * 2;
-  const bh = lines.length * lineH + padY * 2;
   let bx = tx - bw / 2;
-  let by = ty - bh - fontPx * 1.1;
+  // Box bottom sits a tail's length above the anchor, with the spike overhang accounted for.
+  let by = ty - bh - fontPx * 1.1 - extra;
   bx = Math.max(8, Math.min(canvasW - bw - 8, bx));
-  by = Math.max(8, Math.min(canvasH - bh - 8, by));
+  by = Math.max(8 + extra, Math.min(canvasH - bh - 8 - extra, by));
   ctx.save();
   ctx.lineWidth = Math.max(1.5, fontPx * (0.08 + style.heat * 0.08)) * (style.highContrast ? 1.6 : 1);
   ctx.strokeStyle = style.highContrast ? "#000000" : INK;
   ctx.fillStyle = style.highContrast ? "#ffffff" : style.heat > 0.75 ? "#ffe9dc" : style.heat > 0.45 ? "#fff6e6" : "#fffdf5";
   ctx.beginPath();
   let tailBaseY = by + bh;
-  if (style.heat > 0.85) {
+  if (jagged) {
     // Jagged shout bubble: the inner envelope must clear the text box's corners.
     const spikes = 18;
     const baseRx = Math.hypot(bw / 2, bh / 2) * 0.92 + fontPx * 0.2;
