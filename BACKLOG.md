@@ -46,6 +46,7 @@ long soak.
 - Villagers answer back, dog thoughts, dawn forecast, anatomy and fungi books, cloud shadows, book ban-list test
 - Delighters round: arrival hop and cheer, dog at his feet at the end, shooting stars, shouting mouth, signature word in red, gossiping sheep, frogs, dusk hedgehog, swinging gate
 - Tired stoop, dusk lantern, hay and trough in the pen
+- Scarecrows with remarks, owls, ducklings, grazing sheep, jumping fish, rabbits that bolt, vocabulary pop
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

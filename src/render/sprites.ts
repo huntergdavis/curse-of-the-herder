@@ -8,7 +8,7 @@ export function setShadowSkew(v: number): void {
   shadowSkew = v;
 }
 
-export type SheepPose = "idle" | "walk" | "carried" | "asleep" | "fled";
+export type SheepPose = "idle" | "walk" | "carried" | "asleep" | "fled" | "graze";
 
 /** Draw a sheep centred at (x, y) with body width ~T. `phase` 0..1 animates. */
 export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: SheepPose, facing: number, phase: number, named: boolean, crowned = false, black = false): void {
@@ -49,15 +49,16 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
     ctx.arc(bx * T, by * T + bob, br * T, 0, Math.PI * 2);
     ctx.fill();
   }
-  // Head
+  // Head (lowered to the grass when grazing)
+  const headDrop = pose === "graze" ? T * 0.16 : 0;
   ctx.fillStyle = face;
   ctx.beginPath();
-  ctx.ellipse(T * 0.36, -T * 0.02 + bob, T * 0.16, T * 0.14, 0, 0, Math.PI * 2);
+  ctx.ellipse(T * 0.36, -T * 0.02 + bob + headDrop, T * 0.16, T * 0.14, pose === "graze" ? 0.5 : 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   // Ear
   ctx.beginPath();
-  ctx.ellipse(T * 0.3, -T * 0.14 + bob, T * 0.08, T * 0.04, -0.5, 0, Math.PI * 2);
+  ctx.ellipse(T * 0.3, -T * 0.14 + bob + headDrop, T * 0.08, T * 0.04, -0.5, 0, Math.PI * 2);
   ctx.fill();
   // Eye
   if (pose === "asleep") {
@@ -67,13 +68,13 @@ export function drawSheep(ctx: Ctx, x: number, y: number, T: number, pose: Sheep
     ctx.lineTo(T * 0.44, -T * 0.04 + bob);
     ctx.stroke();
   } else {
-    ctx.fillStyle = black ? "#f6f2e6" : "#f6f2e6";
+    ctx.fillStyle = "#f6f2e6";
     ctx.beginPath();
-    ctx.arc(T * 0.4, -T * 0.05 + bob, T * 0.045, 0, Math.PI * 2);
+    ctx.arc(T * 0.4, -T * 0.05 + bob + headDrop, T * 0.045, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = INK;
     ctx.beginPath();
-    ctx.arc(T * 0.415, -T * 0.05 + bob, T * 0.02, 0, Math.PI * 2);
+    ctx.arc(T * 0.415, -T * 0.05 + bob + headDrop, T * 0.02, 0, Math.PI * 2);
     ctx.fill();
   }
   if (crowned) {

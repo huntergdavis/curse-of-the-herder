@@ -376,6 +376,48 @@ export class Renderer {
             if (Math.floor(nowMs / 1000 + x) % 17 === 0) drawEmote(ctx, fx + T * 0.25, fy - T * 0.4, T * 0.6, "ribbit");
             continue;
           }
+          if (t === Terrain.Water && ((x * 41 + y * 67) % 131) === 9) {
+            // A fish jumps now and then: a small arc and a splash ring.
+            const cycle = (nowMs / 1000 + x) % 11;
+            if (cycle < 0.8) {
+              const k = cycle / 0.8;
+              const fx = sx(x + 0.5) + (k - 0.5) * T * 0.5;
+              const fy = sy(y + 0.5) - Math.sin(k * Math.PI) * T * 0.45;
+              ctx.fillStyle = "#8fb9d9";
+              ctx.beginPath();
+              ctx.ellipse(fx, fy, T * 0.09, T * 0.045, (k - 0.5) * 1.6, 0, Math.PI * 2);
+              ctx.fill();
+            } else if (cycle < 1.8) {
+              const r = (cycle - 0.8) / 1.0;
+              ctx.strokeStyle = `rgba(255,255,255,${(0.5 * (1 - r)).toFixed(3)})`;
+              ctx.lineWidth = Math.max(1, T * 0.03);
+              ctx.beginPath();
+              ctx.ellipse(sx(x + 0.5) + T * 0.25, sy(y + 0.5), T * (0.1 + r * 0.3), T * (0.05 + r * 0.14), 0, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+            continue;
+          }
+          if (this.map.deco[i] === Deco.Tuft && ((x * 19 + y * 23) % 29) === 5) {
+            // Rabbits sit by the tufts and bolt when he comes near.
+            const near = Math.hypot(x - h.x, y - h.y) < 3.5;
+            if (near) continue;
+            const rx = sx(x + 0.5) + T * 0.3;
+            const ry = sy(y + 0.55);
+            const twitch = Math.floor(nowMs / 400 + x) % 5 === 0 ? T * 0.01 : 0;
+            ctx.fillStyle = "#a08868";
+            ctx.beginPath();
+            ctx.ellipse(rx, ry, T * 0.1, T * 0.08, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(rx - T * 0.03, ry - T * 0.16 + twitch, T * 0.02, T * 0.07, -0.2, 0, Math.PI * 2);
+            ctx.ellipse(rx + T * 0.03, ry - T * 0.16 - twitch, T * 0.02, T * 0.07, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#f4f1e6";
+            ctx.beginPath();
+            ctx.arc(rx - T * 0.09, ry + T * 0.01, T * 0.025, 0, Math.PI * 2);
+            ctx.fill();
+            continue;
+          }
           if (t === Terrain.Water) {
             if (((x * 73 + y * 151) % 97) !== 3) continue; // roughly one duck per hundred water tiles
             const a = nowMs / 4000 + x;
@@ -636,7 +678,8 @@ export class Renderer {
         herderDrawn = true;
       }
       const moving = s.mode === "loose" && (Math.abs(s.tx - s.x) > 1e-3 || Math.abs(s.ty - s.y) > 1e-3);
-      const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : "idle";
+      const grazing = !moving && s.mode !== "carried" && Math.floor(nowMs / 1000 + s.id * 5) % 9 < 4;
+      const pose = s.mode === "penned" ? (world.finished ? "asleep" : grazing ? "graze" : "idle") : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : grazing && !s.absurd ? "graze" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
       // A newly penned sheep hops for a second; its neighbours in the pen cheer.
