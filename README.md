@@ -86,9 +86,16 @@ in-game titles to real public-domain sources is in
 - **Rendering.** Plain Canvas2D: procedural blob-autotiled terrain in a
   chunk cache, procedural sheep and herder sprites, a following camera,
   day tint from dawn to dusk, rain, speech bubbles, wordless sheep emotes.
+- **Life on the map.** Villagers by the wells who gasp and answer back
+  ("Language!"), washing lines, roof cats, chimney smoke, scarecrows he
+  envies, ducks with ducklings, frogs, fish, rabbits that bolt, owls and
+  a hedgehog at dusk, butterflies, birds, cloud shadows, rainbows,
+  fireflies, shooting stars and a moon.
 - **Persistence.** IndexedDB. Start a new herder whenever; load any
   herder in progress; the Hall of Herders keeps every retired one with
-  his epitaph, vocabulary size and longest outburst.
+  his epitaph, reading list, favourite word, sheep of the day, the
+  highlights of his day, and his dog; an Almanac at the top of the Hall
+  finds patterns across all of them.
 
 ## Documents
 

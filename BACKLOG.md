@@ -48,6 +48,7 @@ long soak.
 - Tired stoop, dusk lantern, hay and trough in the pen
 - Scarecrows with remarks, owls, ducklings, grazing sheep, jumping fish, rabbits that bolt, vocabulary pop
 - Hall Almanac across herders, Marryat line, washing lines, roof cats, village bell
+- Highlights of the day on cards, milestone cheers
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
