@@ -29,6 +29,8 @@ export interface HallRecord {
   signatureWord: string;
   dogName?: string | undefined;
   jailbreaks?: number | undefined;
+  /** Times the neighbour strolled past with his tidy flock. */
+  rivalsSeen?: number | undefined;
   /** The sheep with the most escapes, if any escaped twice or more. */
   sheepOfTheDay?: { name: string; flees: number } | undefined;
   /** The sheep he declared his personal enemy, if any earned it. */
@@ -83,6 +85,7 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     signatureWord,
     dogName: dogName(w.seed),
     jailbreaks: w.jailbreaks,
+    rivalsSeen: w.rivalsSeen,
     sheepOfTheDay: (() => {
       const top = [...w.sheep].sort((a, b) => b.flees - a.flees)[0];
       return top && top.flees >= 2 ? { name: sheepName(w.seed, top.id), flees: top.flees } : undefined;
