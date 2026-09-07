@@ -258,7 +258,7 @@ export const legal: LexPack = {
     adj("inadmissible", { reg: ["legal"] }), adj("actionable", { reg: ["legal"] }), adj("hereby dismissed", { reg: ["legal"] }),
     abs("liability"), abs("negligence"), abs("contempt"), abs("malfeasance"), abs("misadventure"), abs("prior notice"),
     oath("objection", 0, { reg: ["legal"] }), oath("overruled", 0, { reg: ["legal"] }), oath("I rest my case", 0, { reg: ["legal"] }), oath("case dismissed", 0, { reg: ["legal"] }),
-    threat("serve you with papers"), threat("read you your rights, all of which you have forfeited"), threat("enter you into evidence"), threat("find against you, with costs"),
+    { w: "serve you with papers", pos: "threat", band: 0, level: 0, reg: ["legal"] }, { w: "read you your rights, all of which you have forfeited", pos: "threat", band: 0, level: 0, reg: ["legal"] }, { w: "enter you into evidence", pos: "threat", band: 0, level: 0, reg: ["legal"] }, { w: "find against you, with costs", pos: "threat", band: 0, level: 0, reg: ["legal"] },
   ],
 };
 
@@ -270,10 +270,10 @@ export const knitting: LexPack = {
   reviewedAt: "2026-09-07",
   level: 3,
   entries: [
-    threat("knit you into a cardigan for a man I do not like"), threat("make you into a tea cosy"), threat("turn you into bed socks for a very cold widow"),
-    threat("card you, spin you and knit you into something regrettable"), threat("make you into a bobble hat and wear you to market"), threat("unravel you and start again"),
-    threat("knit you into a scarf so long it goes twice round the hill"), threat("purl you"), threat("make you into oven gloves"), threat("darn you"),
-    threat("make you a jumper and give it to the dog"), threat("knit you a jumper and make you wear it"),
+    { w: "knit you into a cardigan for a man I do not like", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "make you into a tea cosy", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "turn you into bed socks for a very cold widow", pos: "threat", band: 0, level: 0, reg: ["knitting"] },
+    { w: "card you, spin you and knit you into something regrettable", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "make you into a bobble hat and wear you to market", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "unravel you and start again", pos: "threat", band: 0, level: 0, reg: ["knitting"] },
+    { w: "knit you into a scarf so long it goes twice round the hill", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "purl you", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "make you into oven gloves", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "darn you", pos: "threat", band: 0, level: 0, reg: ["knitting"] },
+    { w: "make you a jumper and give it to the dog", pos: "threat", band: 0, level: 0, reg: ["knitting"] }, { w: "knit you a jumper and make you wear it", pos: "threat", band: 0, level: 0, reg: ["knitting"] },
     ins("ball of wool", { reg: ["knitting"] }), ins("dropped stitch", { reg: ["knitting"] }), ins("tangle", { reg: ["knitting"] }), ins("unfinished jumper", { reg: ["knitting"] }),
     ins("bobble", { reg: ["knitting"] }), ins("tea cosy", { reg: ["knitting"] }), ins("skein of trouble", { reg: ["knitting"] }), ins("moth-bait", { reg: ["knitting"] }),
     adj("knotted", { reg: ["knitting"] }), adj("frayed", { reg: ["knitting"] }), adj("unravelled", { reg: ["knitting"] }), adj("felted", { reg: ["knitting"] }),

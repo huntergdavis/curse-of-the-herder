@@ -111,6 +111,7 @@ export class Grammar {
       const rule = this.pickRule(candidates, ctx, rnd);
       this.usedThisLine = [];
       this.allitLetter = null;
+      this.currentRuleReg = rule.reg ?? [];
       const raw = this.expand(rule.template, ctx, rnd, 0, 4);
       if (raw === null) continue;
       let text = tidySentence(raw);
@@ -129,6 +130,8 @@ export class Grammar {
   }
 
   private usedThisLine: string[] = [];
+  /** Registers of the rule being expanded, for `.own` slots that must draw from the rule's own register. */
+  private currentRuleReg: string[] = [];
   /** First letter chosen by the first `.allit` slot in the current line; later `.allit` slots match it. */
   private allitLetter: string | null = null;
 
@@ -166,19 +169,20 @@ export class Grammar {
         return "";
       }
       const wantAllit = mods.includes(".allit");
+      const wantOwn = mods.includes(".own");
       const sylMatch = /\.syl(\d)/.exec(mods);
       const wantSyl = sylMatch ? Number(sylMatch[1]) : 0;
-      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit, wantSyl);
+      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit, wantSyl, wantOwn);
       if (value === null) {
         failed = true;
         return "";
       }
-      return applyModifiers(value.text, mods.replace(".allit", "").replace(/\.syl\d/, ""), value.entry);
+      return applyModifiers(value.text, mods.replace(".allit", "").replace(".own", "").replace(/\.syl\d/, ""), value.entry);
     });
     return failed ? null : out;
   }
 
-  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false, syl = 0): { text: string; entry?: LexEntry } | null {
+  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false, syl = 0, own = false): { text: string; entry?: LexEntry } | null {
     const contextual = contextSymbol(symbol, ctx, rnd);
     if (contextual !== null) return { text: contextual };
     const nt = this.nonTerminals.get(symbol);
@@ -208,6 +212,11 @@ export class Grammar {
     if (POS_SET.has(symbol as Pos)) {
       let pool = (this.byPos.get(symbol) ?? []).filter((e) => this.entryAllowed(e, ctx, cap));
       if (pool.length === 0) return null;
+      if (own && this.currentRuleReg.length) {
+        const mine = pool.filter((e) => e.reg?.some((r) => this.currentRuleReg.includes(r)));
+        if (mine.length === 0) return null;
+        pool = mine;
+      }
       if (allit && this.allitLetter) {
         const letter = this.allitLetter;
         const matching = pool.filter((e) => e.w[0]?.toLowerCase() === letter);
