@@ -810,6 +810,7 @@ export class Renderer {
       phase: walking ? (nowMs / (stomping ? 300 : 420)) % 1 : phase,
       fury: h.mode === "ranting" || mishap ? 1 : world.frustration / 100,
       ranting: h.mode === "ranting" || nearMemorial,
+      crookBroken: world.crookBroken,
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

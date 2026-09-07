@@ -114,6 +114,8 @@ export interface HerderPose {
   bookColour?: string;
   /** Mid-rant: the hat leaves his head. */
   ranting?: boolean;
+  /** The crook is in two pieces since this afternoon. */
+  crookBroken?: boolean;
 }
 
 /** Draw the herder with feet at (x, y). Height ~1.4 T. */
@@ -223,8 +225,16 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(T * 0.3 + stride * T * 0.06, -T * 0.5 - bob);
   }
   ctx.stroke();
-  // Crook (in the front hand when not carrying); leans on the ground while sitting.
-  if (!p.carrying && !p.reading) {
+  // Crook (in the front hand when not carrying); leans on the ground while sitting. Half a crook after it breaks.
+  if (!p.carrying && !p.reading && p.crookBroken) {
+    ctx.strokeStyle = "#8a6238";
+    ctx.lineWidth = Math.max(1.5, T * 0.06);
+    ctx.beginPath();
+    const hx = T * 0.3 + stride * T * 0.06;
+    ctx.moveTo(hx, -T * 0.4 - bob);
+    ctx.lineTo(hx + T * 0.04, -T * 0.95 - bob);
+    ctx.stroke();
+  } else if (!p.carrying && !p.reading) {
     ctx.strokeStyle = "#8a6238";
     ctx.lineWidth = Math.max(1.5, T * 0.06);
     ctx.beginPath();

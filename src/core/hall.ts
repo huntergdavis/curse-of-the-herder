@@ -3,7 +3,7 @@ import { fnv1a } from "./rng";
 import { LEVEL_NAMES, erudition, levelFor } from "./progression";
 import { dayHour, hoursElapsed, type WorldState } from "./sim/state";
 import { BOOK_BY_ID } from "../data/books";
-import { dogName } from "./names";
+import { dogName, sheepName } from "./names";
 import type { LexEntry } from "./lang/types";
 
 export const HALL_SCHEMA = 1;
@@ -28,6 +28,8 @@ export interface HallRecord {
   epitaph: string;
   signatureWord: string;
   dogName?: string | undefined;
+  /** The sheep with the most escapes, if any escaped twice or more. */
+  sheepOfTheDay?: { name: string; flees: number } | undefined;
   /** Most-used lexicon word and its favourite target. */
   favouriteWord?: { w: string; n: number; mostly: string } | undefined;
   /** What he read, in order, and a taste of what each book gave him. */
@@ -73,6 +75,10 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     epitaph,
     signatureWord,
     dogName: dogName(w.seed),
+    sheepOfTheDay: (() => {
+      const top = [...w.sheep].sort((a, b) => b.flees - a.flees)[0];
+      return top && top.flees >= 2 ? { name: sheepName(w.seed, top.id), flees: top.flees } : undefined;
+    })(),
     favouriteWord: (() => {
       const top = Object.entries(w.wordUse).sort((a, b) => b[1].n - a[1].n)[0];
       if (!top || top[1].n < 2) return undefined;

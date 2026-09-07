@@ -453,6 +453,12 @@ function stepHerder(w: WorldState, map: GameMap): void {
     h.lastTileY = ty;
     // The walk of shame: past the pen with nothing to show for it.
     h.tripTiles++;
+    // Once a day, somewhere after lunch, the crook gives up.
+    if (!w.crookBroken && w.tick > 5 * TICKS_PER_HOUR && h.carrying < 0 && w.tick - w.lastMishapTick > MISHAP_COOLDOWN && keyedUnit(w.seed, "crook", w.tick) < 0.0015) {
+      w.crookBroken = true;
+      startMishap(w, "crook", 22, 14);
+      return;
+    }
     // The countryside has opinions too.
     if (w.tick - w.lastMishapTick > MISHAP_COOLDOWN) {
       const t = map.terrain[ty * map.size + tx]!;

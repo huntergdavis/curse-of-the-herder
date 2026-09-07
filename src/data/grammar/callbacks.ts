@@ -82,6 +82,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // The crook breaks. Once. It is a whole thing.
+  ...R(0, "crook", ["Crook. Broke.", "No. No no. Crook.", "#swear.cap#. Stick. Broke."]),
+  ...R(2, "crook", ["My crook. My CROOK. Twenty years, and it snaps on a Tuesday, on a hill, for nothing.", "The crook has broken. I now have two sticks and no crook. This is not an improvement.", "#oath.cap#. That crook was my grandfather's. He would have snapped it too, to be fair."]),
+  ...R(4, "crook", ["#oath_phrase#! The crook! The one #adj# thing in this valley that was on MY side!", "#pantheon.cap#, receive this crook. It served. It snapped. It is more than can be said for the sheep."]),
+  ...R(8, "crook", ["The crook broke. It had been a good crook. I held the two pieces and they were two pieces."], { reg: ["hemingway"] }),
+  ...R(10, "crook", ["Let it be entered in the ledger of this most #adj# afternoon that the crook, faithful through #penned# sheep, chose this moment, this hill, and this herder, to become firewood."]),
   // Temperaments: the stubborn heave, the curious one, the dozy one.
   ...R(0, "heave", ["Hnngh.", "Up. UP.", "#oath.cap#. Heavy.", "Hnngh! Hnngh!"]),
   ...R(2, "heave", ["Hnngh. You are heavier than you look. You look heavy.", "Up you come. No? Up you— #oath#, sheep, WORK with me.", "Are you holding on to the ground? You are holding on to the ground."]),

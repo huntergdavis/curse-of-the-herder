@@ -134,6 +134,7 @@ export interface WorldState {
   lastRantTick: number;
   lastGazeTick: number;
   lastMishapTick: number;
+  crookBroken: boolean;
   /** Fog until this tick (0 = clear). */
   fogUntilTick: number;
   /** Books finished today, in order. */
@@ -294,6 +295,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     lastRantTick: -100000,
     lastGazeTick: -100000,
     lastMishapTick: -100000,
+    crookBroken: false,
     fogUntilTick: 0,
     readingList: [],
     wordUse: {},
@@ -395,6 +397,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["lastRantTick"] !== "number") o["lastRantTick"] = -100000;
     if (typeof o["lastGazeTick"] !== "number") o["lastGazeTick"] = -100000;
     if (typeof o["lastMishapTick"] !== "number") o["lastMishapTick"] = -100000;
+    if (typeof o["crookBroken"] !== "boolean") o["crookBroken"] = false;
     if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["wordUse"] || typeof o["wordUse"] !== "object") o["wordUse"] = {};
