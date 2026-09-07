@@ -133,7 +133,7 @@ export const RULES_5_8: Rule[] = [
     "I would thou wert more #adj#, that I might curse thee the more.", "#oath.cap#, what #insult# is this that stands before me, #adj# and #adj#?",
     "Thou #insult#, thou #insult#, thou #intensifier# #adj# #insult#, get thee to #noun.a#!", "#bard_clause.cap#; I have said it, and I shall say it again to the #target#.",
     "Marry, #vocative#, thou art as #adj# as #simile#, and the day is #adj# with thee.", "What #abstract# is this, that I should #verb# #remaining# sheep #time#?",
-    "#oath.cap#! Get thee to #noun.a#, #bard_np#.", "Thou #adj# #insult#, thy wool is #adj# and thy purpose #adj#er still.",
+    "#oath.cap#! Get thee to #noun.a#, #bard_np#.", "Thou #adj# #insult#, thy wool is #adj# and thy purpose more #adj# still.",
     "Peace, #target#! Thou art #adj#, and I would have quiet from thee.", "I do beshrew this #target#, and this #noun#, and thee, #bard_np#.",
     "Hear me, ye #noun.pl#: #bard_clause#, and I am past caring.", "#bard_np.cap#, thou wert made of #abstract# and left out in the rain.",
     "Sirrah #target#, I have carried #penned# of thy kind, and each was more #adj# than the last.", "Fie! #bard_clause.cap#! Fie again!",
@@ -162,9 +162,9 @@ export const RULES_5_8: Rule[] = [
   ...R(6, "dusk", ["The light doth fail, and #remaining# sheep do not.", "Dusk, #oath#, and I am #selfadj# as #simile#."], BARD),
   ...R(6, "breather", ["I sit. #oath.cap#, mine #bodypart# thank me; the #target# does not.", "A moment's rest, ere I #verb# again into #abstract#."], BARD),
   ...R(6, "walkOfShame", ["Past the pen, empty-handed, like #simile#. Look not upon me, #insult.pl#.", "#oath.cap#, I pass mine own pen with nothing. The sheep within do smirk."], BARD),
-  ...R(6, "rain", ["Rain! #oath.cap#, the heavens are #adj# too!", "It rains, and I am #selfadj#, and the #target# is #adj#er."], BARD),
+  ...R(6, "rain", ["Rain! #oath.cap#, the heavens are #adj# too!", "It rains, and I am #selfadj#, and the #target# is more #adj#."], BARD),
   ...R(6, "finished", ["#oath.cap#. All in. #penned.cap# sheep, and I, #adj# as #simile#, am done.", "The last is penned. Fie upon this day, and good night."], BARD),
-  ...R(6, "epitaph", ["#bard_np.cap#.", "Get thee to #noun.a#.", "#oath.cap#, and so to bed.", "He was #adj#. They were #adj#er.", "Exit, pursued by sheep."], { ...BARD, maxChars: 80 }),
+  ...R(6, "epitaph", ["#bard_np.cap#.", "Get thee to #noun.a#.", "#oath.cap#, and so to bed.", "He was #adj#. They were more #adj#.", "Exit, pursued by sheep."], { ...BARD, maxChars: 80 }),
 
   // ---------------------------------------------------------------- Tier 7: Polyglot
   ...R(7, "idle", [

@@ -82,6 +82,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // Lunch.
+  ...R(0, "lunch", ["Bread.", "Sit. Eat.", "Cheese. Good.", "Lunch. Finally."]),
+  ...R(2, "lunch", ["Bread. Cheese. A stump. For ten minutes, no sheep. This is the whole of my religion.", "Lunch. #dog.cap# has noticed. #dog.cap# has done nothing all day and has noticed lunch.", "The bread is hard. The cheese is harder. I have never been happier."]),
+  ...R(4, "lunch", ["#pantheon.cap#, bread. Plain bread. It has not run from me. It has not bitten me. I love it.", "Sit, #dog#. No. That is my cheese. You herd nothing and you want my cheese."]),
+  ...R(8, "lunch", ["I sat down and ate the bread. The dog watched the bread. Neither of us watched the sheep. It was the best part of the day."], { reg: ["hemingway"] }),
+  ...R(10, "lunch", ["Let the ledger record a brief intermission, in which a herder, a heel of bread, and a wedge of something that had once been cheese achieved a perfect and temporary understanding."]),
   // Wind.
   ...R(0, "wind", ["Wind.", "Hat! Hat!", "#oath.cap#. Wind.", "Windy. Wool everywhere."]),
   ...R(2, "wind", ["The wind is up. My hat has opinions about that.", "Wind. Now the sheep smell reaches me before the sheep do.", "#oath.cap#, hold on to your hats. I have one hat. I am holding on to it."]),

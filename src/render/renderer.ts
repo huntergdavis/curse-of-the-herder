@@ -822,6 +822,25 @@ export class Renderer {
       this.ctx.ellipse(sx(h.x + 0.5) - T * 0.1, sy(h.y + 0.95) + T * 0.05, T * 0.32, T * 0.12, 0, 0, Math.PI * 2);
       this.ctx.fill();
     }
+    const lunching = h.mode === "resting" && world.hadLunch && dayHour(world) >= 12.5 && dayHour(world) < 13.2 && !world.finished;
+    if (lunching) {
+      // A heel of bread and a wedge of cheese on a cloth beside him.
+      const bx = sx(h.x + 0.5) + T * 0.55;
+      const by = sy(h.y + 0.95) - T * 0.05;
+      this.ctx.fillStyle = "#f4f1e6";
+      this.ctx.fillRect(bx - T * 0.22, by - T * 0.12, T * 0.44, T * 0.16);
+      this.ctx.fillStyle = "#c9944a";
+      this.ctx.beginPath();
+      this.ctx.ellipse(bx - T * 0.08, by - T * 0.06, T * 0.12, T * 0.07, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.fillStyle = "#f2d16b";
+      this.ctx.beginPath();
+      this.ctx.moveTo(bx + T * 0.04, by - T * 0.02);
+      this.ctx.lineTo(bx + T * 0.2, by - T * 0.02);
+      this.ctx.lineTo(bx + T * 0.12, by - T * 0.14);
+      this.ctx.closePath();
+      this.ctx.fill();
+    }
     drawHerder(this.ctx, sx(h.x + 0.5), sy(h.y + 0.95) + mishapY - hop, T, {
       facing: h.facing,
       walking,

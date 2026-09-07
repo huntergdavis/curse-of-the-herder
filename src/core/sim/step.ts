@@ -393,6 +393,15 @@ function stepHerder(w: WorldState, map: GameMap): void {
     return;
   }
   if (h.mode === "idle") {
+    // Lunch, once, somewhere after half past twelve: bread, cheese, a sit-down, the dog's opinion.
+    if (!w.hadLunch && w.tick > 3.5 * TICKS_PER_HOUR && h.carrying < 0) {
+      w.hadLunch = true;
+      h.mode = "resting";
+      h.restUntilTick = w.tick + 160; // forty seconds
+      addFrustration(w, -12);
+      pushEvent(w, { tick: w.tick, kind: "lunch", sheepId: -1 });
+      return;
+    }
     // A breather when he is fuming and empty-handed.
     if (w.frustration >= 60 && w.tick - w.lastBreatherTick > BREATHER_COOLDOWN && keyedUnit(w.seed, "breather", w.tick) < 0.5) {
       w.lastBreatherTick = w.tick;
