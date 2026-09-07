@@ -327,6 +327,11 @@ function handleEvents(s: Session, nowMs: number): void {
       void vocabEl.offsetWidth;
       vocabEl.classList.add("pop");
     }
+    // The neighbour takes a while to pass; a second remark as he leaves.
+    if (e.kind === "rival") {
+      const line = speakForEvent(w, s.map, { ...e, kind: "rivalGone", seq: e.seq * 10 + 7 }, { lines: s.recent, rules: s.recentRules }, BAND_CAP);
+      if (line) s.queue.push({ text: line.text, heat: line.heat, seconds: line.seconds, atMs: nowMs + 30000 / Math.max(1, FAST) });
+    }
     // A notorious sheep, finally caught, gets a proper telling-off: a short flyting.
     if (e.kind === "caught" && w.sheep[e.sheepId]?.named && u) {
       const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
