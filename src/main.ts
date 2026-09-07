@@ -337,7 +337,7 @@ function handleEvents(s: Session, nowMs: number): void {
       }
     }
     if (e.kind === "finished") onFinished(s);
-    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || (e.kind === "mishap" && e.detail === "crook")) {
+    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || (e.kind === "mishap" && e.detail === "crook")) {
       maybeCurseRemarks(s, e.kind === "mishap" ? "crook" : e.kind, nowMs);
     }
   }
@@ -418,6 +418,7 @@ const CURSE_LINES: Record<string, string[]> = {
   jailbreak: ["The Curse did not do that. The Curse admires it.", "Sixty is a courtesy figure.", "Fences are a suggestion. I thought you knew."],
   milestone: ["Halfway is a word. It has never once been a place.", "You are counting. I find that touching.", "One left. You will remember this one. You always do."],
   streak: ["Enjoy it.", "Five. The Curse is generous in small amounts.", "I did that. You are welcome. It ends now."],
+  streakBroken: ["Told you.", "There. Better.", "Balance restored."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
   book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],
@@ -541,7 +542,7 @@ function showEndCard(r: HallRecord): void {
   showOverlay(
     `<h1>${escapeHtml(r.name)}</h1><p>penned the last of ${r.sheep} sheep at ${r.finishedClock} and was retired to the Hall of Herders.</p>` +
       stoneHtml(r) +
-      `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}${r.dogName ? ` · with ${escapeHtml(r.dogName)}, who was no help` : ""}</p>` +
+      `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}${r.dogName ? ` · with ${escapeHtml(r.dogName)}, who was no help` : ""}${r.jailbreaks ? ` · ${r.jailbreaks} jailbreak${r.jailbreaks === 1 ? "" : "s"}` : ""}</p>` +
       (r.favouriteWord ? `<p>Favourite word: <strong>${escapeHtml(r.favouriteWord.w)}</strong> (${r.favouriteWord.n}×${r.favouriteWord.mostly ? `, mostly at ${escapeHtml(r.favouriteWord.mostly)}` : ""})</p>` : "") +
       (r.sheepOfTheDay ? `<p>Sheep of the day: <strong>${escapeHtml(r.sheepOfTheDay.name)}</strong>, who ran ${r.sheepOfTheDay.flees} times and regrets nothing.</p>` : "") +
       (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +

@@ -544,6 +544,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
       if (s.flees < MAX_FLEES && keyedUnit(w.seed, "flee", s.id, s.flees, w.tick) < s.skittish * 0.5 * hourFactor) {
         s.flees++;
         w.stats.flees++;
+        if (w.streak >= 5) pushEvent(w, { tick: w.tick, kind: "streakBroken", sheepId: s.id, detail: String(w.streak) });
         w.streak = 0;
         fleeTo(w, map, s);
         if (s.flees >= 2) {
@@ -572,6 +573,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
           w.stats.absurds++;
           addFrustration(w, FRUSTRATION.absurdLocation);
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
+        } else if (s.escapee) {
+          pushEvent(w, { tick: w.tick, kind: "recaptured", sheepId: s.id });
         } else if (s.black) {
           pushEvent(w, { tick: w.tick, kind: "black", sheepId: s.id });
         } else if (s.temper === "dozy") {
@@ -671,6 +674,7 @@ function stepJailbreak(w: WorldState, map: GameMap): void {
   s.homeY = Math.round(s.ty);
   s.flees++;
   s.named = true;
+  s.escapee = true;
   w.sheepPenned--;
   w.jailbreaks++;
   w.lastJailbreakTick = w.tick;

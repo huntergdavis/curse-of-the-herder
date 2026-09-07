@@ -103,6 +103,16 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "streak", ["#pantheon.cap#, five in a row. I know what this is. This is the quiet before the sheep.", "Eight. EIGHT in a row. I am not going to say anything. I am not going to say ANYTHING. …Eight."]),
   ...R(8, "streak", ["Five went in and none of them ran. I did not trust it. I was right not to."], { reg: ["hemingway"] }),
   ...R(12, "streak", ["A run of luck, O Curse, is your favourite joke, and I have laughed at it every time, and I am laughing now, and I hate you."]),
+  // The streak ends, as he said it would.
+  ...R(0, "streakBroken", ["There. Knew it.", "And… gone.", "Told you. Told ME."]),
+  ...R(2, "streakBroken", ["There it is. I KNEW it. Five in a row and then you, #vocative#. You could not let me have six.", "And the luck runs out, like everything else on this hill, downhill and away from me.", "I said it. I said this is how the bad ones start. Nobody listens to me. Least of all me."]),
+  ...R(4, "streakBroken", ["#oath_phrase#! I called it! I called it at five and here it is at #vocative#!", "#pantheon.cap#, thank you for the run of luck; I see you have taken it back with interest."]),
+  ...R(8, "streakBroken", ["The run ended. I had known it would. Knowing did not make the sheep slower."], { reg: ["hemingway"] }),
+  // The escapee, recaptured.
+  ...R(0, "recaptured", ["Back. In. AGAIN.", "You. Back.", "Got you. Twice."]),
+  ...R(2, "recaptured", ["Back you go, #vocative#. Back you GO. And this time I am tying the gate with my own belt.", "Recaptured. I want that on the record. I want a plaque.", "You got out once, #vocative#. Everyone gets out once. Nobody gets out twice. That is not a rule, it is a threat."]),
+  ...R(4, "recaptured", ["#oath_phrase#! The escapee! Back on my shoulders where you began, you #adj# #insult#, and this time the pen has OPINIONS.", "#pantheon.cap#, I have caught the same sheep twice today and I feel nothing but old."]),
+  ...R(8, "recaptured", ["I caught it again. It weighed the same. I did not."], { reg: ["hemingway"] }),
   // The library hands him a book he has already read.
   ...R(0, "reread", ["Read it. Reading again.", "Same book. Fine.", "Hm. This one."]),
   ...R(2, "reread", ["I have read this one. I am going to read it again, because the alternative is the sheep.", "This book again. It was wrong the first time. Let us see if it has improved.", "Somebody keeps putting this book in the box. I suspect the sheep."]),
