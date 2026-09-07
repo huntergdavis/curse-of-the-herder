@@ -725,6 +725,28 @@ function stepRival(w: WorldState, map: GameMap): void {
   pushEvent(w, { tick: w.tick, kind: "rival", sheepId: -1, detail: String(w.rivalsSeen) });
 }
 
+/** Mid-afternoon, passing a village well empty-handed, he stops for a drink. It is water. */
+function stepDrink(w: WorldState, map: GameMap): void {
+  if (w.drankTick !== undefined || w.finished || w.tick < 5 * TICKS_PER_HOUR) return;
+  const h = w.herder;
+  if (h.mode !== "toSheep" || h.carrying >= 0 || w.tick % 4 !== 0) return;
+  const hx = Math.round(h.x);
+  const hy = Math.round(h.y);
+  for (let oy = -2; oy <= 2; oy++) for (let ox = -2; ox <= 2; ox++) {
+    const x = hx + ox;
+    const y = hy + oy;
+    if (x < 0 || y < 0 || x >= map.size || y >= map.size) continue;
+    if (map.deco[y * map.size + x] !== Deco.Well) continue;
+    w.drankTick = w.tick;
+    h.mode = "resting";
+    h.restUntilTick = w.tick + 36;
+    h.path = [];
+    addFrustration(w, -6);
+    pushEvent(w, { tick: w.tick, kind: "drink", sheepId: -1 });
+    return;
+  }
+}
+
 /** Once, after two o'clock, the dog herds the sheep he is walking toward straight to him. Nobody can explain it. */
 function stepDogHelps(w: WorldState): void {
   if (w.dogHelped || w.finished || w.tick < 5 * TICKS_PER_HOUR) return;
@@ -807,6 +829,7 @@ export function step(w: WorldState, map: GameMap): WorldState {
   stepJailbreak(w, map);
   stepRival(w, map);
   stepDogHelps(w);
+  stepDrink(w, map);
   govern(w);
   stepSheep(w, map);
   stepHerder(w, map);

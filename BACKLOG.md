@@ -80,6 +80,7 @@ long soak.
 - Level-ups are announced: a toast with the new level name, a line about the words arriving ("A new word arrives and the first thing I do with it is throw it at a hill"), and a Curse remark
 - `node scripts/watch-toasts.mjs <url> [seconds]` logs every toast and herder line with the sim clock; `npx tsx scripts/probe-kind.ts` checks the renderer-hook kinds produce lines at level 0
 - Signposts: he takes their certainty personally when he passes one ("It is a plank on a stick and it is more certain than I am")
+- Mid-afternoon he stops at a village well for a drink ("Cold, honest, and utterly without alcohol, like everything else in my life"), once a day
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

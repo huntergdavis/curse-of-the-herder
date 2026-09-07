@@ -526,6 +526,7 @@ const CURSE_LINES: Record<string, string[]> = {
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
   rivalBolt: ["Do not enjoy this.", "That one is coming to live with you.", "I had nothing to do with it. This time."],
+  drink: ["Water. He is celebrating.", "The well is not cursed. I checked that too.", "He will want a lie-down next."],
   levelUp: ["It was in a book. He found it. Fine.", "More words. Same sheep.", "I gave him the books. Remember that."],
   inn: ["He is not allowed in. I checked.", "The Cursed Ram. Named after me, in a way.", "Sixty sheep, then ale. Those are the terms."],
   cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
