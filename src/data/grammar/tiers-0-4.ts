@@ -187,7 +187,7 @@ export const RULES: Rule[] = [
     "You are as #adj# as #simile#.", "This #target# is more #adj# than #simile#.", "I am as #selfadj# as #simile# and twice as #adj#.",
     "#vocative.cap#, you #insult_np#.", "You #adj#, #adj# #insult# of #abstract#!", "My #bodypart# feel like #simile#.", "This day is #simile#, #time#.",
     "Sheep, like #simile#, do not listen.", "I have the #abstract# of #simile#.", "#clause.cap#, #simile_phrase#.", "#exclaim# #clause.cap#, #time#.",
-    "#remaining.cap# sheep, #time#, and a #target# like #simile#.", "Every #target# I meet is #adj#. Every one. That is not how #noun.pl# work.",
+    "#remaining.cap# sheep, #time#, and a #target# like #simile#.", "Every #target# I meet is #adj#. Every one. That is not how any of this is supposed to work.",
     "There is a word for this #target#, and the word is #insult#.", "I would rather carry #simile# than this #target#.",
     "I have seen #simile# move with more purpose than this #target#.", "#clause.cap#; that is all. That is the whole of it.",
     "There is a #noun# in my boot and #abstract# in my heart.",
