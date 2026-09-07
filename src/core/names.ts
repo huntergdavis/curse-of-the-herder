@@ -27,6 +27,12 @@ const SHEEP = [
   "Gladys", "Wilberforce", "Bernadette", "Algernon", "Philippa", "Cornelius", "Maureen", "Basil",
 ];
 
+const DOGS = ["Biscuit", "Nell", "Fly", "Moss", "Cap", "Bess", "Tam", "Glen", "Meg", "Bracken", "Wisp", "Jess", "Roy", "Sweep", "Shep", "Dot", "Bramble", "Tweed", "Pip", "Floss"];
+
+export function dogName(seed: string): string {
+  return DOGS[Math.floor(keyedUnit(seed, "dog-name") * DOGS.length)] ?? "Nell";
+}
+
 export function sheepName(seed: string, sheepId: number): string {
   return SHEEP[Math.floor(keyedUnit(seed, "sheep-name", sheepId) * SHEEP.length)] ?? "Gerald";
 }

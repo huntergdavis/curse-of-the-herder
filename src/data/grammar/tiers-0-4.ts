@@ -36,8 +36,8 @@ export const NON_TERMINALS: NonTerminal[] = [
     symbol: "clause",
     options: [
       { t: "this #target# is #adj#", weight: 3 },
-      { t: "my #bodypart# are #adj#", weight: 2 },
-      { t: "I am #adj#", weight: 2 },
+      { t: "my #bodypart# are #selfadj#", weight: 2 },
+      { t: "I am #selfadj#", weight: 2 },
       { t: "the #target# is #adj#", weight: 2 },
       { t: "I have #verb.ed# enough", weight: 1 },
       { t: "there is #noun# in my #bodypart#", weight: 1 },
@@ -49,8 +49,8 @@ export const NON_TERMINALS: NonTerminal[] = [
       { t: "this is not what I was promised", weight: 1, minLevel: 3 },
       { t: "the #target# has not helped", weight: 1, minLevel: 3 },
       { t: "you are as #adj# as #simile#", weight: 2, minLevel: 3 },
-      { t: "I am as #adj# as #simile#", weight: 1, minLevel: 3 },
-      { t: "#time#, I am #adj#", weight: 1, minLevel: 3 },
+      { t: "I am as #selfadj# as #simile#", weight: 1, minLevel: 3 },
+      { t: "#time#, I am #selfadj#", weight: 1, minLevel: 3 },
       { t: "nobody asked the #target#", weight: 1, minLevel: 3 },
       { t: "I did not choose this", weight: 1, minLevel: 2 },
       { t: "the #sig# was better than this", weight: 1, minLevel: 2 },
@@ -125,7 +125,7 @@ export const RULES: Rule[] = [
   // ---------------------------------------------------------------- Tier 1
   ...R(1, "idle", ["#intensifier.cap# #adj# #target#.", "#oath.cap#, #target#.", "#adj.cap# #intensifier# #noun#.", "#swear.cap#. #adj.cap# #noun#.", "#intensifier.cap# #noun# in my boot."], { minBand: 1 }),
   ...R(1, "idle", [
-    "#adj.cap# #target#.", "#adj.cap# #noun#.", "#interj.cap#, #noun#.", "#bodypart.cap# #adj#.", "Not again.", "#adj.cap# day.", "More #noun#.",
+    "#adj.cap# #target#.", "#adj.cap# #noun#.", "#interj.cap#, #noun#.", "#bodypart.cap# #selfadj#.", "Not again.", "#adj.cap# day.", "More #noun#.",
     "Too #adj#.", "#adj.cap#. #adj.cap#. #adj.cap#.", "#adj.cap# #target#, #adj# #noun#.", "#remaining.cap# more.", "#interj.cap#, #bodypart#.",
     "#adj.cap# #sig#.", "Long way.", "#noun.cap# in boot.", "#adj.cap# sheep. #adj.cap# hill. #adj.cap# me.", "#pantheon.cap#, #noun#.",
   ]),
@@ -145,10 +145,10 @@ export const RULES: Rule[] = [
   // ---------------------------------------------------------------- Tier 2
   ...R(2, "idle", ["This #intensifier# #target# is #adj#.", "#oath.cap#, my #bodypart#.", "I hate this #intensifier# #target#.", "#swear.cap#. #swear.cap#. #clause.cap#.", "Who put this #intensifier# #target# here?"], { minBand: 2 }),
   ...R(2, "idle", [
-    "This #target# is #adj#.", "I do not like #noun.pl#.", "My #bodypart# are #adj#.", "This is #adj_noun.a#.", "Why is there #noun.a# in my #bodypart#?",
+    "This #target# is #adj#.", "I do not like #noun.pl#.", "My #bodypart# are #selfadj#.", "This is #adj_noun.a#.", "Why is there #noun.a# in my #bodypart#?",
     "#remaining.cap# sheep left. #interj.cap#.", "I want to sit down.", "Every #target# is #adj#. Every one.", "There is #noun# in my boot.",
     "Who put this #target# here?", "#vocative.cap#, you are #adj#.", "You are #insult_np.a#.", "I have carried #penned# sheep and my #bodypart# know it.",
-    "The #target# is #adj# and I am #adj#.", "#terrain_gripe#", "I am a herder. I herd. I do not #verb#. And yet.", "#clause.cap#.",
+    "The #target# is #adj# and I am #selfadj#.", "#terrain_gripe#", "I am a herder. I herd. I do not #verb#. And yet.", "#clause.cap#.",
     "#clause.cap# and #clause#.", "#exclaim# #clause.cap#.", "Nobody told me about the #noun.pl#.", "I did not sign up for #noun.pl#.",
     "#interj.cap#. #clause.cap#.", "This #sig# is the only #sig# I trust.", "I will remember this #target#.",
   ]),
@@ -182,7 +182,7 @@ export const RULES: Rule[] = [
 
   // ---------------------------------------------------------------- Tier 3
   ...R(3, "idle", [
-    "You are as #adj# as #simile#.", "This #target# is more #adj# than #simile#.", "I am as #adj# as #simile# and twice as #adj#.",
+    "You are as #adj# as #simile#.", "This #target# is more #adj# than #simile#.", "I am as #selfadj# as #simile# and twice as #adj#.",
     "#vocative.cap#, you #insult_np#.", "You #adj#, #adj# #insult# of #abstract#!", "My #bodypart# feel like #simile#.", "This day is #simile#, #time#.",
     "Sheep, like #simile#, do not listen.", "I have the #abstract# of #simile#.", "#clause.cap#, #simile_phrase#.", "#exclaim# #clause.cap#, #time#.",
     "#remaining.cap# sheep, #time#, and a #target# like #simile#.", "Every #target# I meet is #adj#. Every one. That is not how #noun.pl# work.",
@@ -216,7 +216,7 @@ export const RULES: Rule[] = [
   ...R(3, "walkOfShame", ["Past the pen with nothing, like #simile#.", "The sheep watch me go by. Empty. Like #simile#."]),
   ...R(3, "rain", ["Rain, #time#. Like #simile#, it does not care.", "And now rain. As #adj# as #simile#."]),
   ...R(3, "dusk", ["Dusk, #remaining# out, and I feel like #simile#.", "The light goes like #simile#. So do I."]),
-  ...R(3, "breather", ["A sit-down. I am as #adj# as #simile#.", "Sitting like #simile#. Just a moment."]),
+  ...R(3, "breather", ["A sit-down. I am as #selfadj# as #simile#.", "Sitting like #simile#. Just a moment."]),
 
   // ---------------------------------------------------------------- Tier 4
   ...R(4, "idle", [

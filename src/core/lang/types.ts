@@ -90,6 +90,7 @@ export interface Context {
   /** Words the herder has learned from books, in addition to level-unlocked packs. */
   knownPacks: string[];
   villageName: string;
+  dogName: string;
   /** Running tallies for callbacks (optional so simple test contexts stay small). */
   stats?: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
 }

@@ -184,6 +184,18 @@ export class Grammar {
       }
       return null;
     }
+    // Adjectives that can describe the herder himself: no target fence, or one that includes "self".
+    if (symbol === "selfadj") {
+      const pool = (this.byPos.get("adj") ?? []).filter((e) => {
+        const { targets, ...rest } = e;
+        return this.entryAllowed(rest as LexEntry, ctx, cap) && (!targets || targets.includes("self"));
+      });
+      if (pool.length === 0) return null;
+      const weights = pool.map((e) => this.entryWeight(e, ctx));
+      const e = pool[pickIndex(weights, rnd)]!;
+      this.usedThisLine.push(e.w);
+      return { text: e.w, entry: e };
+    }
     if (POS_SET.has(symbol as Pos)) {
       const pool = (this.byPos.get(symbol) ?? []).filter((e) => this.entryAllowed(e, ctx, cap));
       if (pool.length === 0) return null;
@@ -328,6 +340,8 @@ function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string 
       return ctx.signatureWord;
     case "village":
       return ctx.villageName;
+    case "dog":
+      return ctx.dogName;
     case "bignum":
       return BIG_NUMBERS[Math.floor(rnd() * BIG_NUMBERS.length)]!;
     case "hour":

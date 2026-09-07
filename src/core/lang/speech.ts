@@ -10,7 +10,7 @@ import { PACKS_9_12 } from "../../data/lexicon/packs-9-12";
 import { NON_TERMINALS_9_12, RULES_9_12 } from "../../data/grammar/tiers-9-12";
 import { Deco, Terrain } from "../map/terrain";
 import type { GameMap } from "../map/generate";
-import { sheepName } from "../names";
+import { dogName, sheepName } from "../names";
 import { curseIntervalSeconds, erudition, filthCeiling, levelFor } from "../progression";
 import { keyedUnit } from "../rng";
 import { hoursElapsed, type WorldEvent, type WorldState } from "../sim/state";
@@ -91,6 +91,7 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
     knownPacks: w.knownPacks,
     villageName: nearest.name,
     stats: w.stats,
+    dogName: dogName(w.seed),
   };
 }
 

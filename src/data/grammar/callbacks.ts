@@ -60,6 +60,25 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // The dog. He has a dog. The dog has never once helped.
+  ...R(1, "idle", ["#dog.cap#. Help. #dog.cap#!", "Good dog, #dog#. Useless dog."]),
+  ...R(2, "idle", [
+    "#dog.cap# is watching a butterfly. There are #remaining# sheep out and #dog# is watching a butterfly.",
+    "I have a sheepdog. His name is #dog#. Look at him. LOOK at him.",
+    "#dog.cap#, fetch the sheep. #dog.cap#. #dog.cap#. ...Fine. Fetch nothing. You are good at that.",
+    "The dog has lain down. The dog has read the situation correctly.",
+  ]),
+  ...R(2, "flee", ["#dog.cap#! After it! ...No. Of course not."]),
+  ...R(4, "idle", [
+    "#oath.cap#, #dog#, you are a sheepdog. It is in the name. Both halves of the name.",
+    "#pantheon.cap#, I have a dog who herds nothing and a flock that herds itself away from me.",
+    "#dog.cap# has caught #bignum# butterflies today and no sheep. #dog.cap# is having the better day.",
+  ]),
+  ...R(4, "flee", ["#oath.cap#! #dog.cap#, THAT is a sheep, THAT is what you are FOR!"]),
+  ...R(8, "idle", ["The dog lay down. The dog was right. I did not lie down. I was wrong."], { reg: ["hemingway"] }),
+  ...R(8, "penned", ["In. The dog watched. The dog has watched all of them. The dog is very good at watching."], { reg: ["hemingway"] }),
+  ...R(10, "idle", ["Consider #dog#: a sheepdog in name, a spectator in practice, and, in the final accounting, the only one of us who is enjoying this."]),
+  ...R(12, "epitaph", ["The dog was no help. Neither was anything else.", "Herder. Sixty sheep. One dog, decorative."]),
   // The signature word: every herder has one noun he cannot stop saying.
   ...R(1, "idle", ["#sig.cap#.", "#sig.cap#. Always #sig#.", "Where is my #sig#."]),
   ...R(3, "idle", [

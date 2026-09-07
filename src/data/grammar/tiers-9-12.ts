@@ -98,7 +98,7 @@ export const RULES_9_12: Rule[] = [
   ...R(9, "idle", [
     "#oath_chain#, #vocative#!", "#bignum.cap# #adj# #noun.pl#!", "Ten thousand thundering #noun.pl#!", "Blistering barnacles and #adj# #insult.pl#!",
     "Avast, you #insult#! Belay that #verb.ing#!", "#oath.cap#, and I say it with salt in my teeth: #clause#.", "You #alliter#!", "Hear this, you #alliter#: #clause#.",
-    "Bilge and blazes, #time#, and still #remaining# sheep to sea!", "Batten down, #vocative#; I am coming, and I am #adj#.", "#oath_chain#! #clause.cap#, and the #target# with it!",
+    "Bilge and blazes, #time#, and still #remaining# sheep to sea!", "Batten down, #vocative#; I am coming, and I am #selfadj#.", "#oath_chain#! #clause.cap#, and the #target# with it!",
     "Shiver my timbers and #verb# my #bodypart#: #clause#.", "By the bilge, by the brine, by the barnacles on the bottom of this #target#, #clause#.",
     "Land ho, you #insult#. It is all land. That is the problem.", "Ten thousand #adj# #noun.pl# could not #verb# this #target#, and neither can I.", "Weigh anchor, #vocative#, and I mean you, you anchor.",
     "Splice my mainbrace, #vocative#, you are #insult_np.a# on a sea of #abstract#.", "#oath.cap#! Hard a-port, hard a-starboard, hard everywhere: #clause#!",
@@ -146,7 +146,7 @@ export const RULES_9_12: Rule[] = [
     "Let the record show, #time#, that #clause#; that #clause#; and that the #target#, throughout, did nothing.",
     "Of all the #adj# things in this #adj# valley—#catalog#—you, #vocative#, are the most #adj#.",
     "I would #verb#, #vocative#, were #verb.ing# not so far beneath a man who has read #books# books, and so far above a sheep.",
-    "Whereas the sheep is #adj#; and whereas the #target# is #adj#; and whereas I am #adj#: be it resolved that #oath#.",
+    "Whereas the sheep is #adj#; and whereas the #target# is #adj#; and whereas I am #selfadj#: be it resolved that #oath#.",
     "One does not simply #verb# #noun.a#; one #verb.s# it #intensifier#, with #abstract#, and then one sits down.",
     "#intensifier.cap#, #intensifier#, #intensifier# #adj#: I am running out of adverbs, #vocative#, and you are not running out of hill.",
     "In the beginning was the #target#, and the #target# was #adj#, and I was there, and I said #oath#, and it was so.",

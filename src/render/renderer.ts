@@ -1,7 +1,7 @@
 import type { GameMap } from "../core/map/generate";
 import { dayHour, isFoggy, isRaining, type WorldState } from "../core/sim/state";
 import { BOOK_BY_ID } from "../data/books";
-import { sheepName } from "../core/names";
+import { dogName, sheepName } from "../core/names";
 import { Deco } from "../core/map/terrain";
 import type { Bubbles } from "./bubbles";
 import type { Camera } from "./camera";
@@ -70,6 +70,73 @@ export class Renderer {
       }
     }
     return null;
+  }
+
+  private drawDog(px: number, py: number, T: number, facing: number, moving: boolean, lying: boolean, nowMs: number): void {
+    const ctx = this.ctx;
+    const flip = facing === 2 ? -1 : 1;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(flip, 1);
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, T * 0.3, T * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#2b2620";
+    ctx.lineWidth = Math.max(1, T * 0.04);
+    const bob = moving ? Math.abs(Math.sin(nowMs / 130)) * T * 0.05 : 0;
+    const bodyY = lying ? -T * 0.14 : -T * 0.3 - bob;
+    // Legs
+    if (!lying) {
+      ctx.strokeStyle = "#2b2620";
+      ctx.lineWidth = Math.max(1.5, T * 0.06);
+      ctx.beginPath();
+      const sw = moving ? Math.sin(nowMs / 130) * T * 0.08 : 0;
+      for (const [lx, sgn] of [[-0.16, 1], [0.14, -1], [-0.08, -1], [0.06, 1]] as const) {
+        ctx.moveTo(lx * T, bodyY + T * 0.08);
+        ctx.lineTo(lx * T + sw * sgn, -T * 0.02);
+      }
+      ctx.stroke();
+    }
+    // Body
+    ctx.fillStyle = "#2b2620";
+    ctx.beginPath();
+    ctx.ellipse(0, bodyY, T * 0.3, lying ? T * 0.12 : T * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f4f1e6";
+    ctx.beginPath();
+    ctx.ellipse(-T * 0.02, bodyY + T * 0.03, T * 0.16, lying ? T * 0.06 : T * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail (wags when lying and content)
+    ctx.strokeStyle = "#2b2620";
+    ctx.lineWidth = Math.max(1.5, T * 0.05);
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.28, bodyY - T * 0.02);
+    ctx.lineTo(-T * 0.42, bodyY - T * 0.18 + (lying ? Math.sin(nowMs / 200) * T * 0.06 : Math.sin(nowMs / 300) * T * 0.03));
+    ctx.stroke();
+    // Head
+    ctx.fillStyle = "#2b2620";
+    ctx.beginPath();
+    ctx.ellipse(T * 0.3, bodyY - T * 0.1, T * 0.13, T * 0.11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f4f1e6";
+    ctx.beginPath();
+    ctx.ellipse(T * 0.37, bodyY - T * 0.06, T * 0.07, T * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Ear and eye
+    ctx.fillStyle = "#2b2620";
+    ctx.beginPath();
+    ctx.ellipse(T * 0.24, bodyY - T * 0.2, T * 0.05, T * 0.08, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f4f1e6";
+    ctx.beginPath();
+    ctx.arc(T * 0.32, bodyY - T * 0.12, T * 0.025, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // A thought, now and then: never about sheep.
+    const beat = Math.floor(nowMs / 1000) % 29;
+    if (beat === 0) drawEmote(ctx, px + T * 0.45, py - T * 0.75, T * 0.8, lying ? "z" : "?");
+    else if (beat === 14 && !lying) drawEmote(ctx, px + T * 0.45, py - T * 0.75, T * 0.8, "woof");
   }
 
   private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
@@ -155,6 +222,9 @@ export class Renderer {
   rainStopped(nowMs: number): void {
     this.rainbowFromMs = nowMs;
   }
+
+  /** The sheepdog: follows him about, sits when he sits, helps with nothing. */
+  private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0 };
 
   /** Epitaph of the herder before this one, carved on a stone by the pen. */
   memorial: { name: string; epitaph: string } | null = null;
@@ -288,6 +358,39 @@ export class Renderer {
             ctx.ellipse(px + T * 0.06 * flap, py, T * 0.06 * flap, T * 0.05, 0, 0, Math.PI * 2);
             ctx.fill();
           }
+        }
+      }
+    }
+
+    // The dog: trails a tile and a half behind, lies down when he stops, wanders off after butterflies.
+    {
+      const d = this.dog;
+      if (!d.init) {
+        d.x = h.x - 1.5;
+        d.y = h.y;
+        d.init = true;
+      }
+      const moving = h.mode === "toSheep" || h.mode === "toPen" || h.mode === "toLibrary";
+      const targetX = h.x - (h.facing === 0 ? 1.6 : h.facing === 2 ? -1.6 : 0.9);
+      const targetY = h.y - (h.facing === 1 ? 1.4 : h.facing === 3 ? -1.4 : 0.3) + 0.5;
+      const dist = Math.hypot(targetX - d.x, targetY - d.y);
+      if (moving || dist > 3) {
+        const k = 1 - Math.exp(-(1 / 60) * 3.2);
+        d.vx = (targetX - d.x) * k;
+        d.vy = (targetY - d.y) * k;
+        d.x += d.vx;
+        d.y += d.vy;
+        if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
+      }
+      const dogMoving = Math.hypot(d.vx, d.vy) > 0.004;
+      if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
+        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, dogMoving, !moving && !dogMoving, nowMs);
+        if (T >= 40 && !moving) {
+          ctx.font = `${Math.max(9, T * 0.18)}px "Fredoka", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.fillStyle = "rgba(43,38,32,0.7)";
+          ctx.fillText(dogName(world.seed), sx(d.x + 0.5), sy(d.y + 0.9) + T * 0.28);
+          ctx.textAlign = "left";
         }
       }
     }
