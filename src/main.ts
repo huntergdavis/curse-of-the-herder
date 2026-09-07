@@ -549,7 +549,7 @@ function showEndCard(r: HallRecord): void {
       stoneHtml(r) +
       `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}${r.dogName ? ` · with ${escapeHtml(r.dogName)}, who was no help` : ""}${r.jailbreaks ? ` · ${r.jailbreaks} jailbreak${r.jailbreaks === 1 ? "" : "s"}` : ""}</p>` +
       (r.favouriteWord ? `<p>Favourite word: <strong>${escapeHtml(r.favouriteWord.w)}</strong> (${r.favouriteWord.n}×${r.favouriteWord.mostly ? `, mostly at ${escapeHtml(r.favouriteWord.mostly)}` : ""})</p>` : "") +
-      (r.sheepOfTheDay ? `<p>Sheep of the day: <strong>${escapeHtml(r.sheepOfTheDay.name)}</strong>, who ran ${r.sheepOfTheDay.flees} times and regrets nothing.</p>` : "") +
+      (r.nemesis ? `<p>Nemesis: <strong>${escapeHtml(r.nemesis.name)}</strong>, who ran ${r.nemesis.flees} times and was eventually carried home in a manner not fit for a village.</p>` : r.sheepOfTheDay ? `<p>Sheep of the day: <strong>${escapeHtml(r.sheepOfTheDay.name)}</strong>, who ran ${r.sheepOfTheDay.flees} times and regrets nothing.</p>` : "") +
       (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +
       (r.highlights?.length ? `<details class="reading"><summary>Highlights of the day (${r.highlights.length})</summary><ol>${r.highlights.map((h) => `<li><span class="rl-when">${h.clock}</span> “${escapeHtml(h.text)}”</li>`).join("")}</ol></details>` : "") +
       readingHtml(r, true) +
@@ -596,7 +596,7 @@ async function showHall(): Promise<void> {
     .slice(0, 64)
     .map(
       (r) =>
-        `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd>${r.dogName ? `<dt>Dog</dt><dd>${escapeHtml(r.dogName)} (no help)</dd>` : ""}${r.sheepOfTheDay ? `<dt>Sheep of the day</dt><dd>${escapeHtml(r.sheepOfTheDay.name)} (${r.sheepOfTheDay.flees} escapes)</dd>` : ""}${r.favouriteWord ? `<dt>Favourite word</dt><dd>${escapeHtml(r.favouriteWord.w)} (${r.favouriteWord.n}×)</dd>` : ""}</dl>` +
+        `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd>${r.dogName ? `<dt>Dog</dt><dd>${escapeHtml(r.dogName)} (no help)</dd>` : ""}${r.nemesis ? `<dt>Nemesis</dt><dd>${escapeHtml(r.nemesis.name)} (${r.nemesis.flees} escapes)</dd>` : r.sheepOfTheDay ? `<dt>Sheep of the day</dt><dd>${escapeHtml(r.sheepOfTheDay.name)} (${r.sheepOfTheDay.flees} escapes)</dd>` : ""}${r.favouriteWord ? `<dt>Favourite word</dt><dd>${escapeHtml(r.favouriteWord.w)} (${r.favouriteWord.n}×)</dd>` : ""}</dl>` +
         (r.longestLine ? `<div class="longest">“${escapeHtml(r.longestLine)}”</div>` : "") +
         (r.namedSheep?.length ? `<div class="longest">Named today: ${r.namedSheep.map((n) => `${escapeHtml(n.name)} (${n.flees})`).join(", ")}</div>` : "") +
         (r.highlights?.length ? `<details class="reading"><summary>Highlights (${r.highlights.length})</summary><ol>${r.highlights.map((h) => `<li><span class="rl-when">${h.clock}</span> “${escapeHtml(h.text)}”</li>`).join("")}</ol></details>` : "") +
