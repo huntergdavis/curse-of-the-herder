@@ -823,7 +823,7 @@ export class Renderer {
         ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = "rgba(43,38,32,0.8)";
-        ctx.fillText(sheepName(world.seed, s.id), sx(s.x + 0.5), sy(s.y + 0.5) + T * 0.62);
+        ctx.fillText(sheepName(world.seed, s.id) + (s.escapee ? " (again)" : ""), sx(s.x + 0.5), sy(s.y + 0.5) + T * 0.62);
         ctx.textAlign = "left";
       }
       // Two loose sheep standing near each other gossip.
