@@ -5,7 +5,7 @@ import type { Band } from "./core/lang/types";
 import { createWorld, dayHour, hoursElapsed, mapForWorld, upgradeWorld, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
 import { step } from "./core/sim/step";
 import { repository } from "./persist/db";
-import { BOOK_BY_ID } from "./data/books";
+import { BOOKS, BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
 import { makeHallRecord, tasteOfPack, type HallRecord } from "./core/hall";
 import { dogName, sheepName } from "./core/names";
@@ -140,6 +140,22 @@ async function startSession(world: WorldState): Promise<void> {
     if (u) say(session, u.text, u.heat, u.seconds, performance.now(), true, u);
   };
   if (params.get("hat")) renderer.hatPeriod = 10;
+  if (params.get("read")) {
+    // Screenshot hook: he sits down with a book and the nearest sheep drift over to listen.
+    const w = session.world;
+    const first = BOOKS[0];
+    if (first) {
+      w.reading = { bookId: first.id, startTick: w.tick, untilTick: w.tick + 600 };
+      w.herder.mode = "reading";
+      w.herder.path = [];
+      w.sheep.filter((sh) => sh.mode === "loose").slice(0, 5).forEach((sh, k) => {
+        sh.x = Math.round(w.herder.x) + [-5, 5, -4, 4, 0][k]!;
+        sh.y = Math.round(w.herder.y) + [-3, -2, 4, 3, -6][k]!;
+        sh.tx = sh.x;
+        sh.ty = sh.y;
+      });
+    }
+  }
   if (params.get("rival")) {
     const w = session.world;
     const cx = Math.round(w.herder.x);
