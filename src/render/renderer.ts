@@ -218,13 +218,22 @@ export class Renderer {
     if (!this.chunks) {
       const chunkPx = CHUNK * this.chunkTilePx;
       const visible = (Math.ceil(this.width / chunkPx) + 2) * (Math.ceil(this.height / chunkPx) + 2);
-      this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 8);
+      this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 8, this.season);
     }
     return this.chunks;
   }
 
   /** Fewer moving decorations for viewers who prefer reduced motion. */
   reducedMotion = false;
+  /** Season of the current herder; changes the palette and the weather's look. */
+  season = "summer";
+
+  setSeason(season: string): void {
+    if (season !== this.season) {
+      this.season = season;
+      this.chunks = null;
+    }
+  }
   /** Multiplier on bubble text for viewing from a distance. */
   fontScale = 1;
   highContrast = false;
@@ -326,7 +335,7 @@ export class Renderer {
     {
       const sinceRain = world.rainUntilTick ? 0 : (world.tick - this.lastRainTick) * 0.25;
       if (isRaining(world)) this.lastRainTick = world.tick;
-      const wet = isRaining(world) ? 1 : Math.max(0, 1 - sinceRain / 600);
+      const wet = this.season === "winter" ? 0 : isRaining(world) ? 1 : Math.max(0, 1 - sinceRain / 600);
       if (wet > 0) {
         const x0 = Math.max(0, Math.floor(cam.x - W / (2 * T)) - 1);
         const x1 = Math.min(this.map.size - 1, Math.ceil(cam.x + W / (2 * T)) + 1);
@@ -453,7 +462,7 @@ export class Renderer {
             ctx.moveTo(px + T * 0.2, py + T * 0.12);
             ctx.lineTo(px + T * 0.45, py + T * 0.22);
             ctx.stroke();
-          } else if (this.map.deco[i] === Deco.Flowers && hourNow < 17.5 && !this.reducedMotion) {
+          } else if (this.map.deco[i] === Deco.Flowers && hourNow < 17.5 && !this.reducedMotion && this.season !== "winter") {
             const u = keyedUnit(this.map.seed, "bfly", x, y);
             if (u > 0.5) continue;
             const a = nowMs / 1300 + u * 20;
@@ -964,8 +973,37 @@ export class Renderer {
     }
     void Deco;
 
+    // Winter: rain falls as snow, slow and drifting.
+    if (isRaining(world) && this.season === "winter") {
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
+      const flakes = Math.floor((W * H) / (T * T) * 0.25);
+      const t = nowMs / 1000;
+      for (let i = 0; i < flakes; i++) {
+        const seedX = (i * 7919) % 10007;
+        const seedY = (i * 104729) % 10009;
+        const x = ((seedX / 10007) * W + Math.sin(t * 0.7 + i) * T * 0.6) % W;
+        const y = ((seedY / 10009) * H + t * T * 1.2 + i) % H;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(1, T * 0.035) * (0.7 + ((i * 13) % 7) / 10), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = "rgba(230, 235, 245, 0.12)";
+      ctx.fillRect(0, 0, W, H);
+    }
+    // Breath in the cold: little puffs from the herder every couple of seconds.
+    if (this.season === "winter" && !world.finished) {
+      const ph = (nowMs % 2600) / 2600;
+      if (ph < 0.5) {
+        const dir = h.facing === 2 ? -1 : 1;
+        ctx.fillStyle = `rgba(255,255,255,${(0.45 * (1 - ph * 2)).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(sx(h.x + 0.5) + dir * T * (0.25 + ph * 0.5), sy(h.y + 0.95) - T * 1.05 - ph * T * 0.3, T * (0.06 + ph * 0.14), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // Rain: diagonal streaks, deterministic per frame bucket so they scroll.
-    if (isRaining(world)) {
+    if (isRaining(world) && this.season !== "winter") {
       ctx.strokeStyle = "rgba(200, 220, 255, 0.35)";
       ctx.lineWidth = Math.max(1, T * 0.03);
       ctx.beginPath();

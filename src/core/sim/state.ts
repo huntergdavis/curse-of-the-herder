@@ -117,6 +117,8 @@ export interface WorldState {
   events: WorldEvent[];
   finished: boolean;
   finishedTick: number;
+  /** Derived from the calendar when the herder was created (northern hemisphere). */
+  season: "spring" | "summer" | "autumn" | "winter";
   eventCount: number;
   /** Sum of pen distances of all sheep at creation, for the speed governor. */
   totalWork: number;
@@ -167,6 +169,13 @@ export const DEFAULT_RINGS = [
   { min: 220, max: 285, count: 12 },
   { min: 300, max: 380, count: 8 },
 ];
+
+export type Season = WorldState["season"];
+
+export function seasonFor(wallMs: number): Season {
+  const m = new Date(wallMs).getMonth();
+  return m >= 2 && m <= 4 ? "spring" : m >= 5 && m <= 7 ? "summer" : m >= 8 && m <= 10 ? "autumn" : "winter";
+}
 
 export function createWorld(seed: string, map: GameMap, wallMs: number, opts: FlockOptions = {}): WorldState {
   const rnd = mulberry32(fnv1a(seed + "|flock"));
@@ -305,6 +314,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     events: [{ seq: 0, tick: 0, kind: "started", sheepId: -1 }],
     finished: false,
     finishedTick: -1,
+    season: seasonFor(wallMs),
     eventCount: 1,
     totalWork: sheep.reduce((a, s) => a + map.penDistance[s.y * map.size + s.x]!, 0),
     libraries: placeLibraries(map, sheep, rnd),
@@ -440,6 +450,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["wordUse"] || typeof o["wordUse"] !== "object") o["wordUse"] = {};
     if (!Array.isArray(o["highlights"])) o["highlights"] = [];
+    if (typeof o["season"] !== "string") o["season"] = seasonFor(typeof o["createdAt"] === "number" ? (o["createdAt"] as number) : Date.now());
     if (!o["stats"]) o["stats"] = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
     for (const sh of (o["sheep"] as Record<string, unknown>[]) ?? []) {
       if (typeof sh["tx"] !== "number") { sh["tx"] = sh["x"]; sh["ty"] = sh["y"]; sh["speed"] = 0; }

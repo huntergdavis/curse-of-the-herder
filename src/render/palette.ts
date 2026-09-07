@@ -16,6 +16,37 @@ export const TERRAIN_COLOR: Record<number, string> = {
 
 export const INK = "#2b2620";
 
+/** Seasonal overrides for terrain colours. */
+export function seasonalTerrain(season: string): Record<number, string> {
+  const base = { ...TERRAIN_COLOR };
+  if (season === "winter") {
+    base[Terrain.Grass] = "#b9c3ad";
+    base[Terrain.Meadow] = "#c8cfb8";
+    base[Terrain.Forest] = "#8e9b84";
+    base[Terrain.Farm] = "#b8a882";
+    base[Terrain.Mud] = "#8f7d69";
+    base[Terrain.Rock] = "#b7b3aa";
+    base[Terrain.Water] = "#6a8fb5";
+  } else if (season === "autumn") {
+    base[Terrain.Grass] = "#94ac4c";
+    base[Terrain.Meadow] = "#b3b055";
+    base[Terrain.Forest] = "#7a8c3e";
+    base[Terrain.Farm] = "#c0955a";
+  } else if (season === "summer") {
+    base[Terrain.Grass] = "#86ba4c";
+    base[Terrain.Meadow] = "#a9c25a";
+  }
+  return base;
+}
+
+/** Tree canopy colours by season. */
+export function seasonalGreens(season: string): string[] {
+  if (season === "autumn") return ["#d9822b", "#c9502f", "#e0b33c", "#b8652c", "#a8452a"];
+  if (season === "winter") return ["#6b7a66", "#5f6f5c", "#7a8a75", "#66765f", "#586a55"];
+  if (season === "spring") return ["#5fb054", "#72c25f", "#4fa34a", "#86c96a", "#4b9a40"];
+  return ["#3f8a3a", "#4b9a40", "#357a38", "#5aa34a", "#2f7a44"];
+}
+
 /** Day tint keyframes: [hour, rgba]. Interpolated linearly. */
 const TINT_KEYS: [number, [number, number, number, number]][] = [
   [9.0, [120, 160, 255, 0.10]],

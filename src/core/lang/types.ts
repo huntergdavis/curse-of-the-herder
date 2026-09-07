@@ -53,6 +53,8 @@ export interface Rule {
   reg?: string[];
   targets?: TargetKind[];
   maxChars?: number;
+  /** Only in this season. */
+  season?: string;
 }
 
 export interface NonTerminal {
@@ -93,6 +95,7 @@ export interface Context {
   knownPacks: string[];
   villageName: string;
   dogName: string;
+  season?: string;
   /** Running tallies for callbacks (optional so simple test contexts stay small). */
   stats?: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
 }

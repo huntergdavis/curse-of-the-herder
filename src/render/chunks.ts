@@ -1,7 +1,7 @@
 import type { GameMap } from "../core/map/generate";
 import { Deco, TERRAIN_LAYER_ORDER, Terrain } from "../core/map/terrain";
 import { keyedUnit } from "../core/rng";
-import { INK, TERRAIN_COLOR, shade } from "./palette";
+import { INK, TERRAIN_COLOR, seasonalGreens, seasonalTerrain, shade } from "./palette";
 
 export const CHUNK = 16;
 
@@ -27,8 +27,13 @@ export class ChunkCache {
   private frame = 0;
   readonly px: number;
 
-  constructor(readonly map: GameMap, readonly tilePx: number, readonly capacity: number) {
+  private colours: Record<number, string>;
+  private greens: string[];
+
+  constructor(readonly map: GameMap, readonly tilePx: number, readonly capacity: number, readonly season = "summer") {
     this.px = CHUNK * tilePx;
+    this.colours = seasonalTerrain(season);
+    this.greens = seasonalGreens(season);
   }
 
   beginFrame(): void {
@@ -69,7 +74,7 @@ export class ChunkCache {
     const oy = cy * CHUNK;
     const M = 2; // margin tiles so neighbours can encroach
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = TERRAIN_COLOR[Terrain.Water]!;
+    ctx.fillStyle = this.colours[Terrain.Water]!;
     ctx.fillRect(0, 0, this.px, this.px);
     const terrainAt = (x: number, y: number): number => (x < 0 || y < 0 || x >= n || y >= n ? Terrain.Water : map.terrain[y * n + x]!);
 
@@ -77,7 +82,7 @@ export class ChunkCache {
     for (let y = -M; y < CHUNK + M; y++) {
       for (let x = -M; x < CHUNK + M; x++) {
         const t = terrainAt(ox + x, oy + y);
-        ctx.fillStyle = TERRAIN_COLOR[t]!;
+        ctx.fillStyle = this.colours[t]!;
         ctx.fillRect(x * T, y * T, T, T);
       }
     }
@@ -86,7 +91,7 @@ export class ChunkCache {
     const r = T * 0.5;
     for (const layer of TERRAIN_LAYER_ORDER) {
       if (layer === Terrain.Water) continue;
-      ctx.fillStyle = TERRAIN_COLOR[layer]!;
+      ctx.fillStyle = this.colours[layer]!;
       ctx.beginPath();
       for (let y = -M; y < CHUNK + M; y++) {
         for (let x = -M; x < CHUNK + M; x++) {
@@ -139,7 +144,7 @@ export class ChunkCache {
           ctx.closePath();
           ctx.fill();
         } else if ((t === Terrain.Grass || t === Terrain.Meadow) && u < 0.18) {
-          ctx.fillStyle = "rgba(0,0,0,0.07)";
+          ctx.fillStyle = this.season === "winter" ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.07)";
           ctx.beginPath();
           ctx.ellipse(px + T * (0.3 + u), py + T * 0.5, T * 0.18, T * 0.1, 0, 0, Math.PI * 2);
           ctx.fill();
@@ -162,8 +167,7 @@ export class ChunkCache {
         const size = 0.8 + ((u * 7) % 1) * 0.45;
         ctx.fillStyle = "#6b4a2b";
         ctx.fillRect(cxp - T * 0.07, base - T * 0.3 * size, T * 0.14, T * 0.3 * size);
-        const greens = ["#3f8a3a", "#4b9a40", "#357a38", "#5aa34a", "#2f7a44"];
-        ctx.fillStyle = greens[Math.floor(u * 5) % 5]!;
+        ctx.fillStyle = this.greens[Math.floor(u * 5) % 5]!;
         ctx.beginPath();
         ctx.arc(cxp, base - T * 0.5 * size, T * 0.32 * size, 0, Math.PI * 2);
         ctx.fill();
@@ -179,7 +183,7 @@ export class ChunkCache {
         const size = 0.8 + ((u * 3) % 1) * 0.5;
         ctx.fillStyle = "#6b4a2b";
         ctx.fillRect(cxp - T * 0.06, base - T * 0.2, T * 0.12, T * 0.2);
-        ctx.fillStyle = u < 0.5 ? "#2f6f3a" : "#3a7d46";
+        ctx.fillStyle = this.season === "winter" ? (u < 0.5 ? "#4d6a52" : "#5a7a5e") : u < 0.5 ? "#2f6f3a" : "#3a7d46";
         ctx.beginPath();
         ctx.moveTo(cxp - T * 0.3 * size, base - T * 0.15);
         ctx.lineTo(cxp, base - T * 0.85 * size);

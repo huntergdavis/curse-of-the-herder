@@ -100,6 +100,7 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
     villageName: nearest.name,
     stats: w.stats,
     dogName: dogName(w.seed),
+    season: w.season,
   };
 }
 

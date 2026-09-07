@@ -133,6 +133,7 @@ async function startSession(world: WorldState): Promise<void> {
     napNoted: false,
   };
   renderer.hourOverride = null;
+  renderer.setSeason(world.season);
   renderer.signatureWord = signatureWord(world.seed);
   renderer.reducedMotion = motionSetting;
   renderer.fontScale = textScale;
@@ -143,7 +144,7 @@ async function startSession(world: WorldState): Promise<void> {
     const skies = ["overcast, with opinions", "bright, then not", "changeable, like the sheep", "fair, which the sheep will not honour", "grey, with grey later", "sunny spells, mostly on the sheep"];
     const later = ["rain by lunch", "a wind that knows your name", "fog where the sheep are", "a bog that has been waiting", "one wasp, personal", "dusk, eventually"];
     const pick = (arr: string[], salt: string): string => arr[Math.floor(keyedUnit(world.seed, salt) * arr.length)] ?? arr[0]!;
-    window.setTimeout(() => toast(`<strong>Forecast</strong> (The Sad Almanac): ${pick(skies, "sky")}; ${pick(later, "later")}. Outlook: sheep. Dog on duty: ${escapeHtml(dogName(world.seed))} (no help expected).`), 3500);
+    window.setTimeout(() => toast(`<strong>Forecast</strong> (The Sad Almanac, ${world.season}): ${pick(skies, "sky")}; ${pick(later, "later")}. Outlook: sheep. Dog on duty: ${escapeHtml(dogName(world.seed))} (no help expected).`), 3500);
   }
   // A fresh herder says his first words of the day.
   if (world.tick === 0 && world.events[0]) {
@@ -154,6 +155,17 @@ async function startSession(world: WorldState): Promise<void> {
   const hall = await repository.hall();
   const prev = hall.find((r) => r.seed !== world.seed);
   renderer.memorial = prev ? { name: prev.name, epitaph: prev.epitaph } : null;
+  // A word for yesterday's herder, once his own first words are out.
+  if (prev && world.tick === 0) {
+    const lines = [
+      `Morning, ${prev.name}. You had the right idea, lying down.`,
+      `${prev.name}. Sixty sheep, they say. Well. Watch this.`,
+      `Rest easy, ${prev.name}. I have your dog's cousin and none of your luck.`,
+      `${prev.name} said "${prev.epitaph}" and then stopped. Wise. I am not wise yet.`,
+    ];
+    const line = lines[Math.floor(keyedUnit(world.seed, "memorial-line") * lines.length)] ?? lines[0]!;
+    window.setTimeout(() => session && say(session, line, 0.1, 6, performance.now(), true), 8000);
+  }
   await refreshLoadList();
   hideOverlay();
   updateHud(true);
@@ -165,6 +177,8 @@ async function newHerder(): Promise<void> {
   const world = createWorld(seed, map, Date.now());
   if (START_BOOKS > 0) world.booksRead = START_BOOKS;
   // `?weather=rain|fog|wind` pins a weather for the whole day (development screenshots).
+  const seasonPin = params.get("season");
+  if (seasonPin === "spring" || seasonPin === "summer" || seasonPin === "autumn" || seasonPin === "winter") world.season = seasonPin;
   const weather = params.get("weather");
   if (weather === "rain") world.rainUntilTick = 1e9;
   if (weather === "fog") world.fogUntilTick = 1e9;

@@ -140,6 +140,7 @@ export class Grammar {
     if (minLevel > ctx.level) return false;
     if ((r.minBand ?? 0) > ctx.band) return false;
     if (r.targets && !r.targets.includes(ctx.target.kind)) return false;
+    if (r.season && r.season !== ctx.season) return false;
     return true;
   }
 

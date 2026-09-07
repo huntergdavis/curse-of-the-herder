@@ -82,6 +82,21 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // Seasons.
+  ...R(1, "idle", ["Cold. Sheep. Cold sheep.", "Snow on the wool. Snow in the boot.", "Breath. Look. Cold."], { season: "winter", weight: 0.6 }),
+  ...R(2, "idle", [
+    "Winter. The sheep are white and the ground is white and I have lost three already by not squinting.",
+    "My breath comes out in clouds. The sheep's does too. We are all just steaming in a field.",
+    "A sheep in the snow is a sheep-shaped hole in the world. I have to check each one.",
+  ], { season: "winter", weight: 0.7 }),
+  ...R(4, "idle", ["#pantheon.cap#, it is winter, my #bodypart# are #adj#, and the sheep have the only coats.", "#oath.cap#, snow! The sheep are camouflaged and I am not, and the hill has noticed."], { season: "winter", weight: 0.7 }),
+  ...R(8, "idle", ["It snowed. The sheep did not mind. I carried one and it was warm and I did not mind either, for a while."], { season: "winter", reg: ["hemingway"] }),
+  ...R(1, "idle", ["Leaves. Everywhere. Also sheep.", "Autumn. Wet leaves. Wet sheep."], { season: "autumn", weight: 0.6 }),
+  ...R(2, "idle", ["The leaves are turning. The sheep are not. The sheep never turn. They run.", "Autumn: the trees let go of everything and I cannot let go of a single sheep.", "Every leaf on this hill is a colour I have no word for yet. Every sheep is the same colour and I have plenty."], { season: "autumn", weight: 0.7 }),
+  ...R(4, "idle", ["#pantheon.cap#, the whole valley is gold and red and I am looking at the back end of a sheep."], { season: "autumn", weight: 0.7 }),
+  ...R(2, "idle", ["Spring. Everything is growing, including the distance between me and the sheep.", "Lambs, somewhere, are being sweet. These are not lambs. These are opinions with wool.", "The flowers are out. The sheep are eating them. Nature is a circle and I am walking round it."], { season: "spring", weight: 0.7 }),
+  ...R(2, "idle", ["Summer. The sun is a cowpat in the sky and I am the boot.", "Hot. The sheep are wearing wool in this. By choice. I have questions.", "Midsummer, and the sheep have found the one patch of shade and are not sharing."], { season: "summer", weight: 0.7 }),
+  ...R(4, "idle", ["#oath.cap#, the heat! I am a stew and the sheep are the dumplings and none of us asked to be lunch."], { season: "summer", weight: 0.7 }),
   // The scarecrow has the better job.
   ...R(0, "scarecrow", ["Scarecrow. Lucky.", "Stands. All day. Lucky.", "Hat. Nice hat."]),
   ...R(2, "scarecrow", ["The scarecrow has the better job. He stands in one place and nothing runs from him.", "Evening, scarecrow. No? Fine. You and the sheep can not-talk together.", "I envy the scarecrow. Nobody expects him to catch anything."]),
