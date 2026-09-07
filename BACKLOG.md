@@ -39,6 +39,7 @@ long soak.
 - The sheepdog: follows, lies down, chases butterflies, bolts from wasps, barks once at runaways; lines about him
 - First words at dawn, crown for thrice-escaped sheep, dog on Hall records, Burns bonus book
 - Sheep temperaments (dozy, curious, stubborn), the crook breaking once a day, sheep of the day, wind weather
+- Lunch beat, frustration arc rebalanced (mean 28 at 09:00 to 87 at 17:00), English-only verb slots, ?weather pin
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

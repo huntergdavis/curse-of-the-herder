@@ -63,9 +63,13 @@ in-game titles to real public-domain sources is in
   repeat. Sheep flee, some are on roofs or in rivers ("how did you get up
   there"), repeat escapees earn names and a red ribbon. He detours for a
   book when empty-handed, sits and reads for a minute or two, and talks
-  like the book for ten minutes afterwards. The countryside fights back:
-  bogs, nettles, cowpats, wasps, a sheep that bites, a gate that jams.
-  His sheepdog follows him all day and helps with nothing.
+  like the book for ten minutes afterwards. Sheep have temperaments:
+  dozy ones sleep where they stand, curious ones walk up to him,
+  stubborn ones will not be lifted on the first heave. The countryside
+  fights back: bogs, nettles, cowpats, wasps, a sheep that bites, a gate
+  that jams, and once a day the crook snaps. He eats lunch on a stump at
+  half past twelve. His sheepdog follows him all day and helps with
+  nothing. Rain, fog and wind come and go; a rainbow follows the rain.
 - **Two axes drive every line.** *Eloquence* (level 0–12) comes from
   books; *frustration* (0–100) rises through the day with distance, rain,
   fleeing sheep and the walk of shame, and sets both curse frequency and
