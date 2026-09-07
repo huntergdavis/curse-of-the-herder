@@ -80,6 +80,10 @@ in-game titles to real public-domain sources is in
   Three days in four a sheep eats his lunch while he watches. Once a day,
   after two, the dog actually herds a sheep to him, and nobody can explain
   it; on other days it lies down exactly where his boot was going.
+  When he sits down the dog may bring him a stick, which he throws, and
+  which is not a sheep. Mid-afternoon he stops at a village well for a
+  drink of water, which is not ale. Each new level is announced, and he
+  feels the words arrive.
 - **Two axes drive every line.** *Eloquence* (level 0–12) comes from
   books; *frustration* (0–100) rises through the day with distance, rain,
   fleeing sheep and the walk of shame, and sets both curse frequency and
@@ -101,7 +105,8 @@ in-game titles to real public-domain sources is in
   of hours with three sheep that follow him in a line (even the dog goes
   to look; on the third pass one of them bolts, and he is thrilled), hens
   that scatter, an inn called the Cursed Ram that he walks past with
-  difficulty, cows that explain the cowpats, loose sheep that drift over to
+  difficulty, signposts whose certainty he resents, cows that explain the
+  cowpats, loose sheep that drift over to
   listen while he reads aloud, the Curse itself heckling from the
   sidelines, washing lines, roof cats, chimney smoke, scarecrows he
   envies, ducks with ducklings, frogs, fish, rabbits that bolt, owls and
