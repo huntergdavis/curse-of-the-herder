@@ -67,7 +67,7 @@ interface Session {
   /** Which excerpt of the current book is showing. */
   excerptShown: number;
   /** Lines waiting to be delivered after the current bubble (flyting, quotations). */
-  queue: { text: string; heat: number; seconds: number; sheepId?: number; emote?: string; atMs: number }[];
+  queue: { text: string; heat: number; seconds: number; sheepId?: number; emote?: string; atMs: number; force?: boolean }[];
   /** The last book finished, for quoting later. */
   lastBook: { id: string; tick: number; quoted: boolean } | null;
   /** Wall ms when the last sheep was penned; drives the dusk fade. */
@@ -434,7 +434,7 @@ function hourlyDiary(s: Session): void {
 function flushQueue(s: Session, nowMs: number): void {
   while (s.queue.length && s.queue[0]!.atMs <= nowMs) {
     const q = s.queue.shift()!;
-    say(s, q.text, q.heat, q.seconds, nowMs);
+    say(s, q.text, q.heat, q.seconds, nowMs, q.force ?? false);
     if (q.sheepId !== undefined && q.emote) s.bubbles.emote(q.sheepId, q.emote, Math.min(3, q.seconds), nowMs + 500);
   }
 }
@@ -499,7 +499,8 @@ function maybeCurseRemarks(s: Session, kind: string, nowMs: number): void {
   // He hears it, and about half the time he answers back.
   if (kind !== "finished" && keyedUnit(w.seed, "curse-reply", w.tick) < 0.55) {
     const reply = speakKind(w, s.map, "curseReply", { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP, 0.35);
-    if (reply) s.queue.push({ text: reply.text, heat: reply.heat, seconds: reply.seconds, atMs: nowMs + 4500 / Math.max(1, FAST) + 1500 });
+    // The toast lands 2.5 s from now and lingers; he answers while it is still up, whatever the sim speed.
+    if (reply) s.queue.push({ text: reply.text, heat: reply.heat, seconds: reply.seconds, atMs: nowMs + 6000, force: true });
   }
   window.setTimeout(() => {
     const el = $("toast");

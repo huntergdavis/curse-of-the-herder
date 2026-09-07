@@ -1,7 +1,7 @@
 // Run a fast day and log every Curse toast and the herder's next line after it.
 import { chromium } from "@playwright/test";
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
-await p.goto("http://localhost:4174/curse-of-the-herder/?fast=100&new=1&seed=heckle&books=6");
+await p.goto("http://localhost:4174/curse-of-the-herder/?fast=10&new=1&seed=heckle&books=30");
 await p.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
 let lastToast = ""; let lastHeard = ""; let curses = 0; let replies = 0; let awaiting = false;
 const t0 = Date.now();

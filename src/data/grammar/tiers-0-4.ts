@@ -42,7 +42,7 @@ export const NON_TERMINALS: NonTerminal[] = [
       { t: "I am #selfadj#", weight: 2 },
       { t: "the #target# is #adj#", weight: 2 },
       { t: "I have #verb.ed# enough", weight: 1 },
-      { t: "there is #noun# in my #bodypart#", weight: 1 },
+      { t: "there is an ache in my #bodypart# the size of #noun.a#", weight: 1 },
       { t: "everything is #adj#", weight: 1 },
       { t: "#remaining# sheep are still out", weight: 2 },
       { t: "my #bodypart# have opinions", weight: 1, minLevel: 3 },
