@@ -78,6 +78,7 @@ long soak.
 - When he sits down, the dog sometimes fetches him a stick ("I asked for sheep and you have brought me KINDLING!")
 - He throws the stick; the dog fetches it, the fastest it moves all day
 - Level-ups are announced: a toast with the new level name, a line about the words arriving ("A new word arrives and the first thing I do with it is throw it at a hill"), and a Curse remark
+- `node scripts/watch-toasts.mjs <url> [seconds]` logs every toast and herder line with the sim clock; `npx tsx scripts/probe-kind.ts` checks the renderer-hook kinds produce lines at level 0
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
