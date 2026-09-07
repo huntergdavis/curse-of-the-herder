@@ -365,6 +365,30 @@ export const jerome: LexPack = {
   ],
 };
 
+const CR = { reg: ["crawler"] };
+const cr = (e: LexEntry): LexEntry => ({ ...e, ...CR });
+
+/** Crib notes on a dungeon crawl: a man, a cat, an announcer that keeps score. The oath is Carl's. */
+export const crawler: LexPack = {
+  id: "crawler",
+  title: "Crib Notes: Dungeon Crawler Carl",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 6,
+  entries: [
+    cr(oath("Goddamnit, Donut!", 2)), cr(oath("Goddamnit, Donut!", 2)), cr(oath("goddamnit", 2)), cr(oath("oh, for the love of", 1)), cr(oath("not again, Donut", 1)),
+    cr(interj("New achievement!")), cr(interj("Loot box!")), cr(interj("Level up!")), cr(interj("Achievement unlocked!")),
+    cr(n("loot box", { pl: "loot boxes" })), cr(n("achievement")), cr(n("dungeon")), cr(n("staircase")), cr(n("boss")), cr(n("tiara")), cr(n("hairball")), cr(n("announcer")),
+    cr(n("crawler")), cr(n("level")), cr(n("cat")), cr(n("trousers", { pl: "-" })), cr(n("floor")), cr(n("goblin")), cr(n("tutorial")), cr(n("respawn")),
+    cr(adj("sponsored")), cr(adj("legendary", { syl: 4 })), cr(adj("cursed")), cr(adj("underlevelled", { syl: 4 })), cr(adj("achievement-worthy", { syl: 5 })), cr(adj("trouserless", { syl: 3 })),
+    cr(adj("feline")), cr(adj("catastrophic", { syl: 4 })), cr(adj("un-looted", { syl: 3 })),
+    cr(ins("crawler")), cr(ins("tutorial boss")), cr(ins("walking loot box")), cr(ins("cat with a tiara")), cr(ins("first-floor goblin")), cr(ins("hairball with ambitions")), cr(ins("unsponsored nobody")),
+    cr(sim("a cat that has been told no")), cr(sim("a loot box with nothing in it")), cr(sim("a tutorial that will not end")), cr(sim("a man in a dungeon with no trousers")), cr(sim("an announcer who has seen it all")),
+    cr(abs("the leaderboard")), cr(abs("the tutorial")), cr(abs("floor one")), cr(abs("a lack of trousers")),
+    cr(verb("loot")), cr(verb("respawn")), cr(verb("descend")), cr(verb("level up", { forms: ["levels up", "levelled up", "levelling up"] })),
+  ],
+};
+
 const N_ = { reg: ["nautical"] };
 const nt = (e: LexEntry): LexEntry => ({ ...e, ...N_ });
 
@@ -400,4 +424,4 @@ export const nautical: LexPack = {
   ],
 };
 
-export const PACKS_5_8: LexPack[] = [groseVulgarTongue, bard, french, german, italianSpanish, yiddishScotsAussie, quebecSacres, hemingway, nautical, jerome];
+export const PACKS_5_8: LexPack[] = [groseVulgarTongue, bard, french, german, italianSpanish, yiddishScotsAussie, quebecSacres, hemingway, nautical, jerome, crawler];

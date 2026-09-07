@@ -25,6 +25,7 @@ const SHEEP = [
   "Percival", "Gwendolyn", "Cedric", "Hilda", "Rupert", "Mildred", "Ambrose", "Edith", "Cuthbert",
   "Winifred", "Bartholomew", "Muriel", "Humphrey", "Ethel", "Lancelot", "Dorothy", "Fitzwilliam",
   "Gladys", "Wilberforce", "Bernadette", "Algernon", "Philippa", "Cornelius", "Maureen", "Basil",
+  "Donut", "Mongo",
 ];
 
 const DOGS = ["Biscuit", "Nell", "Fly", "Moss", "Cap", "Bess", "Tam", "Glen", "Meg", "Bracken", "Wisp", "Jess", "Roy", "Sweep", "Shep", "Dot", "Bramble", "Tweed", "Pip", "Floss"];

@@ -78,6 +78,7 @@ long soak.
 - The neighbour stops dead for six seconds and calls after her, which is a new feeling for him
 - He waves back at the neighbour, stiffly, whenever he passes within five tiles and his hands are free (`?wave=1` holds the pose; `?rival=1` now spawns him three seconds in, within waving distance)
 - New book and register: *Three Men in a Boat* (Jerome K. Jerome, 1889, genuine excerpts) with a `jerome` pack of Victorian idler's outrage ("I like herding: it fascinates me. I can sit and look at a sheep for hours. It is the carrying I object to.")
+- Easter egg: *Crib Notes: Dungeon Crawler Carl* (a summary, no text quoted) with a `crawler` pack and register: "Goddamnit, Donut!" as his oath, unnamed sheep addressed as Donut while the register is hot, achievement announcements, a 🏆 toast on reading, and Donut and Mongo in the sheep-name pool
 - When he sits down, the dog sometimes fetches him a stick ("I asked for sheep and you have brought me KINDLING!")
 - He throws the stick; the dog fetches it, the fastest it moves all day
 - Level-ups are announced: a toast with the new level name, a line about the words arriving ("A new word arrives and the first thing I do with it is throw it at a hill"), and a Curse remark

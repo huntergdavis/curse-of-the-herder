@@ -402,6 +402,9 @@ function handleEvents(s: Session, nowMs: number): void {
         const sample = b.pack ? tasteOfPack(grammar.packEntries(b.pack), w.seed + b.id + "toast", 3) : [];
         toast(`Read <em>${b.title}</em>${sample.length ? `: ${sample.map(escapeHtml).join(", ")}…` : ""} Vocabulary: ${grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP))} words.`);
       }
+      if (e.bookId === "crawler-notes") {
+        window.setTimeout(() => toast(`<strong>🏆 New Achievement!</strong> Read a book about a cat. Reward: none. Goddamnit, Donut.`), 9000);
+      }
       if (e.bookId) s.lastBook = { id: e.bookId, tick: w.tick, quoted: false };
       const vocabEl = $("hud-vocab");
       vocabEl.classList.remove("pop");
@@ -550,7 +553,7 @@ const CURSE_LINES: Record<string, string[]> = {
   lunchStolen: ["That was the good cheese, too.", "I did not arrange that. I would have, but I did not.", "Lunch is for the uncursed."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
-  book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],
+  book: ["Learn all the words you like. The sheep have heard them.", "That one had a cat in it. The cat was doing better than he is.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],
 };
 let lastCurseMs = -1e9;
 /** From level 10, the Curse itself occasionally remarks on events, drily, in its own voice. */

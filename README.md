@@ -5,6 +5,7 @@ his flock for all eternity, spends a nine-hour day carrying sheep home
 across a large tile map. He starts the morning barely able to grunt.
 By evening, after finding books in little free libraries along the way,
 he curses in Shakespearean thou-and-thee, Hemingway declaratives,
+the occasional "Goddamnit, Donut!",
 Québécois sacres and Rabelaisian catalogs. When the last sheep is penned
 he retires to the Hall of Herders, and his final curse goes on his
 tombstone.

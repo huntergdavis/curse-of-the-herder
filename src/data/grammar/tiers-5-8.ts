@@ -11,6 +11,7 @@ const BARD = { reg: ["bard"] };
 const POLY = { reg: ["fr", "de", "it", "es", "yi", "sco", "au", "qc"] };
 const HEM = { reg: ["hemingway"] };
 const JER = { reg: ["jerome"] };
+const CRAWL = { reg: ["crawler"] };
 
 export const NON_TERMINALS_5_8: NonTerminal[] = [
   {
@@ -264,4 +265,23 @@ export const RULES_5_8: Rule[] = [
   ...R(7, "rain", ["The rain came on, as it always does when one has decided against the umbrella, which is to say on principle."], JER),
   ...R(7, "flee", ["Off it goes, at a pace it has never once shown in my direction. Hang it all.", "Dash it! It ran! It stood there like a tin of pineapple for an hour and now it RUNS!"], JER),
   ...R(7, "breather", ["I shall sit. I am told that idleness is a vice; I have always found it the only one I am any good at."], JER),
+  // Crib notes on a dungeon crawl: the announcer keeps score, and the oath is Carl's.
+  ...R(6, "idle", [
+    "Goddamnit, Donut! Get down from there! You are a sheep! You do not even have the EXCUSE of being a cat!",
+    "Goddamnit, Donut. Every time. Every single time I turn my back.",
+    "New achievement! You have walked #bignum# miles for a sheep that was behind you. Reward: the sheep is still behind you.",
+    "Achievement unlocked: #adj.cap# Herder. Description: carried a sheep up a hill and said something #adj# about it. Reward: another hill.",
+    "This is floor one. This is the TUTORIAL. Nobody told me the tutorial had sixty of you in it.",
+    "Loot box! Contents: one sheep, #adj#, slightly used. I have opened #penned# of these today and every one of them was a sheep.",
+    "The announcer in my head says #remaining# to go, in a voice that is enjoying this far too much.",
+    "At least the man in the book had a cat with a tiara. I have #vocative#, who has neither a tiara nor a single redeeming quality.",
+    "If this hill had a leaderboard I would be on it, under the heading Most #adj#, and I would not be proud.",
+    "Goddamnit, Donut, that is a ROOF. We have talked about roofs.",
+  ], CRAWL),
+  ...R(6, "caught", ["Goddamnit, Donut! Up! Up you come! New achievement: Lifting Things That Object.", "Got you. Loot box, opened. Contents: you. I want a refund."], CRAWL),
+  ...R(6, "penned", ["Goddamnit, Donut, stay IN. New achievement: #penned.cap# in the Pen. Reward: an announcer who will not stop.", "In. #penned.cap#. If there were sponsors they would have left by now."], CRAWL),
+  ...R(6, "flee", ["Goddamnit, DONUT!", "It ran. The announcer would call that a boss mechanic. I call it a #adj# sheep."], CRAWL),
+  ...R(6, "absurd", ["Goddamnit, Donut, how are you UP there? What floor is this? Who put stairs on a hill?"], CRAWL),
+  ...R(6, "repeatEscape", ["Not you. Not AGAIN. Goddamnit, Donut, you are a boss fight with wool."], CRAWL),
+  ...R(6, "epitaph", ["Goddamnit, Donut.", "New achievement: Done. Reward: a stone.", "He never found his trousers. He found the sheep."], { ...CRAWL, maxChars: 60 }),
 ];

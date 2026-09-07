@@ -363,7 +363,8 @@ function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string 
     case "name":
       return ctx.target.name ?? ctx.target.noun;
     case "vocative":
-      return ctx.target.name ?? (ctx.target.kind === "sheep" ? "sheep" : ctx.target.noun);
+      // While the crawler register is hot, every unnamed sheep is Donut. Goddamnit.
+      return ctx.target.name ?? (ctx.target.kind === "sheep" ? (ctx.registers.includes("crawler") ? "Donut" : "sheep") : ctx.target.noun);
     case "you":
       return ctx.target.name ?? "you";
     case "it":

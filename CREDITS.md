@@ -31,5 +31,9 @@ All terrain, sprites, UI and the tombstone are drawn procedurally in code.
 
 ## Inspiration (nothing copied)
 
+- *Dungeon Crawler Carl* (Matt Dinniman): the "Crib Notes" book is a
+  summary in our own words, no text quoted; "Goddamnit, Donut!" is Carl's
+  and is used with affection.
+
 The Grind 2 (huntergdavis), Tracery (Kate Compton), the Shakespeare
 insult kit tradition, Captain Haddock, Carcassonne, Dorfromantik.

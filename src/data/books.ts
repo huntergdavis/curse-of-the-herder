@@ -78,6 +78,15 @@ export const BOOKS: Book[] = [
     excerpts: ["The hill was long. The sheep was heavy. He went up.", "It rained and the road was mud and he did not stop.", "He carried it and it did not thank him and that was all right.", "Short words. Wet boots. One more."],
   },
   {
+    id: "crawler-notes", title: "Crib Notes: Dungeon Crawler Carl", author: "a summary, after Matt Dinniman (no text quoted)", pack: "crawler", register: "crawler", when: 0.55, colour: "#e2679a",
+    excerpts: [
+      "Summary: a man, a cat, and a dungeon that keeps score. The cat is royalty. The man has no trousers. Nobody explains why.",
+      "Everything is an achievement, including the mistakes. Especially the mistakes. An announcer reads them out.",
+      "Recurring line, chapter after chapter: \"Goddamnit, Donut!\" Applies to cats. Applies, it turns out, to sheep.",
+      "Study question: if the sheep were a cat, would it listen? (No. But it would have a tiara.)",
+    ],
+  },
+  {
     id: "three-men", title: "Three Men in a Boat", author: "Jerome K. Jerome, 1889 (genuine excerpts)", pack: "jerome", register: "jerome", when: 0.6, colour: "#5b7f9a",
     excerpts: [
       "I like work: it fascinates me. I can sit and look at it for hours.",
