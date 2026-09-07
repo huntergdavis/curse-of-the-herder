@@ -82,6 +82,21 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // Milestones: halfway, ten to go, one to go.
+  ...R(0, "halfway", ["Half.", "Thirty. Half.", "Half. #interj.cap#."]),
+  ...R(2, "halfway", ["Thirty. Halfway. The other half are the ones that run.", "Half the flock is in. The half that was near. I know how this goes.", "Halfway, #dog#. Halfway. Do not get up. You never do."]),
+  ...R(4, "halfway", ["#pantheon.cap#, thirty in, thirty out, and the thirty out are the #adj# ones.", "#oath_phrase#, halfway! And the easy half is the half that is done!"]),
+  ...R(8, "halfway", ["Thirty in. Thirty out. It was noon and the arithmetic was even and it would not stay that way."], { reg: ["hemingway"] }),
+  ...R(10, "halfway", ["Let the ledger note the equinox of this #adj# day: thirty sheep in the pen, thirty at large, and one herder precisely half as patient as he was at dawn."]),
+  ...R(0, "tentogo", ["Ten.", "Ten left. Ten.", "#interj.cap#. Ten."]),
+  ...R(2, "tentogo", ["Ten to go. The ten that are furthest. Of course.", "Ten left. I can count them on my fingers, which is more than I can do with my toes.", "Ten. #dog.cap#, ten. Look alive. No. As you were."]),
+  ...R(4, "tentogo", ["#oath.cap#, ten left, and every one of them a #adj# #insult# on a #adj# hill!", "#pantheon.cap#, ten. Grant me the legs for ten."]),
+  ...R(8, "tentogo", ["Ten. I said it out loud. It did not make them fewer."], { reg: ["hemingway"] }),
+  ...R(0, "lastone", ["One.", "One more.", "Last. One."]),
+  ...R(2, "lastone", ["One left. It is on the rock. It is always on the rock.", "One more. One. I could cry. I will not. There is a sheep watching.", "The last one. Somewhere out there, chewing, unaware that it is the last one."]),
+  ...R(4, "lastone", ["#pantheon.cap#, one. ONE. Let it be near. Let it be slow. Let it be ASLEEP.", "#oath_phrase#, one left, and the day is nearly done, and my #bodypart# are nearly done, and so, nearly, am I."]),
+  ...R(8, "lastone", ["One left. I went to get it. That is all there is to say about the last one until it is in."], { reg: ["hemingway"] }),
+  ...R(12, "lastone", ["One sheep between me and the stone. I have never wanted a sheep so much, or a stone."]),
   // The kitchen register.
   ...R(5, "idle", [
     "You #adj# #insult#, you would not pass at a wake.",

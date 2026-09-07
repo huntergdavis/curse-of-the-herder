@@ -30,6 +30,8 @@ export interface HallRecord {
   dogName?: string | undefined;
   /** The sheep with the most escapes, if any escaped twice or more. */
   sheepOfTheDay?: { name: string; flees: number } | undefined;
+  /** Every sheep that earned a name today. */
+  namedSheep?: { name: string; flees: number }[] | undefined;
   /** Most-used lexicon word and its favourite target. */
   favouriteWord?: { w: string; n: number; mostly: string } | undefined;
   /** What he read, in order, and a taste of what each book gave him. */
@@ -79,6 +81,7 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
       const top = [...w.sheep].sort((a, b) => b.flees - a.flees)[0];
       return top && top.flees >= 2 ? { name: sheepName(w.seed, top.id), flees: top.flees } : undefined;
     })(),
+    namedSheep: w.sheep.filter((s) => s.named).sort((a, b) => b.flees - a.flees).map((s) => ({ name: sheepName(w.seed, s.id), flees: s.flees })),
     favouriteWord: (() => {
       const top = Object.entries(w.wordUse).sort((a, b) => b[1].n - a[1].n)[0];
       if (!top || top[1].n < 2) return undefined;

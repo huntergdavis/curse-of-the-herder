@@ -474,6 +474,7 @@ async function showHall(): Promise<void> {
       (r) =>
         `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd>${r.dogName ? `<dt>Dog</dt><dd>${escapeHtml(r.dogName)} (no help)</dd>` : ""}${r.sheepOfTheDay ? `<dt>Sheep of the day</dt><dd>${escapeHtml(r.sheepOfTheDay.name)} (${r.sheepOfTheDay.flees} escapes)</dd>` : ""}${r.favouriteWord ? `<dt>Favourite word</dt><dd>${escapeHtml(r.favouriteWord.w)} (${r.favouriteWord.n}×)</dd>` : ""}</dl>` +
         (r.longestLine ? `<div class="longest">“${escapeHtml(r.longestLine)}”</div>` : "") +
+        (r.namedSheep?.length ? `<div class="longest">Named today: ${r.namedSheep.map((n) => `${escapeHtml(n.name)} (${n.flees})`).join(", ")}</div>` : "") +
         readingHtml(r, true) +
         `</article>`,
     )

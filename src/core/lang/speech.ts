@@ -138,6 +138,7 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   wind: "wind",
   lunch: "lunch",
   black: "black",
+  milestone: "idle",
 };
 
 function holdSeconds(text: string, heat: number): number {
@@ -149,7 +150,7 @@ export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent
   let ev = EVENT_MAP[e.kind];
   if (!ev) return null;
   // Catching a sheep off a roof gets its own material.
-  if (e.kind === "mishap" && e.detail) ev = e.detail as RuleEvent;
+  if ((e.kind === "mishap" || e.kind === "milestone") && e.detail) ev = e.detail as RuleEvent;
   if (e.kind === "absurd" && wasOnRoof(w, map, e.sheepId)) ev = "roof";
   else if (e.kind === "absurd" && wasInRiver(w, map, e.sheepId)) ev = "river";
   else if (e.kind === "absurd" && map.deco[Math.round(w.sheep[e.sheepId]?.homeY ?? 0) * map.size + Math.round(w.sheep[e.sheepId]?.homeX ?? 0)] === Deco.Boulder) ev = "boulder";

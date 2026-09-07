@@ -614,6 +614,9 @@ function stepHerder(w: WorldState, map: GameMap): void {
         s.ty = s.y;
         w.sheepPenned++;
         pushEvent(w, { tick: w.tick, kind: "penned", sheepId: s.id });
+        if (w.sheepPenned === Math.floor(w.sheep.length / 2)) pushEvent(w, { tick: w.tick, kind: "milestone", sheepId: -1, detail: "halfway" });
+        else if (w.sheepPenned === w.sheep.length - 10) pushEvent(w, { tick: w.tick, kind: "milestone", sheepId: -1, detail: "tentogo" });
+        else if (w.sheepPenned === w.sheep.length - 1) pushEvent(w, { tick: w.tick, kind: "milestone", sheepId: -1, detail: "lastone" });
       }
       h.carrying = -1;
       h.tripTiles = 0;
