@@ -32,8 +32,11 @@ export class Minimap {
   draw(target: HTMLCanvasElement, world: WorldState): void {
     const ctx = target.getContext("2d")!;
     const px = this.px;
-    target.width = px;
-    target.height = px;
+    if (target.width !== px || target.height !== px) {
+      target.width = px;
+      target.height = px;
+    }
+    ctx.clearRect(0, 0, px, px);
     ctx.drawImage(this.base, 0, 0);
     const s = px / this.map.size;
     ctx.fillStyle = "rgba(0,0,0,0.25)";

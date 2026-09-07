@@ -671,8 +671,8 @@ export class Renderer {
     if (this.season === "winter") {
       for (const v of this.map.villages) {
         if (Math.abs(v.x - cam.x) * T > W / 2 + T * 3 || Math.abs(v.y - cam.y) * T > H / 2 + T * 3) continue;
-        const px = sx(v.x - 1 + 0.5);
-        const py = sy(v.y + 1 + 0.9);
+        const px = sx(v.x + 2 + 0.5);
+        const py = sy(v.y - 2 + 0.9);
         ctx.fillStyle = "#f4f6f8";
         ctx.strokeStyle = "#2b2620";
         ctx.lineWidth = Math.max(1, T * 0.04);
