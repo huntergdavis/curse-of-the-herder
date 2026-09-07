@@ -22,12 +22,14 @@
 | Delighters | Dog, nemesis sheep, jailbreaks (plotted in whispers), lunch theft, the neighbour Tom and his three obedient sheep (one bolts on his third pass), cows, hens, the Cursed Ram inn, signposts, the well, sticks, streaks, the Curse heckling and being answered, level-up announcements, seasons, weather, wildlife, villagers, washing lines, the dusk finale. |
 | Hall of Herders | Done. Tombstone, reading list with word usage, favourite word, nemesis, lunch thief, dog's one good deed, neighbour visits, highlights, Almanac across herders. |
 | Mobile | Done. Header collapses; verified at 390×844. |
+| Minimap | Viewport reticle; click or drag to look around; two-second hold, then a glide back. Hidden on narrow phones. |
 | Robustness | Liveness watchdog, wall-clock catch-up (capped 4 h), weekly soak, heap floors, and (today) self-probing terrain chunks with two fallback modes. |
 
 ## Fixed today (bug report round)
 
 - **Sea over the whole island after a long day.** Terrain chunk canvases (up to 9 MB each, two dozen cached, plus the previous island's set) were being dropped by the browser; the roads and cloud shadows drawn on top survived, so the land read as water. Chunks are now capped at 4 MB, freed explicitly on every map/season/resize change and on `contextlost`, probed with a known-colour pixel after render and every three seconds, and fall back (offscreen → on-DOM canvas → direct painting) the moment a probe fails, retrying the fast path every 20 s.
 - **Day ended at 17:30.** Board 512 → 576 and a steeper governor.
+- **Looking around.** The minimap shows the viewport as a reticle; click or hold-and-drag on it to look anywhere on the island, and the view glides back to the herder two seconds after release. Covered by a Playwright test.
 - `scratch/` is ignored by git.
 
 ## Backlog remaining
