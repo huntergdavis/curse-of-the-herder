@@ -166,8 +166,9 @@ export function tidySentence(s: string): string {
     const fixed = art[0] === "A" ? capitalize(want) : want;
     return `${fixed}${sp}${word}`;
   });
-  t = t.replace(/(^|[.!?]\s+|["“]\s*)([a-z])/g, (_m, pre: string, ch: string) => pre + ch.toUpperCase());
+  t = t.replace(/(^|[.!?]\s+|["“]\s*)([("“']*)([a-z])/g, (_m, pre: string, open: string, ch: string) => pre + open + ch.toUpperCase());
   t = t.replace(/\bi\b/g, "I");
-  if (!/[.!?…"”]$/.test(t)) t += ".";
+  // "(It scans.)" is already terminated; otherwise add a full stop.
+  if (!/[.!?…"”]$/.test(t) && !/[.!?…]\)$/.test(t)) t += ".";
   return t;
 }

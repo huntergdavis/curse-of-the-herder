@@ -166,6 +166,7 @@ export class Grammar {
 
   private applyHeat(text: string, ctx: Context, rnd: () => number): string {
     let t = text;
+    if (/\)$/.test(t)) return t; // a parenthetical aside is delivered quietly
     if (ctx.heat > 0.55 && /\.$/.test(t) && rnd() < 0.7) t = t.slice(0, -1) + "!";
     if (ctx.heat > 0.8 && /!$/.test(t) && rnd() < 0.5) t += "!";
     if (ctx.heat > 0.9 && rnd() < 0.5) {

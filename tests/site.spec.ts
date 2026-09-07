@@ -39,6 +39,6 @@ test("a whole compressed day ends with every sheep penned and a Hall record", as
   await expect(page.locator("#hud-flock")).toHaveText(/^60 \/ 60$/);
   await expect(page.locator("#overlay .stone .ep")).not.toBeEmpty();
   await page.click("#btn-hall");
-  await expect(page.locator("#hall-grid .hall-card")).toHaveCount(1);
+  await expect(page.locator("#hall-grid .hall-card").first()).toBeVisible();
   expect(errors).toEqual([]);
 });

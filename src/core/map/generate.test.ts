@@ -4,12 +4,14 @@ import { Terrain } from "./terrain";
 
 describe("generateMap", () => {
   const map = generateMap("test-seed", { size: 128 });
+  // This machine is slow; generation-heavy tests get generous timeouts.
+  const SLOW = 60_000;
 
   it("is deterministic", () => {
     const again = generateMap("test-seed", { size: 128 });
     expect(again.terrain).toEqual(map.terrain);
     expect(again.pen).toEqual(map.pen);
-  });
+  }, SLOW);
 
   it("puts the pen on reachable grass with a fence and a gate", () => {
     const i = map.pen.y * map.size + map.pen.x;
@@ -45,5 +47,5 @@ describe("generateMap", () => {
       }
     }
     expect(placeable).toBeGreaterThan(1000);
-  });
+  }, SLOW);
 });

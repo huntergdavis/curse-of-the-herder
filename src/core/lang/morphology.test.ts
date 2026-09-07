@@ -36,5 +36,6 @@ describe("morphology", () => {
     expect(tidySentence("this   is a hill , sheep")).toBe("This is a hill, sheep.")
     expect(tidySentence("a ewe. a owl")).toBe("A ewe. An owl.");
     expect(tidySentence("i hate it!")).toBe("I hate it!");
+    expect(tidySentence("a swab. (it scans.)")).toBe("A swab. (It scans.)");
   });
 });
