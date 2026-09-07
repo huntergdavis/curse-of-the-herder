@@ -81,10 +81,11 @@ function planPath(w: WorldState, map: GameMap, tx: number, ty: number): boolean 
 function planToSheep(w: WorldState, map: GameMap, s: SheepState): boolean {
   const tx = Math.round(s.tx);
   const ty = Math.round(s.ty);
-  if (!s.onRoof) return planPath(w, map, tx, ty);
-  for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1]] as const) {
+  if (!s.onRoof && !s.inRiver) return planPath(w, map, tx, ty);
+  for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]] as const) {
     const i = (ty + dy) * map.size + (tx + dx);
     if (map.deco[i] === Deco.House || map.deco[i] === Deco.HouseRed || map.deco[i] === Deco.Fence) continue;
+    if (!isWalkable(map.terrain[i]!)) continue;
     if (planPath(w, map, tx + dx, ty + dy)) return true;
   }
   return false;
@@ -459,8 +460,9 @@ function stepHerder(w: WorldState, map: GameMap): void {
     }
     // The sheep may have wandered; re-path when the path is exhausted but we are not there.
     if (h.path.length === 0) {
-      if (d <= (s.onRoof ? 1.6 : 0.75)) {
+      if (d <= (s.onRoof || s.inRiver ? 1.6 : 0.75)) {
         s.onRoof = false;
+        s.inRiver = false;
         s.mode = "carried";
         h.carrying = s.id;
         h.carryOdometer = 0;

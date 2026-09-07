@@ -1,6 +1,7 @@
 import type { GameMap } from "../core/map/generate";
 import { dayHour, isFoggy, isRaining, type WorldState } from "../core/sim/state";
 import { BOOK_BY_ID } from "../data/books";
+import { sheepName } from "../core/names";
 import { Deco } from "../core/map/terrain";
 import type { Bubbles } from "./bubbles";
 import type { Camera } from "./camera";
@@ -118,7 +119,25 @@ export class Renderer {
       const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : 0.5)), T * (s.onRoof ? 0.75 : 0.9), pose, facing, walkPhase, s.named);
+      if (s.inRiver && s.mode === "loose") {
+        // Ripples around a sheep standing in the water.
+        ctx.strokeStyle = "rgba(255,255,255,0.55)";
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        for (let k = 0; k < 2; k++) {
+          const r = ((nowMs / 1400 + k / 2) % 1);
+          ctx.beginPath();
+          ctx.ellipse(sx(s.x + 0.5), sy(s.y + 0.62), T * (0.3 + r * 0.35), T * (0.12 + r * 0.16), 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : 0.5)), T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named);
+      if (s.named && s.mode === "loose" && T >= 32) {
+        ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(43,38,32,0.8)";
+        ctx.fillText(sheepName(world.seed, s.id), sx(s.x + 0.5), sy(s.y + 0.5) + T * 0.62);
+        ctx.textAlign = "left";
+      }
       // Stranded sheep look faintly puzzled about it, now and then; the others bleat occasionally.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
       else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "baa");

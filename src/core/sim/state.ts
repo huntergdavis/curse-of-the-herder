@@ -34,6 +34,8 @@ export interface SheepState {
   speed: number;
   /** Sitting on a village roof; caught from the doorstep. */
   onRoof?: boolean;
+  /** Standing in the river; caught from the bank. */
+  inRiver?: boolean;
 }
 
 export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting";
@@ -168,8 +170,26 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
   const roofs: number[] = [];
   for (let i = 0; i < map.size * map.size; i++) if ((map.deco[i] === Deco.House || map.deco[i] === Deco.HouseRed) && Number.isFinite(map.penDistance[i - 1] ?? Infinity)) roofs.push(i);
   const roofCount = Math.min(3, roofs.length);
+  // And a few have waded into the river and stopped, as sheep do.
+  const shallows: number[] = [];
+  for (let y = 2; y < map.size - 2; y++) for (let x = 2; x < map.size - 2; x++) {
+    const i = y * map.size + x;
+    if (map.terrain[i] !== Terrain.Water) continue;
+    const bank = [i - 1, i + 1, i - map.size, i + map.size].filter((j) => Number.isFinite(map.penDistance[j]!) && map.terrain[j] !== Terrain.Water && map.terrain[j] !== Terrain.Bridge);
+    const d = map.penDistance[bank[0] ?? i];
+    if (bank.length >= 2 && d !== undefined && d > 60 * (map.size / 512) && d < 300 * (map.size / 512)) shallows.push(i);
+  }
+  const riverCount = Math.min(3, shallows.length);
   rings.forEach((ring, r) => {
     let bucket = buckets[r]!;
+    // Swap one sheep of the middle rings for a river sheep.
+    if (r >= 1 && r <= 3 && sheep.filter((x) => x.inRiver).length < riverCount && shallows.length) {
+      const i = shallows.splice(Math.floor(rnd() * shallows.length), 1)[0]!;
+      const x = i % map.size;
+      const y = Math.floor(i / map.size);
+      sheep.push({ id: sheep.length, x, y, homeX: x, homeY: y, mode: "loose", skittish: 0, flees: 0, absurd: true, seen: false, ring: r, named: false, tx: x, ty: y, speed: 0, inRiver: true });
+      ring = { ...ring, count: ring.count - 1 };
+    }
     // Swap one sheep of the middle rings for a roof sheep.
     if (r >= 1 && r <= 3 && sheep.filter((x) => x.onRoof).length < roofCount && roofs.length) {
       const i = roofs.splice(Math.floor(rnd() * roofs.length), 1)[0]!;

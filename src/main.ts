@@ -286,6 +286,24 @@ function maybeQuoteBook(s: Session, nowMs: number): void {
   say(s, text, Math.min(0.6, w.frustration / 100), 5 + text.length * 0.04, nowMs);
 }
 
+let lastDiaryHour = -1;
+/** On the hour, a one-line entry from the herder's day book. */
+function hourlyDiary(s: Session): void {
+  const w = s.world;
+  const hour = Math.floor(dayHour(w));
+  if (hour === lastDiaryHour || w.tick < 40) return;
+  lastDiaryHour = hour;
+  if (hour === 9) return;
+  const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
+  const mood = w.frustration < 22 ? "grumbling" : w.frustration < 42 ? "cursing" : w.frustration < 66 ? "swearing" : "unhinged";
+  const notes = [
+    w.stats.flees ? `${w.stats.flees} bolted` : "",
+    w.stats.absurds ? `${w.stats.absurds} found somewhere absurd` : "",
+    w.stats.rains ? `${w.stats.rains} rain${w.stats.rains === 1 ? "" : "s"}` : "",
+  ].filter(Boolean).join(", ");
+  toast(`<strong>${String(hour).padStart(2, "0")}:00</strong> · ${w.sheepPenned}/${w.sheep.length} sheep in · ${w.booksRead} book${w.booksRead === 1 ? "" : "s"} · level ${level} · ${mood}${notes ? ` · ${notes}` : ""}`);
+}
+
 /** Deliver queued follow-up lines when their time comes. */
 function flushQueue(s: Session, nowMs: number): void {
   while (s.queue.length && s.queue[0]!.atMs <= nowMs) {
@@ -463,6 +481,7 @@ function frame(nowMs: number): void {
       handleEvents(s, nowMs);
       showExcerpts(s, nowMs);
       if (!catchingUp && w.tick % 40 === 0) maybeQuoteBook(s, nowMs);
+      if (!catchingUp && FAST <= 20) hourlyDiary(s);
     }
     flushQueue(s, nowMs);
     if (nowMs - s.lastSaveMs > SAVE_EVERY_MS) {

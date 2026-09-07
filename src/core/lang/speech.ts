@@ -101,6 +101,12 @@ function wasOnRoof(w: WorldState, map: GameMap, sheepId: number): boolean {
   return d === Deco.House || d === Deco.HouseRed;
 }
 
+function wasInRiver(w: WorldState, map: GameMap, sheepId: number): boolean {
+  const s = w.sheep[sheepId];
+  if (!s) return false;
+  return map.terrain[Math.round(s.homeY) * map.size + Math.round(s.homeX)] === Terrain.Water;
+}
+
 const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   flee: "flee",
   caught: "caught",
@@ -127,6 +133,7 @@ export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent
   if (!ev) return null;
   // Catching a sheep off a roof gets its own material.
   if (e.kind === "absurd" && wasOnRoof(w, map, e.sheepId)) ev = "roof";
+  else if (e.kind === "absurd" && wasInRiver(w, map, e.sheepId)) ev = "river";
   const ctx = buildContext(w, map, e, recent, bandCap);
   // Events run hotter than the meter says: something just happened.
   const bump: Partial<Record<RuleEvent, number>> = { flee: 0.25, repeatEscape: 0.4, absurd: 0.3, penned: -0.2, finished: 0.5, rant: 0.3 };

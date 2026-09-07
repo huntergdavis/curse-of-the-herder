@@ -1,0 +1,11 @@
+import { chromium } from "@playwright/test";
+const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
+p.on("pageerror", (e) => console.log("[pageerror]", e.message));
+await p.goto("http://localhost:4174/curse-of-the-herder/?fast=600&new=1");
+await p.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
+await p.waitForSelector("#overlay", { state: "visible", timeout: 200000 });
+const recs = await p.evaluate(() => new Promise((res) => { const r = indexedDB.open("curse-of-the-herder"); r.onsuccess = () => { const g = r.result.transaction("hall").objectStore("hall").getAll(); g.onsuccess = () => res(g.result); }; }));
+const r = recs[recs.length - 1];
+console.log(r.name, "|", r.epitaph);
+for (const x of r.reading) console.log(`${x.clock} ${x.title} → ${x.used?.length ? x.used.map((u) => `${u.w} (${u.n}x, mostly at ${u.mostly})`).join("; ") : x.taught.join(", ")}`);
+await b.close();
