@@ -16,6 +16,9 @@ describe("morphology", () => {
     expect(pluralize("daisy")).toBe("daisies");
     expect(pluralize("bush")).toBe("bushes");
     expect(pluralize("wet blanket")).toBe("wet blankets");
+    expect(pluralize("typhoons")).toBe("typhoons");
+    expect(pluralize("boss")).toBe("bosses");
+    expect(pluralize("bus")).toBe("buses");
   });
   it("conjugates", () => {
     expect(verbForm("carry", "s")).toBe("carries");

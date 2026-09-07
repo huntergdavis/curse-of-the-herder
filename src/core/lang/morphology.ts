@@ -63,6 +63,8 @@ export function pluralize(word: string, override?: string): string {
   const lower = word.toLowerCase();
   const irr = IRREGULAR_PLURALS[lower];
   if (irr) return matchCase(word, irr);
+  // Already plural ("typhoons", "barnacles"): leave it. Singulars in -s are rarer than plurals in our lexicon.
+  if (/[^sui]s$/i.test(word) && !/(?:ss|us|is)$/i.test(word)) return word;
   if (/(?:s|x|z|ch|sh)$/i.test(word)) return word + "es";
   if (/[^aeiou]y$/i.test(word)) return word.slice(0, -1) + "ies";
   if (/(?:fe)$/i.test(word)) return word.slice(0, -2) + "ves";
