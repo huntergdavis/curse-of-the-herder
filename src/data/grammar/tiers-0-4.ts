@@ -149,7 +149,7 @@ export const RULES: Rule[] = [
     "#remaining.cap# sheep left. #interj.cap#.", "I want to sit down.", "Every #target# is #adj#. Every one.", "There is #noun# in my boot.",
     "Who put this #target# here?", "#vocative.cap#, you are #adj#.", "You are #insult_np.a#.", "I have carried #penned# sheep and my #bodypart# know it.",
     "The #target# is #adj# and I am #adj#.", "#terrain_gripe#", "I am a herder. I herd. I do not #verb#. And yet.", "#clause.cap#.",
-    "#clause.cap# and #clause#.", "#exclaim# #clause.cap#.", "Nobody told me about the #noun.pl#.", "I did not sign up for #noun#.",
+    "#clause.cap# and #clause#.", "#exclaim# #clause.cap#.", "Nobody told me about the #noun.pl#.", "I did not sign up for #noun.pl#.",
     "#interj.cap#. #clause.cap#.", "This #sig# is the only #sig# I trust.", "I will remember this #target#.",
   ]),
   ...R(2, "flee", [
