@@ -3,13 +3,17 @@ import { chromium } from "@playwright/test";
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
 await p.goto("http://localhost:4174/curse-of-the-herder/?fast=10&new=1&seed=heckle&books=30");
 await p.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
-let lastToast = ""; let lastHeard = ""; let curses = 0; let replies = 0; let awaiting = false;
+let lastToast = ""; let lastHeard = ""; let curses = 0; let replies = 0; let awaiting = 0;
 const t0 = Date.now();
 while (Date.now() - t0 < 150000) {
   await p.waitForTimeout(400);
   const [toast, heard] = await p.evaluate(() => [document.getElementById("toast")?.textContent ?? "", document.getElementById("line-text")?.textContent ?? ""]);
-  if (toast !== lastToast && toast.startsWith("The Curse:")) { curses++; awaiting = true; console.log("CURSE ", toast.slice(0, 110)); }
-  if (heard !== lastHeard && awaiting && heard) { replies++; awaiting = false; console.log("HERDER", heard.slice(0, 110)); }
+  if (toast !== lastToast && toast.startsWith("The Curse:")) { curses++; awaiting = Date.now(); console.log("CURSE ", toast.slice(0, 110)); }
+  if (heard !== lastHeard && awaiting && heard) {
+    const dt = Date.now() - awaiting;
+    console.log(`  +${(dt / 1000).toFixed(1)}s HERDER`, heard.slice(0, 110));
+    if (dt > 9000) awaiting = 0; else replies++;
+  }
   lastToast = toast; lastHeard = heard;
 }
 console.log("curse toasts:", curses, "next herder lines:", replies);
