@@ -438,10 +438,10 @@ export class Renderer {
   private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "", herdSheep: -1 };
 
   /** The dog notices things, briefly. */
-  dogReact(kind: "wasp" | "flee" | "bite" | "book" | "herd", nowMs: number, sheepId = -1): void {
+  dogReact(kind: "wasp" | "flee" | "bite" | "book" | "herd" | "underfoot", nowMs: number, sheepId = -1): void {
     this.dog.react = kind;
     this.dog.herdSheep = sheepId;
-    this.dog.reactUntil = nowMs + (kind === "wasp" ? 3500 : kind === "herd" ? 5000 : 2200);
+    this.dog.reactUntil = nowMs + (kind === "wasp" ? 3500 : kind === "herd" ? 5000 : kind === "underfoot" ? 3000 : 2200);
   }
 
   private shoutingNow = false;
@@ -749,9 +749,17 @@ export class Renderer {
         if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
         if (Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.7, "hup!");
       }
+      // Underfoot: flat out exactly where his boot was going, and unbothered.
+      const underfoot = reacting && d.react === "underfoot";
+      if (underfoot) {
+        d.x = h.x + 0.45;
+        d.y = h.y + 0.3;
+        d.vx = 0;
+        d.vy = 0;
+      }
       const dogMoving = Math.hypot(d.vx, d.vy) > 0.004;
       if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
-        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, dogMoving || chasing, !moving && !dogMoving && !reacting && !chasing, nowMs);
+        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, (dogMoving || chasing) && !underfoot, (!moving && !dogMoving && !reacting && !chasing) || underfoot, nowMs);
         if (reacting) {
           const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "…") : d.react === "bite" ? "?" : "…";
           drawEmote(ctx, sx(d.x + 0.5) + T * 0.45, sy(d.y + 0.9) - T * 0.85, T * 0.8, glyph);

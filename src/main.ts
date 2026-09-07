@@ -331,6 +331,7 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "mishap" && e.detail === "bite" && e.sheepId >= 0) s.bubbles.emote(e.sheepId, "grr", 2.5, nowMs);
     if (e.kind === "mishap" && e.detail === "wasp") s.renderer.dogReact("wasp", nowMs);
     if (e.kind === "mishap" && e.detail === "bite") s.renderer.dogReact("bite", nowMs);
+    if (e.kind === "mishap" && e.detail === "dogUnderfoot") s.renderer.dogReact("underfoot", nowMs);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.renderer.dogReact("flee", nowMs);
     if (e.kind === "dogHelps") {
       s.renderer.dogReact("herd", nowMs, e.sheepId);

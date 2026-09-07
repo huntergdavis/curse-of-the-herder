@@ -71,6 +71,7 @@ long soak.
 - Hens by every third house: peck, scatter with a "!" when he comes within two tiles, drift back
 - He takes the hens personally ("Even the HENS run from me. I have never so much as looked at a hen."), at most every fifteen sim-minutes; `npx tsx scripts/village-of.ts <seed>` prints village coordinates for camera screenshots
 - Once a day after two o'clock the dog herds the sheep he is walking toward straight to him, darting behind it with a "hup!"; he does not know what to do with his face, the Curse did not authorise it, and there is a toast
+- New mishap: the dog underfoot, flat out where his boot was going ("you have a whole county to lie down in and you chose my boots")
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

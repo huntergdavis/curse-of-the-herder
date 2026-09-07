@@ -37,6 +37,8 @@ const MISHAPS: { kind: string; terrain: number[] | null; chance: number; anger: 
   { kind: "cowpat", terrain: [Terrain.Grass, Terrain.Meadow, Terrain.Farm], chance: 0.004, anger: 10, ticks: 6 },
   { kind: "molehill", terrain: [Terrain.Grass, Terrain.Meadow], chance: 0.003, anger: 9, ticks: 6 },
   { kind: "wasp", terrain: null, chance: 0.0012, anger: 16, ticks: 10 },
+  // The dog, lying in the one place he was about to put his foot.
+  { kind: "dogUnderfoot", terrain: null, chance: 0.0009, anger: 11, ticks: 8 },
 ];
 
 function startMishap(w: WorldState, kind: string, anger: number, ticks: number, sheepId = -1): void {

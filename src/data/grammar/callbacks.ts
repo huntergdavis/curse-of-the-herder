@@ -121,6 +121,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(6, "curseReply", ["Yes, thank you, I am aware that I am cursed. The reminders are not, on the whole, helping with the cursing.", "Heckled by my own affliction. There is a word for that and I will find it in a book and I will use it at you."]),
   ...R(8, "curseReply", ["The curse spoke. I did not answer. Then I did. It was not a good answer."], { reg: ["hemingway"] }),
   ...R(10, "curseReply", ["Speak up, O Curse; my #adj# hearing is the one faculty you have not yet ruined, and I should hate for you to feel you had left a job unfinished."]),
+  // The dog, underfoot.
+  ...R(0, "dogUnderfoot", ["DOG. Feet. MOVE.", "Dog. Rug. Same thing.", "Ow. DOG."]),
+  ...R(2, "dogUnderfoot", ["The dog. Lying there. In the one place on this entire hill I was about to put my FOOT.", "#dog#, you have a whole county to lie down in and you chose my boots.", "Up. UP. You are a sheepdog, not a doormat, although I am beginning to see the resemblance."]),
+  ...R(4, "dogUnderfoot", ["#oath_phrase#, #dog#, you are the only thing on this hill that follows me, and you use it to TRIP ME!", "#pantheon.cap#, I have been felled by my own dog. Not a sheep. Not a bog. The DOG."]),
+  ...R(6, "dogUnderfoot", ["Observe, #vocative#, the sheepdog in its natural habitat: horizontal, underfoot, and entirely without remorse."]),
+  ...R(8, "dogUnderfoot", ["I fell over the dog. The dog did not move. It was right not to."], { reg: ["hemingway"] }),
   // The dog, once, does its job.
   ...R(0, "dogHelps", ["Dog. DOG. Did you…?", "Good… dog?", "Sheep coming. Dog behind. What."]),
   ...R(2, "dogHelps", ["Did the dog just… no. No. #dog#, did you just do your JOB? Once? In front of me?", "The sheep is coming here. Of its own accord. The dog is behind it. I do not know what to do with my face.", "#dog#. #dog#, look at me. Was that on purpose? Blink twice if it was on purpose."]),
