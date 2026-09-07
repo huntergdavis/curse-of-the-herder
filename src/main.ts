@@ -8,7 +8,7 @@ import { repository } from "./persist/db";
 import { BOOKS, BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
 import { makeHallRecord, tasteOfPack, type HallRecord } from "./core/hall";
-import { dogName, sheepName } from "./core/names";
+import { dogName, rivalName, sheepName } from "./core/names";
 import { keyedUnit } from "./core/rng";
 import { catchUpPlan, shouldRecover } from "./runtime/liveness";
 import { startUpdatePolling } from "./update/automatic-update";
@@ -351,6 +351,7 @@ function handleEvents(s: Session, nowMs: number): void {
       void vocabEl.offsetWidth;
       vocabEl.classList.add("pop");
     }
+    if (e.kind === "rival" && e.detail === "1") toast(`${escapeHtml(rivalName(w.seed))} from over the hill walks past with three sheep that follow him. Nobody knows how he does it.`);
     // The grudge is made official for the audience.
     if (e.kind === "nemesis") s.renderer.wanted = sheepName(w.seed, e.sheepId);
     if (e.kind === "nemesis") toast(`<strong>Nemesis declared:</strong> ${escapeHtml(sheepName(w.seed, e.sheepId))}, three flights and counting. He has a look in his eye.`);
@@ -614,7 +615,7 @@ function showEndCard(r: HallRecord): void {
       stoneHtml(r) +
       `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}${r.dogName ? ` · with ${escapeHtml(r.dogName)}, who was no help` : ""}${r.jailbreaks ? ` · ${r.jailbreaks} jailbreak${r.jailbreaks === 1 ? "" : "s"}` : ""}</p>` +
       (r.favouriteWord ? `<p>Favourite word: <strong>${escapeHtml(r.favouriteWord.w)}</strong> (${r.favouriteWord.n}×${r.favouriteWord.mostly ? `, mostly at ${escapeHtml(r.favouriteWord.mostly)}` : ""})</p>` : "") +
-      (r.rivalsSeen ? `<p>The neighbour walked past ${r.rivalsSeen === 1 ? "once" : `${r.rivalsSeen} times`}. His sheep never once ran. Nobody knows how he does it.</p>` : "") +
+      (r.rivalsSeen ? `<p>${escapeHtml(r.rivalName ?? "The neighbour")} walked past ${r.rivalsSeen === 1 ? "once" : `${r.rivalsSeen} times`}. His sheep never once ran. Nobody knows how he does it.</p>` : "") +
       (r.nemesis ? `<p>Nemesis: <strong>${escapeHtml(r.nemesis.name)}</strong>, who ran ${r.nemesis.flees} times and was eventually carried home in a manner not fit for a village.</p>` : r.sheepOfTheDay ? `<p>Sheep of the day: <strong>${escapeHtml(r.sheepOfTheDay.name)}</strong>, who ran ${r.sheepOfTheDay.flees} times and regrets nothing.</p>` : "") +
       (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +
       (r.highlights?.length ? `<details class="reading"><summary>Highlights of the day (${r.highlights.length})</summary><ol>${r.highlights.map((h) => `<li><span class="rl-when">${h.clock}</span> “${escapeHtml(h.text)}”</li>`).join("")}</ol></details>` : "") +

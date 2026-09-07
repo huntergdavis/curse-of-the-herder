@@ -33,6 +33,13 @@ export function dogName(seed: string): string {
   return DOGS[Math.floor(keyedUnit(seed, "dog-name") * DOGS.length)] ?? "Nell";
 }
 
+const RIVAL_NAMES = ["Tom", "Alfred", "Gilbert", "Ned", "Percy", "Wilf", "Ambrose", "Cuthbert", "Bertram", "Silas", "Humphrey", "Clement"];
+
+/** The neighbour with the well-behaved sheep. One name; he needs no epithet. */
+export function rivalName(seed: string): string {
+  return RIVAL_NAMES[Math.floor(keyedUnit(seed, "rival-name") * RIVAL_NAMES.length)]!;
+}
+
 export function sheepName(seed: string, sheepId: number): string {
   return SHEEP[Math.floor(keyedUnit(seed, "sheep-name", sheepId) * SHEEP.length)] ?? "Gerald";
 }

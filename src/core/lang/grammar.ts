@@ -390,6 +390,8 @@ function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string 
       return ctx.villageName;
     case "dog":
       return ctx.dogName;
+    case "rival":
+      return ctx.rivalName;
     case "bignum":
       return BIG_NUMBERS[Math.floor(rnd() * BIG_NUMBERS.length)]!;
     case "hour":

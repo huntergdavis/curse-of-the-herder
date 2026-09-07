@@ -97,6 +97,7 @@ export interface Context {
   knownPacks: string[];
   villageName: string;
   dogName: string;
+  rivalName: string;
   season?: string;
   /** Running tallies for callbacks (optional so simple test contexts stay small). */
   stats?: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };

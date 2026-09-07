@@ -3,7 +3,7 @@ import { fnv1a } from "./rng";
 import { LEVEL_NAMES, erudition, levelFor } from "./progression";
 import { dayHour, hoursElapsed, type WorldState } from "./sim/state";
 import { BOOK_BY_ID } from "../data/books";
-import { dogName, sheepName } from "./names";
+import { dogName, sheepName, rivalName } from "./names";
 import type { LexEntry } from "./lang/types";
 
 export const HALL_SCHEMA = 1;
@@ -31,6 +31,7 @@ export interface HallRecord {
   jailbreaks?: number | undefined;
   /** Times the neighbour strolled past with his tidy flock. */
   rivalsSeen?: number | undefined;
+  rivalName?: string | undefined;
   /** The sheep with the most escapes, if any escaped twice or more. */
   sheepOfTheDay?: { name: string; flees: number } | undefined;
   /** The sheep he declared his personal enemy, if any earned it. */
@@ -86,6 +87,7 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     dogName: dogName(w.seed),
     jailbreaks: w.jailbreaks,
     rivalsSeen: w.rivalsSeen,
+    rivalName: rivalName(w.seed),
     sheepOfTheDay: (() => {
       const top = [...w.sheep].sort((a, b) => b.flees - a.flees)[0];
       return top && top.flees >= 2 ? { name: sheepName(w.seed, top.id), flees: top.flees } : undefined;
