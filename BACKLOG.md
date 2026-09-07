@@ -35,14 +35,14 @@ long soak.
 - Mishaps that spike his anger: bog, nettles, stubbed toe, cowpat, molehill, wasp, biting sheep, jammed gate (each with lines and a pose)
 - Calmer emotes (no more strobing flock at the end), hot moods favour the strongest allowed words
 - Lexicon realness audit (removed hidden slurs and body mockery, fixed glosses, fenced descriptors by target, added genuine bite); dusk flicker fixed with a measured test
+- Engine: `.allit` alliteration slots (tier 9 generates its own runs), `.sylN` syllable slots (haiku that scan), `#selfadj#` for first-person lines
+- The sheepdog: follows, lies down, chases butterflies, bolts from wasps, barks once at runaways; lines about him
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
 
 - [ ] Read a full simulated day as a script (`npx tsx scripts/transcript.ts`) once per release and cut the 10% weakest templates.
 - [ ] Template audit to match the lexicon audit: slots like "I am #adj#" should draw adjectives that apply to a person (add a `self` target facet).
-- [ ] Alliteration constraint in the engine (`{alliterate:b}`) so tier 9 can generate rather than hard-code runs.
-- [ ] Syllable-aware slots for verse using the `syl` field, so haiku and limerick slots scan.
 - [ ] Per-register heat rules (Hemingway exempt already; verse should keep its own punctuation).
 - [ ] Flyting as a real duel: the sheep's emotes should escalate (…, !, ?!) and the herder should react to them.
 

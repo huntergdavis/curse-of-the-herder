@@ -27,6 +27,15 @@ export const CALLBACK_RULES: Rule[] = [
     "#flees.cap# ran. I counted. Counting is what you do when you cannot do anything else.",
     "It rained #rains# times. Each time it was rain. I did not expect it to be anything else.",
   ], { reg: ["hemingway"] }),
+  // Verse that scans: syllable-counted slots (5-7-5 haiku, and couplets with a fixed beat).
+  ...R(11, "idle", [
+    "#adj.syl2.cap# #noun.syl1#, #adj.syl2# #noun.syl1#. / #remaining.cap# sheep are still out there. / #interj.syl1.cap#. #noun.syl2.cap#. #interj.syl1.cap#.",
+    "One #adj.syl2# #noun.syl1#. / One #adj.syl2# #insult.syl2#, and me. / #time.cap#. #noun.syl1.cap#.",
+    "The #noun.syl1# is #adj.syl2#. / The sheep is #adj.syl3#. / I am #selfadj.syl2#. So.",
+  ], { reg: ["verse"] }),
+  ...R(11, "penned", ["#nth.cap# one in. / #adj.syl2.cap# #insult.syl1#, stay put. / #remaining.cap# to go. #interj.syl1.cap#."], { reg: ["verse"] }),
+  ...R(11, "flee", ["It runs. Of course. / #adj.syl2.cap#, #adj.syl2# #insult.syl1#. / I follow. #interj.syl1.cap#."], { reg: ["verse"] }),
+  ...R(11, "epitaph", ["#adj.syl2.cap# #noun.syl1#. #adj.syl2.cap# man. / Sixty sheep. The end.", "Here lies a #adj.syl2# / herder, #adj.syl3#, / out of #noun.syl1.pl#."]),
   // Alliteration, generated rather than hard-coded (tier 9 and up).
   ...R(9, "idle", [
     "#bignum.cap# #adj.allit# #noun.allit.pl#!",

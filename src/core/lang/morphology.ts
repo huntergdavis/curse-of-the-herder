@@ -160,6 +160,22 @@ export function ordinalWord(n: number): string {
   return w + "th";
 }
 
+/** Rough English syllable count for words without a tagged count. */
+export function countSyllables(word: string): number {
+  const w = word.toLowerCase().replace(/[^a-z]/g, " ").trim();
+  if (!w) return 0;
+  let total = 0;
+  for (const part of w.split(/\s+/)) {
+    let p = part.replace(/e$/, "").replace(/(?:es|ed)$/, "");
+    if (!p) p = part;
+    const groups = p.match(/[aeiouy]+/g);
+    let n = groups ? groups.length : 1;
+    if (/[^aeiou]le$/.test(part)) n++;
+    total += Math.max(1, n);
+  }
+  return total;
+}
+
 /** Capitalise sentence starts and fix spacing around punctuation. */
 export function tidySentence(s: string): string {
   let t = s.replace(/\s+/g, " ").replace(/\s+([,.!?;:])/g, "$1").replace(/([,;:])(?=\S)/g, "$1 ").trim();

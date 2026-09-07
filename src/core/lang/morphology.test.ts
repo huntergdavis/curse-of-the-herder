@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { article, numberWord, ordinalWord, pluralize, tidySentence, verbForm } from "./morphology";
+import { article, countSyllables, numberWord, ordinalWord, pluralize, tidySentence, verbForm } from "./morphology";
 
 describe("morphology", () => {
   it("chooses a/an by sound", () => {
@@ -26,6 +26,13 @@ describe("morphology", () => {
     expect(verbForm("trudge", "ing")).toBe("trudging");
     expect(verbForm("sit", "ing")).toBe("sitting");
     expect(verbForm("wander", "ed")).toBe("wandered");
+  });
+  it("counts syllables roughly", () => {
+    expect(countSyllables("sheep")).toBe(1);
+    expect(countSyllables("turnip")).toBe(2);
+    expect(countSyllables("wheelbarrow")).toBe(3);
+    expect(countSyllables("miserable")).toBe(4);
+    expect(countSyllables("bramble")).toBe(2);
   });
   it("spells numbers", () => {
     expect(numberWord(7)).toBe("seven");

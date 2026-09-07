@@ -379,8 +379,28 @@ export class Renderer {
       const moving = h.mode === "toSheep" || h.mode === "toPen" || h.mode === "toLibrary";
       const targetX = h.x - (h.facing === 0 ? 1.6 : h.facing === 2 ? -1.6 : 0.9);
       const targetY = h.y - (h.facing === 1 ? 1.4 : h.facing === 3 ? -1.4 : 0.3) + 0.5;
-      const dist = Math.hypot(targetX - d.x, targetY - d.y);
-      if (moving || dist > 3) {
+      let dist = Math.hypot(targetX - d.x, targetY - d.y);
+      // When the herder stops, the dog notices flowers and drifts toward them, tail up.
+      let chasing = false;
+      if (!moving) {
+        const fx = Math.round(d.x);
+        const fy = Math.round(d.y);
+        for (let oy = -3; oy <= 3 && !chasing; oy++) for (let ox = -3; ox <= 3; ox++) {
+          const i = (fy + oy) * this.map.size + (fx + ox);
+          if (this.map.deco[i] === Deco.Flowers && Math.hypot(fx + ox - h.x, fy + oy - h.y) < 6) {
+            const bx = fx + ox + Math.sin(nowMs / 900) * 0.4;
+            const by = fy + oy + Math.cos(nowMs / 1100) * 0.3;
+            d.vx = (bx - d.x) * 0.03;
+            d.vy = (by - d.y) * 0.03;
+            d.x += d.vx;
+            d.y += d.vy;
+            if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
+            chasing = true;
+            break;
+          }
+        }
+      }
+      if (!chasing && (moving || dist > 3)) {
         const k = 1 - Math.exp(-(1 / 60) * 3.2);
         d.vx = (targetX - d.x) * k;
         d.vy = (targetY - d.y) * k;
@@ -396,7 +416,7 @@ export class Renderer {
       }
       const dogMoving = Math.hypot(d.vx, d.vy) > 0.004;
       if (Math.abs(d.x - cam.x) * T < W / 2 + T * 2 && Math.abs(d.y - cam.y) * T < H / 2 + T * 2) {
-        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, dogMoving, !moving && !dogMoving && !reacting, nowMs);
+        this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, dogMoving || chasing, !moving && !dogMoving && !reacting && !chasing, nowMs);
         if (reacting) {
           const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "…") : d.react === "bite" ? "?" : "…";
           drawEmote(ctx, sx(d.x + 0.5) + T * 0.45, sy(d.y + 0.9) - T * 0.85, T * 0.8, glyph);
@@ -775,6 +795,7 @@ export class Renderer {
       this.ctx.ellipse(sx(h.x + 0.5), sy(h.y + 0.95) - T * 0.05, T * 0.5, T * 0.18, 0, 0, Math.PI * 2);
       this.ctx.fill();
     }
+    const nearMemorial = !!this.memorial && !world.finished && h.carrying < 0 && Math.hypot(h.x - (this.map.pen.x - 2.7), h.y - (this.map.pen.y + 0.9)) < 2.2;
     if (mishap === "cowpat") {
       this.ctx.fillStyle = "#5a4520";
       this.ctx.beginPath();
@@ -787,7 +808,7 @@ export class Renderer {
       carrying: h.carrying >= 0,
       phase: walking ? (nowMs / (stomping ? 300 : 420)) % 1 : phase,
       fury: h.mode === "ranting" || mishap ? 1 : world.frustration / 100,
-      ranting: h.mode === "ranting",
+      ranting: h.mode === "ranting" || nearMemorial,
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

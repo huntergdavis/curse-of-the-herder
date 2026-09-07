@@ -21,7 +21,7 @@ a few thousand words. The craft is in the structures.
 #L6:insult#              symbol restricted to level ≥ 6 packs
 [reg=bard]               set register for the rest of this expansion
 #adj.allit#              modifier: all .allit slots in a line share the first slot's initial letter
-{syll=8}                 constraint: total syllables (for verse)
+#noun.syl2#              modifier: pick an entry with exactly 2 syllables (tagged `syl`, else a rough count)
 {rhyme=#slot1#}          constraint: rhymes with an earlier slot
 ```
 

@@ -1,9 +1,9 @@
 import { findBanned } from "./banned";
-import { capitalize, numberWord, ordinalWord, pluralize, tidySentence, verbForm, withArticle } from "./morphology";
+import { capitalize, countSyllables, numberWord, ordinalWord, pluralize, tidySentence, verbForm, withArticle } from "./morphology";
 import { fnv1a, mulberry32 } from "../rng";
 import type { Band, Context, LexEntry, NonTerminal, Pos, Rule, RuleEvent } from "./types";
 
-const SLOT = /#(?:([FL])(\d):)?([A-Za-z_][\w]*)((?:\.[a-z]+)*)#/g;
+const SLOT = /#(?:([FL])(\d):)?([A-Za-z_][\w]*)((?:\.[a-z0-9]+)*)#/g;
 const MAX_DEPTH = 12;
 
 export interface GenerateResult {
@@ -163,17 +163,19 @@ export class Grammar {
         return "";
       }
       const wantAllit = mods.includes(".allit");
-      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit);
+      const sylMatch = /\.syl(\d)/.exec(mods);
+      const wantSyl = sylMatch ? Number(sylMatch[1]) : 0;
+      const value = this.resolve(symbol, ctx, rnd, depth, cap, wantAllit, wantSyl);
       if (value === null) {
         failed = true;
         return "";
       }
-      return applyModifiers(value.text, mods.replace(".allit", ""), value.entry);
+      return applyModifiers(value.text, mods.replace(".allit", "").replace(/\.syl\d/, ""), value.entry);
     });
     return failed ? null : out;
   }
 
-  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false): { text: string; entry?: LexEntry } | null {
+  private resolve(symbol: string, ctx: Context, rnd: () => number, depth: number, cap: Band, allit = false, syl = 0): { text: string; entry?: LexEntry } | null {
     const contextual = contextSymbol(symbol, ctx, rnd);
     if (contextual !== null) return { text: contextual };
     const nt = this.nonTerminals.get(symbol);
@@ -207,6 +209,11 @@ export class Grammar {
         const letter = this.allitLetter;
         const matching = pool.filter((e) => e.w[0]?.toLowerCase() === letter);
         if (matching.length) pool = matching;
+      }
+      if (syl > 0) {
+        const matching = pool.filter((e) => (e.syl ?? countSyllables(e.w)) === syl);
+        if (matching.length) pool = matching;
+        else return null; // the line would not scan; let the rule retry
       }
       const weights = pool.map((e) => this.entryWeight(e, ctx));
       const e = pool[pickIndex(weights, rnd)]!;
