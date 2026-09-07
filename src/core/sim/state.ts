@@ -149,6 +149,8 @@ export interface WorldState {
   readingList: { bookId: string; tick: number }[];
   /** Word → [times used, target label → count]. Capped to learned words. */
   wordUse: Record<string, { n: number; at: Record<string, number> }>;
+  /** The day's best lines: hottest and most elaborate, at most eight. */
+  highlights: { text: string; score: number; clock: string }[];
 }
 
 export const MAX_EVENTS = 16;
@@ -327,6 +329,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     windUntilTick: 0,
     readingList: [],
     wordUse: {},
+    highlights: [],
   };
 }
 
@@ -436,6 +439,7 @@ export function upgradeWorld(w: unknown): WorldState {
     if (typeof o["windUntilTick"] !== "number") o["windUntilTick"] = 0;
     if (!Array.isArray(o["readingList"])) o["readingList"] = [];
     if (!o["wordUse"] || typeof o["wordUse"] !== "object") o["wordUse"] = {};
+    if (!Array.isArray(o["highlights"])) o["highlights"] = [];
     if (!o["stats"]) o["stats"] = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
     for (const sh of (o["sheep"] as Record<string, unknown>[]) ?? []) {
       if (typeof sh["tx"] !== "number") { sh["tx"] = sh["x"]; sh["ty"] = sh["y"]; sh["speed"] = 0; }

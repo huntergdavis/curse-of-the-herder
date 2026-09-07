@@ -264,6 +264,7 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "repeatEscape" && w.sheep[e.sheepId]?.flees === 2) toast(`That one has earned a name. It is <strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> now.`);
     if (e.kind === "rainStops") s.renderer.rainStopped(nowMs);
+    if (e.kind === "milestone" && (e.detail === "halfway" || e.detail === "tentogo")) s.renderer.sheepPenned(-1, nowMs + 600);
     if (e.kind === "penned") {
       s.renderer.sheepPenned(e.sheepId, nowMs);
       const el = $("hud-flock");
@@ -419,6 +420,16 @@ function say(s: Session, text: string, heat: number, seconds: number, nowMs: num
   s.recent.push(text);
   if (s.recent.length > 32) s.recent.shift();
   if (text.length > s.world.longestLine.length) s.world.longestLine = text;
+  // Keep the day's best lines: heat plus length, favouring the rare long hot ones.
+  {
+    const score = heat * 60 + Math.min(text.length, 160) * 0.4 + (text.includes(" / ") ? 15 : 0);
+    const hl = s.world.highlights;
+    if (score > 45 && !hl.some((h) => h.text === text)) {
+      hl.push({ text, score, clock: fmtClock(dayHour(s.world)) });
+      hl.sort((a, b) => b.score - a.score);
+      if (hl.length > 8) hl.length = 8;
+    }
+  }
   $("line-text").textContent = text;
 }
 
@@ -471,6 +482,7 @@ function showEndCard(r: HallRecord): void {
       (r.favouriteWord ? `<p>Favourite word: <strong>${escapeHtml(r.favouriteWord.w)}</strong> (${r.favouriteWord.n}×${r.favouriteWord.mostly ? `, mostly at ${escapeHtml(r.favouriteWord.mostly)}` : ""})</p>` : "") +
       (r.sheepOfTheDay ? `<p>Sheep of the day: <strong>${escapeHtml(r.sheepOfTheDay.name)}</strong>, who ran ${r.sheepOfTheDay.flees} times and regrets nothing.</p>` : "") +
       (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +
+      (r.highlights?.length ? `<details class="reading"><summary>Highlights of the day (${r.highlights.length})</summary><ol>${r.highlights.map((h) => `<li><span class="rl-when">${h.clock}</span> “${escapeHtml(h.text)}”</li>`).join("")}</ol></details>` : "") +
       readingHtml(r, true) +
       `<p>${next}</p>`,
   );
@@ -518,6 +530,7 @@ async function showHall(): Promise<void> {
         `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd>${r.dogName ? `<dt>Dog</dt><dd>${escapeHtml(r.dogName)} (no help)</dd>` : ""}${r.sheepOfTheDay ? `<dt>Sheep of the day</dt><dd>${escapeHtml(r.sheepOfTheDay.name)} (${r.sheepOfTheDay.flees} escapes)</dd>` : ""}${r.favouriteWord ? `<dt>Favourite word</dt><dd>${escapeHtml(r.favouriteWord.w)} (${r.favouriteWord.n}×)</dd>` : ""}</dl>` +
         (r.longestLine ? `<div class="longest">“${escapeHtml(r.longestLine)}”</div>` : "") +
         (r.namedSheep?.length ? `<div class="longest">Named today: ${r.namedSheep.map((n) => `${escapeHtml(n.name)} (${n.flees})`).join(", ")}</div>` : "") +
+        (r.highlights?.length ? `<details class="reading"><summary>Highlights (${r.highlights.length})</summary><ol>${r.highlights.map((h) => `<li><span class="rl-when">${h.clock}</span> “${escapeHtml(h.text)}”</li>`).join("")}</ol></details>` : "") +
         readingHtml(r, true) +
         `</article>`,
     )
