@@ -55,7 +55,8 @@ long soak.
 ## P1 — Runtime robustness (Phase 4 leftovers)
 
 - [ ] Simulation in a Web Worker behind a versioned protocol (main thread stays smooth during 4-hour catch-ups). Deferred: at 1× the sim costs ~nothing on the main thread; only the rare long catch-up janks for a few seconds.
-- [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
+- [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak. (Weekly soak exists and passes.)
+- [ ] Frame time on a real GPU browser: headless software rendering at 1080p measures ~167 ms/frame regardless of effects (fog +50 ms, wind +33 ms), i.e. the base full-screen passes dominate; effects are cheap. Measure on hardware with `node scripts/frame-time.mjs`; if a laptop struggles, the Eco frame-rate setting is the lever, and the fog gradient could become a cached image.
 - [ ] Auto-update via version.json poll and a service worker.
 - [ ] Real PD excerpts for Smollett/Marryat (nautical) with edition cited (R-REAL-04; Molière, Cervantes, Burns done).
 
