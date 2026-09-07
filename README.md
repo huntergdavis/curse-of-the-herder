@@ -17,6 +17,8 @@ sentence structures. Filthy, never cruel.
 
 ![A morning on the road: the herder carries a sheep past an emptied library box](docs/img/morning-road.png)
 
+![A village: Tupsley's signpost, a little free library, and a sheep on a roof](docs/img/village-roof-sheep.png)
+
 ![Dusk: the tombstone card at the end of a day](docs/img/ending.png)
 
 ## Running it

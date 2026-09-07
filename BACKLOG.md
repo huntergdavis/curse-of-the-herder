@@ -23,6 +23,8 @@ long soak.
 - Tiers 9-12 (nautical, baroque, verse, meta), callbacks, wistful book lines
 - Language selector (full/mild/clean), Export/Import JSON, ?books=N, ?fps=N
 - Liveness watchdog, capped catch-up with a "long sit-down" line, self-hosted OFL fonts
+- Roof sheep, village names on signposts, flyting follow-ups, quoting books back at the day
+- Quiet screensaver mode, ?cam dev parameter, memory soak script, full-day end-to-end test
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -31,8 +33,7 @@ long soak.
 - [ ] Alliteration constraint in the engine (`{alliterate:b}`) so tier 9 can generate rather than hard-code runs.
 - [ ] Syllable-aware slots for verse using the `syl` field, so haiku and limerick slots scan.
 - [ ] Per-register heat rules (Hemingway exempt already; verse should keep its own punctuation).
-- [ ] Flyting duel beat: herder vs. a named sheep, alternating lines, sheep "replies" with emotes.
-- [ ] Reading-aloud beat: he quotes the book's excerpt *in his own register* ten minutes later (a callback to the book).
+- [ ] Flyting as a real duel: the sheep's emotes should escalate (…, !, ?!) and the herder should react to them.
 
 ## P1 — Runtime robustness (Phase 4 leftovers)
 
@@ -44,8 +45,8 @@ long soak.
 ## P1 — Presentation
 
 - [ ] Sheep walk animation while wandering; flee dash.
-- [ ] Villages: signposts with names; a villager or two; smoke from chimneys.
-- [ ] Better absurd-location staging: sheep drawn *on* the rock / mid-river with a "?" emote until approached.
+- [ ] Villages: a villager or two; smoke from chimneys.
+- [ ] Better absurd-location staging: sheep drawn *on* the rock / mid-river (roof sheep done).
 - [ ] Tombstone rises beside the pen in the world (not only on the card).
 - [ ] Pen fills with sleeping sheep in rows; night sky with stars during the fade.
 - [ ] Export/Import of a herder and of the Hall as JSON.

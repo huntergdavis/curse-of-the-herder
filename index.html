@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Curse of the Herder: a no-input browser screensaver. A cursed herder gathers his flock across a vast tile map over a 9-hour day, swearing ever more eloquently as he goes." />
     <title>Curse of the Herder</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='34' r='22' fill='%23f6f2e6' stroke='%232b2620' stroke-width='3'/%3E%3Cellipse cx='48' cy='30' rx='10' ry='9' fill='%233a2f2a'/%3E%3Ccircle cx='51' cy='28' r='2' fill='%23fff'/%3E%3Crect x='22' y='50' width='5' height='10' fill='%233a2f2a'/%3E%3Crect x='36' y='50' width='5' height='10' fill='%233a2f2a'/%3E%3C/svg%3E" />
+    <meta name="theme-color" content="#3d6fa3" />
     <style>
       /* Self-hosted, SIL OFL 1.1; see public/fonts/OFL.txt */
       @font-face { font-family: "Fredoka"; font-style: normal; font-weight: 300 700; font-display: swap; src: url("./fonts/Fredoka-400.woff2") format("woff2"); }
@@ -78,7 +80,7 @@
       <div class="row"><span class="label">Flock</span><span id="hud-flock">0 / 0</span></div>
       <div class="row"><span class="label">Level</span><span id="hud-level">0 · Grunting</span></div>
       <div class="row"><span class="label">Books</span><span id="hud-books">0</span></div>
-      <div class="row"><span class="label">Frustration</span><span id="hud-frust">0</span></div>
+      <div class="row"><span class="label">Mood</span><span id="hud-frust">Calm</span></div>
       <div id="meter"><div id="meter-fill"></div></div>
     </section>
     <nav id="toolbar" class="panel" aria-label="Controls">

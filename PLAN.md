@@ -181,36 +181,36 @@ every 60–75 min.
 
 ## Build phases
 
-### Phase 0 — Scaffold (done)
+### Phase 0 — Scaffold (done 2026-09-06)
 Repo, Vite/TS, Pages workflow, teaser canvas, RNG module + tests.
 
-### Phase 1 — A board and a walk (1–2 weeks)
+### Phase 1 — A board and a walk (done 2026-09-06)
 Map generator, autotile renderer with chunk cache, camera, A* herder
 walking to sheep and back to a pen, sheep as SVG. Pacing simulator
 (headless) prints finish-time histograms. Save/load of a world seed +
 tick. Playwright `?fast=1` smoke test.
 
-### Phase 2 — The mouth (2–3 weeks)
+### Phase 2 — The mouth (done 2026-09-06)
 Grammar engine + morphology, tiers 0–4 with lexicon packs `primer`
 through `minced-oaths`, frustration meter, curse scheduler, canvas
 speech bubbles, ban-list CI test, never-emit test, `?clean=1`.
 
-### Phase 3 — The library (2 weeks)
+### Phase 3 — The library (done 2026-09-07)
 Little Free Libraries on the map, book catalog, reading beat with
 excerpts, pack unlocking, register drift, tiers 5–8 packs (Grose,
 Bard, polyglot, Hemingway) with the curation pipeline and
 `reviewedAt` gating.
 
-### Phase 4 — The day (2 weeks)
+### Phase 4 — The day (mostly done 2026-09-07; worker sim and auto-update remain)
 Day clock and palette shift, weather, breathers, walk of shame, absurd
 locations, sheep names and callbacks, speed governor, worker + catch-up
 + watchdog, IndexedDB persistence, New/Load herder UI.
 
-### Phase 5 — The end (1–2 weeks)
+### Phase 5 — The end (done 2026-09-07)
 Tiers 9–12 (nautical, baroque, verse, meta), epitaph grammar,
 tombstone-safe subset, dusk ending, Hall of Herders, loop-at-end.
 
-### Phase 6 — Polish and soak (ongoing)
+### Phase 6 — Polish and soak (in progress)
 Full 9-hour soak in CI weekly, heap slope check, auto-update, settings,
 accessibility pass, sound (optional, off by default: sheep, wind, a
 grumble), README screenshots, launch.
