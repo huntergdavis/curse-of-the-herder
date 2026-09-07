@@ -72,6 +72,7 @@ long soak.
 - He takes the hens personally ("Even the HENS run from me. I have never so much as looked at a hen."), at most every fifteen sim-minutes; `npx tsx scripts/village-of.ts <seed>` prints village coordinates for camera screenshots
 - Once a day after two o'clock the dog herds the sheep he is walking toward straight to him, darting behind it with a "hup!"; he does not know what to do with his face, the Curse did not authorise it, and there is a toast
 - New mishap: the dog underfoot, flat out where his boot was going ("you have a whole county to lie down in and you chose my boots")
+- The Almanac counts lunches eaten by sheep, days a dog did its job, herders with a nemesis, and the most frequent passer-by; named sheep in the Hall say why they were named
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

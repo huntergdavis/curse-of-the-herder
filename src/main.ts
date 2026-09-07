@@ -672,6 +672,24 @@ async function showHall(): Promise<void> {
       dg ? `Most frequent dog: <strong>${escapeHtml(dg[0])}</strong>, no help on ${dg[1]} occasion${dg[1] === 1 ? "" : "s"}` : "",
       `Loudest day: <strong>${escapeHtml(mostCurses.name)}</strong> (${mostCurses.totalCurses} curses)`,
       longest.longestLine ? `Longest outburst on record: “${escapeHtml(longest.longestLine)}” — ${escapeHtml(longest.name)}` : "",
+      (() => {
+        const stolen = records.filter((r) => r.lunchThief).length;
+        return stolen ? `Lunches eaten by sheep: <strong>${stolen}</strong> of ${records.length}. The cheese, every time.` : "";
+      })(),
+      (() => {
+        const deeds = records.filter((r) => r.dogHelpedAt).length;
+        return deeds ? `Days on which a dog did its job: <strong>${deeds}</strong>. Once each. Nobody knows why.` : "";
+      })(),
+      (() => {
+        const nem = records.filter((r) => r.nemesis).length;
+        return nem ? `Herders who made a personal enemy of a sheep: <strong>${nem}</strong>` : "";
+      })(),
+      (() => {
+        const rv = new Map<string, number>();
+        for (const r of records) if (r.rivalName && r.rivalsSeen) rv.set(r.rivalName, (rv.get(r.rivalName) ?? 0) + r.rivalsSeen);
+        const t = top(rv);
+        return t ? `Most frequent passer-by: <strong>${escapeHtml(t[0])}</strong>, ${t[1]} stroll${t[1] === 1 ? "" : "s"}, sheep in a line every time` : "";
+      })(),
     ].filter(Boolean);
     almanac.innerHTML = `<h3>The Almanac</h3><ul>${parts.map((x) => `<li>${x}</li>`).join("")}</ul>`;
     almanac.hidden = false;
