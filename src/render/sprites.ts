@@ -121,6 +121,8 @@ export interface HerderPose {
   crookBroken?: boolean;
   /** Somebody else's coat. */
   coat?: string;
+  /** Waving back at the neighbour, stiffly. */
+  wave?: boolean;
   /** Windy: one hand on the hat. */
   windy?: boolean;
   /** Eloquence level 0-12: adds a book, a quill, a scarf, spectacles, a laurel. */
@@ -254,6 +256,13 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(-T * 0.34, -T * 0.6 - bob);
     ctx.moveTo(T * 0.2, -T * 0.85 - bob);
     ctx.lineTo(T * 0.14, -T * 1.22 - bob);
+  } else if (p.wave) {
+    // A stiff wave: one arm up and wagging a little, the other where it was.
+    const wag = Math.sin(p.phase * Math.PI * 6) * T * 0.05;
+    ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(-T * 0.3, -T * 0.5 - bob);
+    ctx.moveTo(T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(T * 0.34 + wag, -T * 1.24 - bob);
   } else if (p.fury > 0.6 && !p.walking) {
     // Fists shaking at the sky.
     const shake = Math.sin(p.phase * Math.PI * 8) * T * 0.04;
