@@ -1726,6 +1726,20 @@ export class Renderer {
       this.ctx.ellipse(sx(h.x + 0.5) - T * 0.1, sy(h.y + 0.95) + T * 0.05, T * 0.32, T * 0.12, 0, 0, Math.PI * 2);
       this.ctx.fill();
     }
+    // Drinking at the well: a bucket at his feet and the sound of it.
+    if (world.drankTick !== undefined && world.tick - world.drankTick < 36 && h.mode === "resting") {
+      const bx = sx(h.x + 0.5) + T * 0.5;
+      const by = sy(h.y + 0.95);
+      this.ctx.fillStyle = "#6b6b70";
+      this.ctx.fillRect(bx - T * 0.12, by - T * 0.22, T * 0.24, T * 0.2);
+      this.ctx.strokeStyle = "#2b2620";
+      this.ctx.lineWidth = Math.max(1, T * 0.03);
+      this.ctx.strokeRect(bx - T * 0.12, by - T * 0.22, T * 0.24, T * 0.2);
+      this.ctx.beginPath();
+      this.ctx.arc(bx, by - T * 0.22, T * 0.12, Math.PI, 0);
+      this.ctx.stroke();
+      if (Math.floor(nowMs / 700) % 2 === 0) drawEmote(this.ctx, sx(h.x + 0.5) + T * 0.4, sy(h.y) - T * 0.2, T * 0.7, "glug");
+    }
     const lunching = h.mode === "resting" && world.hadLunch && dayHour(world) >= 12.5 && dayHour(world) < 13.2 && !world.finished;
     if (lunching) {
       // A heel of bread and a wedge of cheese on a cloth beside him.
