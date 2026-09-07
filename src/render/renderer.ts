@@ -528,7 +528,21 @@ export class Renderer {
       let dist = Math.hypot(targetX - d.x, targetY - d.y);
       // When the herder stops, the dog notices flowers and drifts toward them, tail up.
       let chasing = false;
-      if (!moving) {
+      // The neighbour's sheep are far more interesting than ours; the dog trots over and is ignored.
+      if (world.rival && Math.abs(world.rival.x - h.x) < 9) {
+        const r = world.rival;
+        const back = r.dx > 0 ? -1 : 1;
+        const bx = r.x + 0.5 + back * 4.3 + Math.sin(nowMs / 700) * 0.3;
+        const by = r.y + 0.3;
+        d.vx = (bx - d.x) * 0.05;
+        d.vy = (by - d.y) * 0.05;
+        d.x += d.vx;
+        d.y += d.vy;
+        if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
+        chasing = true;
+        if (Math.floor(nowMs / 1000) % 9 === 7 && Math.hypot(bx - d.x, by - d.y) < 1) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.7, "?");
+      }
+      if (!moving && !chasing) {
         const fx = Math.round(d.x);
         const fy = Math.round(d.y);
         for (let oy = -3; oy <= 3 && !chasing; oy++) for (let ox = -3; ox <= 3; ox++) {
