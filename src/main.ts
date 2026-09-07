@@ -76,6 +76,7 @@ interface Session {
 let session: Session | null = null;
 let paused = false;
 let motionSetting = false;
+let textScale = 1;
 let lastFrameMs = performance.now();
 let lastTickMs = performance.now();
 let lastDrawMs = 0;
@@ -129,6 +130,7 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   renderer.reducedMotion = motionSetting;
+  renderer.fontScale = textScale;
   repository.setActiveId(world.id);
   // A fresh herder says his first words of the day.
   if (world.tick === 0 && world.events[0]) {
@@ -619,6 +621,18 @@ async function boot(): Promise<void> {
     if (session) session.world.lastWallMs = Date.now();
     updateHud(true);
     toast(FAST === 1 ? "Real time. A day is a day." : `${FAST}× speed: a day takes about ${Math.round((9 * 60) / FAST)} minutes.`);
+  });
+  const selText = $<HTMLSelectElement>("sel-text");
+  selText.value = repository.getSetting("text", "1");
+  const applyText = (v: string): void => {
+    textScale = Number(v) || 1;
+    if (session) session.renderer.fontScale = textScale;
+    document.documentElement.style.setProperty("--caption-scale", String(textScale));
+  };
+  applyText(selText.value);
+  selText.addEventListener("change", () => {
+    repository.setSetting("text", selText.value);
+    applyText(selText.value);
   });
   const selMotion = $<HTMLSelectElement>("sel-motion");
   const osReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;

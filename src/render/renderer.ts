@@ -212,6 +212,8 @@ export class Renderer {
 
   /** Fewer moving decorations for viewers who prefer reduced motion. */
   reducedMotion = false;
+  /** Multiplier on bubble text for viewing from a distance. */
+  fontScale = 1;
 
   /** When set, the sky follows this hour instead of the world clock (ending fade). */
   hourOverride: number | null = null;
@@ -780,7 +782,7 @@ export class Renderer {
 
     const line = bubbles.herderLine();
     if (line) {
-      const fontPx = Math.max(14 * this.dpr, Math.min(T * 0.42, 30 * this.dpr));
+      const fontPx = Math.max(14 * this.dpr, Math.min(T * 0.42, 30 * this.dpr)) * this.fontScale;
       drawBubble(ctx, sx(h.x + 0.5), sy(h.y + 0.5) - T * 1.45, line.text, fontPx, { heat: line.heat, font: BUBBLE_FONT }, W, H);
     }
   }
