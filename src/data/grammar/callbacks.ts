@@ -173,6 +173,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "rivalGone", ["#oath_phrase#, and off he strolls into the #adj# distance, three sheep and not a care, and I hope the distance is uphill.", "Go on then, #rival#! Walk! Enjoy your obedient sheep and your #adj# posture!"]),
   ...R(6, "rivalGone", ["He is gone, and with him the last evidence that this job can be done quietly. I shall take it as a personal insult and keep going."]),
   ...R(8, "rivalGone", ["He went over the hill. The sheep went with him. I looked at mine."], { reg: ["hemingway"] }),
+  // One of the neighbour's sheep bolts. It happens to him too.
+  ...R(0, "rivalBolt", ["HA. HA! Run!", "His. Ran. HIS.", "Look! LOOK! Sheep gone! HIS!"]),
+  ...R(2, "rivalBolt", ["ALSO PRUDENCE HAS BOLTED. #rival.poss# Also Prudence. Oh, this is the best day of my life, I am going to remember this on my deathbed.", "It happens to him too. It happens to HIM too. Everybody look. Nobody move. Let me have this.", "Run, Also Prudence, run! Run like the wind! Run like MINE do!"]),
+  ...R(4, "rivalBolt", ["#oath_phrase#, look at that! One of #rival.poss# has RUN! It happens to him too! IT HAPPENS TO HIM TOO!", "#pantheon.cap#, I take back one thing I said this morning. Not the words. The tone. Look at him GO."]),
+  ...R(6, "rivalBolt", ["Observe, #vocative#: even #rival.poss# flock has a bolter. I feel a warmth in my chest that I suspect is not entirely charitable, and I intend to enjoy it."]),
+  ...R(8, "rivalBolt", ["One of his sheep ran. He did not shout. I did, for him. It felt good and I am not proud of it."], { reg: ["hemingway"] }),
   // Three flights. He has an enemy now.
   ...R(0, "nemesis", ["THREE. You. Enemy.", "You. I see you.", "Three times. Remember face."]),
   ...R(2, "nemesis", ["Three times, #vocative#. Three. That is not luck any more, that is a decision, and I have made one too.", "Right. You have a name now and I am going to use it in a tone of voice.", "Everyone else is a sheep. You are a project."]),

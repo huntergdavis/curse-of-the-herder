@@ -1130,9 +1130,15 @@ export class Renderer {
       const r = rivalNow;
       const facing: 0 | 2 = r.dx > 0 ? 0 : 2;
       const back = r.dx > 0 ? -1 : 1;
+      // Once in a day, the last in the line makes a break for it, downhill and away.
+      const boltT = "boltTick" in r && r.boltTick !== undefined ? Math.min(60, world.tick - r.boltTick) : -1;
       for (let k = 3; k >= 1; k--) {
-        drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.6), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
-        if (T >= 32) {
+        const bolting = k === 3 && boltT >= 0;
+        const bx = r.x + 0.5 + back * k * 1.6 + (bolting ? back * boltT * 0.12 : 0);
+        const by = r.y + 0.5 + (bolting ? boltT * 0.09 : 0);
+        drawSheep(ctx, sx(bx), sy(by), T * 0.85, bolting ? "fled" : "walk", bolting ? (back > 0 ? 0 : 2) : facing, phase + k * 0.7, false, false, false);
+        if (bolting && Math.floor(nowMs / 400) % 2 === 0) drawEmote(ctx, sx(bx) + T * 0.3, sy(by) - T * 0.45, T * 0.75, "!");
+        if (T >= 32 && !bolting) {
           // His sheep have names too. They are not interesting names. That is the point.
           ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
           ctx.textAlign = "center";
@@ -1141,6 +1147,7 @@ export class Renderer {
           ctx.textAlign = "left";
         }
       }
+      if (boltT >= 0 && Math.floor(nowMs / 1000) % 3 === 1) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "…!");
       drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: true, carrying: false, phase, fury: 0, resting: false, coat: "#4a6a8a" });
       const beat = Math.floor(nowMs / 1000) % 9;
       if ("finale" in r) {

@@ -698,6 +698,12 @@ function stepRival(w: WorldState, map: GameMap): void {
   if (r) {
     r.x += r.dx;
     r.ticksLeft--;
+    // On his third pass of the day, halfway across, one of his sheep bolts. It happens to him too.
+    if ((w.rivalsSeen ?? 0) === 3 && r.boltTick === undefined && r.ticksLeft === 90) {
+      r.boltTick = w.tick;
+      addFrustration(w, -10);
+      pushEvent(w, { tick: w.tick, kind: "rivalBolt", sheepId: -1 });
+    }
     if (r.ticksLeft <= 0) w.rival = undefined;
     return;
   }
