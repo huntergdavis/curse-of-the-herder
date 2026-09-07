@@ -152,6 +152,8 @@ export interface WorldState {
   /** A neighbouring herder strolling past with a flock that behaves. */
   rival?: { x: number; y: number; dx: number; ticksLeft: number } | undefined;
   rivalLastTick?: number | undefined;
+  /** A jailbreak in the planning: the sheep whispers at the gate before it goes. */
+  jailbreakPlan?: { tick: number; sheepId: number } | undefined;
   rivalsSeen?: number | undefined;
   /** Pennings in a row without a flight, a mishap or a stranded sheep. */
   streak: number;

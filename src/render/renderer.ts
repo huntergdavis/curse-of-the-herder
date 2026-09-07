@@ -854,6 +854,13 @@ export class Renderer {
       else if (s.mode !== "carried" && !world.finished && Math.floor(nowMs / 1000 + s.id * 7) % 23 === 0) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, (s.id * 13 + Math.floor(nowMs / 23000)) % 9 === 0 ? "achoo" : "baa");
       // At night one or two sheep snore at a time, gently.
       else if (world.finished && s.mode === "penned" && s.id % 20 === Math.floor(nowMs / 6000) % 20) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "z");
+      // The plotter whispers to its neighbours before the jailbreak; the herder is elsewhere and hears nothing.
+      else if (world.jailbreakPlan && s.mode === "penned") {
+        const plotter = world.jailbreakPlan.sheepId === s.id;
+        const beat = Math.floor(nowMs / 900) % 4;
+        if (plotter && beat < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.75, beat === 0 ? "psst" : "…");
+        else if (!plotter && beat === 3 && s.id % 7 === Math.floor(nowMs / 3600) % 7) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.7, "?");
+      }
       // One penned sheep at a time gives him a look when he passes empty-handed.
       else if (s.mode === "penned" && h.carrying < 0 && !world.finished && Math.hypot(h.x - this.map.pen.x, h.y - this.map.pen.y) < 7 && s.id % 12 === Math.floor(nowMs / 4000) % 12) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T * 0.8, "…");
     }

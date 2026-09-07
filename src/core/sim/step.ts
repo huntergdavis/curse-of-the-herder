@@ -685,16 +685,35 @@ function stepRival(w: WorldState, map: GameMap): void {
 }
 
 function stepJailbreak(w: WorldState, map: GameMap): void {
-  if (w.finished || w.jailbreaks >= 2 || w.sheepPenned < 12) return;
+  if (w.finished) return;
+  const h = w.herder;
+  const plan = w.jailbreakPlan;
+  if (plan) {
+    const s = w.sheep[plan.sheepId];
+    // Called off if he wanders back, or if the plotter got out some other way.
+    if (!s || s.mode !== "penned" || Math.hypot(h.x - map.pen.x, h.y - map.pen.y) < 6) {
+      w.jailbreakPlan = undefined;
+      return;
+    }
+    if (w.tick < plan.tick) return;
+    w.jailbreakPlan = undefined;
+    breakOut(w, map, s);
+    return;
+  }
+  if (w.jailbreaks >= 2 || w.sheepPenned < 12) return;
   if (w.tick - w.lastJailbreakTick < 90 * 60 * 4) return;
   if (w.tick < 3 * TICKS_PER_HOUR) return;
   if (keyedUnit(w.seed, "jailbreak", w.tick) > 0.0003) return;
-  const h = w.herder;
   // Not while he is standing right there.
   if (Math.hypot(h.x - map.pen.x, h.y - map.pen.y) < 6) return;
   const penned = w.sheep.filter((s) => s.mode === "penned" && !s.black);
   const s = penned[Math.floor(keyedUnit(w.seed, "jailbreak-who", w.tick) * penned.length)];
   if (!s) return;
+  // Half a minute of whispering at the gate first.
+  w.jailbreakPlan = { tick: w.tick + 120, sheepId: s.id };
+}
+
+function breakOut(w: WorldState, map: GameMap, s: SheepState): void {
   // Out through the gate and a little way off; it becomes notorious.
   const gx = map.pen.x;
   const gy = map.pen.y + 3;
