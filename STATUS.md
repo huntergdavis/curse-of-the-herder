@@ -29,6 +29,7 @@
 
 - **Sea over the whole island after a long day.** Terrain chunk canvases (up to 9 MB each, two dozen cached, plus the previous island's set) were being dropped by the browser; the roads and cloud shadows drawn on top survived, so the land read as water. Chunks are now capped at 4 MB, freed explicitly on every map/season/resize change and on `contextlost`, probed with a known-colour pixel after render and every three seconds, and fall back (offscreen → on-DOM canvas → direct painting) the moment a probe fails, retrying the fast path every 20 s.
 - **Day ended at 17:30.** Board 512 → 576 and a steeper governor.
+- **The dog.** At 100× it could not keep up (its ease ran per frame, blind to sim speed); it now eases in real time scaled by the speed and snaps to heel if left behind. Its bubbles came out of the wrong end when it faced left; they now come from the head on whichever side it faces. It has a snout, a floppy ear and a red collar, so it no longer reads as a cat.
 - **Looking around.** The minimap shows the viewport as a reticle; click or hold-and-drag on it to look anywhere on the island, and the view glides back to the herder two seconds after release. Covered by a Playwright test.
 - `scratch/` is ignored by git.
 
