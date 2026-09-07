@@ -743,7 +743,7 @@ export class Renderer {
         if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
       }
       // When he sits down, the dog sometimes fetches him a stick. It is not a sheep. It is offered anyway.
-      if (h.mode === "resting" && this.stick.restKey !== h.restUntilTick && Math.hypot(d.x - h.x, d.y - h.y) < 2.5 && !world.finished) {
+      if (h.mode === "resting" && this.stick.restKey !== h.restUntilTick && Math.hypot(d.x - h.x, d.y - h.y) < 3.3 && !world.finished) {
         this.stick.restKey = h.restUntilTick;
         if ((h.restUntilTick * 7919) % 100 < 45) {
           this.stick.until = nowMs + 9000;
