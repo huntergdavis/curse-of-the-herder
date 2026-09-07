@@ -153,6 +153,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "hens", ["Even the hens. Even the HENS run from me. I have never so much as looked at a hen.", "Go on, scatter. Everything on this hill scatters. I could scatter a rock.", "Hens. Sixty sheep to find and the hens think it is about THEM."]),
   ...R(4, "hens", ["#oath_phrase#, hens, out of my way, I have no quarrel with poultry and no time for one either!", "Scatter, then, you #adj# feather dusters; at least you do not have to be carried."]),
   ...R(8, "hens", ["The hens ran. Everything ran. I was used to it. That was the worst part."], { reg: ["hemingway"] }),
+  // A signpost. It has one opinion and it has had it all day.
+  ...R(0, "signpost", ["That way. Says plank.", "Sign. Points. So what.", "Not asking you."]),
+  ...R(2, "signpost", ["That way, it says. It has said that way all day. It is a plank on a stick and it is more certain than I am.", "Thank you, signpost. Very helpful. Now point at a SHEEP.", "#village#, it says. I know where #village# is. I want to know where the SHEEP is."]),
+  ...R(4, "signpost", ["#oath_phrase#, a signpost, standing there with one arm out like it has ever carried anything!", "Point at me again, you #adj# plank, and I will use you for the fire and the sheep for the stew and myself for a long lie-down."]),
+  ...R(6, "signpost", ["Consider the signpost, #vocative#: it knows one direction, has never doubted it, and is respected for it. I know all directions and am respected by nobody."]),
+  ...R(8, "signpost", ["The sign pointed to the village. I did not go. The sign did not mind. It had pointed at better men."], { reg: ["hemingway"] }),
   // The inn. Not yet.
   ...R(0, "inn", ["Ale. Later. Sheep.", "Inn. No. Sheep first.", "Door. Warm. NO."]),
   ...R(2, "inn", ["The Cursed Ram. Not yet. Not YET. Sixty sheep and then you may have me, and you will not enjoy it.", "Look at it. A door. A fire. Not one sheep inside it. I could weep. I will, later, in there.", "Walk past the inn. Walk PAST the inn. Good. That was the hardest thing I have done today and it is not yet noon."]),

@@ -136,6 +136,11 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   renderer.setSeason(world.season);
+  renderer.onSignpost = () => {
+    if (!session || keyedUnit(session.world.seed, "signpost-say", session.world.tick) > 0.5) return;
+    const u = speakKind(session.world, session.map, "signpost", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.25);
+    if (u) say(session, u.text, u.heat, u.seconds, performance.now(), false, u);
+  };
   renderer.onInnNear = () => {
     if (!session) return;
     const u = speakKind(session.world, session.map, "inn", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.3);

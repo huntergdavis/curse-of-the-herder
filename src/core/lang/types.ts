@@ -38,7 +38,7 @@ export interface LexEntry {
   tombstoneSafe?: boolean;
 }
 
-export type RuleEvent = "idle" | "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "finished" | "book" | "epitaph" | "rain" | "dusk" | "walkOfShame" | "breather" | "bookPassed" | "callback" | "roof" | "rant" | "fog" | "river" | "gaze" | "bog" | "nettles" | "stub" | "cowpat" | "wasp" | "bite" | "gate" | "molehill" | "dawn" | "heave" | "curious" | "dozy" | "crook" | "wind" | "lunch" | "boulder" | "black" | "miscount" | "halfway" | "tentogo" | "lastone" | "scarecrow" | "jailbreak" | "hat" | "streak" | "reread" | "rainStops" | "fogLifts" | "windDrops" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival" | "rivalGone" | "cow" | "curseReply" | "lunchStolen" | "thiefCaught" | "hens" | "dogHelps" | "dogUnderfoot" | "inn" | "rivalBolt" | "stick" | "levelUp";
+export type RuleEvent = "idle" | "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "finished" | "book" | "epitaph" | "rain" | "dusk" | "walkOfShame" | "breather" | "bookPassed" | "callback" | "roof" | "rant" | "fog" | "river" | "gaze" | "bog" | "nettles" | "stub" | "cowpat" | "wasp" | "bite" | "gate" | "molehill" | "dawn" | "heave" | "curious" | "dozy" | "crook" | "wind" | "lunch" | "boulder" | "black" | "miscount" | "halfway" | "tentogo" | "lastone" | "scarecrow" | "jailbreak" | "hat" | "streak" | "reread" | "rainStops" | "fogLifts" | "windDrops" | "streakBroken" | "recaptured" | "nemesis" | "nemesisCaught" | "rival" | "rivalGone" | "cow" | "curseReply" | "lunchStolen" | "thiefCaught" | "hens" | "dogHelps" | "dogUnderfoot" | "inn" | "rivalBolt" | "stick" | "levelUp" | "signpost";
 
 export interface Rule {
   id: string;

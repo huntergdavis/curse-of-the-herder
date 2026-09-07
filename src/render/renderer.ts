@@ -31,6 +31,9 @@ export class Renderer {
   private houses: { x: number; y: number }[] = [];
   /** Villagers stand by their wells; each remembers when it last heard something. */
   private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }[] = [];
+  /** Signposts at the village edges; he takes their certainty personally. */
+  private signposts: { x: number; y: number; lastTick: number }[] = [];
+  onSignpost: (() => void) | null = null;
   /** One house per village is the inn, with a sign. He is not going in. Yet. */
   private inns: { x: number; y: number; lastTick: number }[] = [];
   onInnNear: (() => void) | null = null;
@@ -54,12 +57,15 @@ export class Renderer {
   private indexHouses(): void {
     this.houses = [];
     this.villagers = [];
+    this.signposts = [];
     const n = this.map.size;
     for (let i = 0; i < n * n; i++) {
       const d = this.map.deco[i];
       if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
       if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3, offences: 0 });
+      if (d === Deco.Signpost) this.signposts.push({ x: i % n, y: Math.floor(i / n), lastTick: -1e9 });
     }
+    this.signposts = this.signposts.slice(0, 64);
     this.inns = [];
     for (const v of this.villagers) {
       const house = [...this.houses].sort((p, q) => Math.hypot(p.x - v.x, p.y - v.y) - Math.hypot(q.x - v.x, q.y - v.y))[0];
@@ -1028,6 +1034,13 @@ export class Renderer {
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
+    for (const sp of this.signposts) {
+      if (Math.abs(sp.x - h.x) > 3 || Math.abs(sp.y - h.y) > 3) continue;
+      if (Math.hypot(sp.x - h.x, sp.y - h.y) < 1.8 && !world.finished && world.tick - sp.lastTick > 7200 && (h.mode === "toSheep" || h.mode === "toPen")) {
+        sp.lastTick = world.tick;
+        this.onSignpost?.();
+      }
+    }
     for (const inn of this.inns) {
       if (Math.abs(inn.x - cam.x) * T > W + T || Math.abs(inn.y - cam.y) * T > H + T) continue;
       // A hanging sign on a bracket beside the door: a pale ram's head on a dark board.
