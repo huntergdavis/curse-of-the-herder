@@ -467,7 +467,7 @@ export class Renderer {
   onHensScatter: (() => void) | null = null;
   /** The dog has just dropped a stick at his feet. */
   onStick: (() => void) | null = null;
-  private stick = { until: 0, x: 0, y: 0, restKey: -1 };
+  private stick = { until: 0, x: 0, y: 0, restKey: -1, thrownAt: 0, tx: 0, ty: 0 };
   private lastHenTick = -1e9;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
   private arrivals: { id: number; atMs: number }[] = [];
@@ -749,20 +749,43 @@ export class Renderer {
           this.stick.until = nowMs + 9000;
           this.stick.x = h.x + (h.facing === 2 ? -0.7 : 0.7);
           this.stick.y = h.y + 0.9;
+          this.stick.thrownAt = 0;
+          this.stick.tx = h.x + (h.facing === 2 ? -4.5 : 4.5);
+          this.stick.ty = h.y + 1.4;
           d.react = "stick";
           d.reactUntil = nowMs + 2500;
           this.onStick?.();
         }
       }
       if (nowMs < this.stick.until) {
+        // Four seconds in, he throws it. The dog goes. Neither of those things is herding.
+        if (!this.stick.thrownAt && nowMs > this.stick.until - 5000) this.stick.thrownAt = nowMs;
+        const ft = this.stick.thrownAt ? Math.min(1, (nowMs - this.stick.thrownAt) / 1100) : 0;
+        const kx = this.stick.x + (this.stick.tx - this.stick.x) * ft;
+        const ky = this.stick.y + (this.stick.ty - this.stick.y) * ft;
+        const arc = Math.sin(ft * Math.PI) * T * 1.4;
+        const spin = this.stick.thrownAt && ft < 1 ? ft * 9 : 0;
+        ctx.save();
+        ctx.translate(sx(kx + 0.5), sy(ky) - T * 0.1 - arc);
+        ctx.rotate(spin);
         ctx.strokeStyle = "#6b4a2a";
         ctx.lineWidth = Math.max(1.5, T * 0.05);
         ctx.beginPath();
-        ctx.moveTo(sx(this.stick.x + 0.3), sy(this.stick.y) - T * 0.04);
-        ctx.lineTo(sx(this.stick.x + 0.75), sy(this.stick.y) - T * 0.14);
-        ctx.moveTo(sx(this.stick.x + 0.55), sy(this.stick.y) - T * 0.1);
-        ctx.lineTo(sx(this.stick.x + 0.62), sy(this.stick.y) - T * 0.2);
+        ctx.moveTo(-T * 0.22, T * 0.05);
+        ctx.lineTo(T * 0.22, -T * 0.05);
+        ctx.moveTo(T * 0.05, -T * 0.01);
+        ctx.lineTo(T * 0.12, -T * 0.12);
         ctx.stroke();
+        ctx.restore();
+        if (this.stick.thrownAt && nowMs - this.stick.thrownAt > 300 && nowMs - this.stick.thrownAt < 3500) {
+          // The dog fetches. This is the fastest it moves all day.
+          d.vx = (this.stick.tx + 0.2 - d.x) * 0.16;
+          d.vy = (this.stick.ty - 0.3 - d.y) * 0.16;
+          d.x += d.vx;
+          d.y += d.vy;
+          if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
+          chasing = true;
+        }
       }
       // Reactions: bolt from a wasp, one bark at a runaway, then lose interest.
       const reacting = nowMs < d.reactUntil;

@@ -121,6 +121,15 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(6, "curseReply", ["Yes, thank you, I am aware that I am cursed. The reminders are not, on the whole, helping with the cursing.", "Heckled by my own affliction. There is a word for that and I will find it in a book and I will use it at you."]),
   ...R(8, "curseReply", ["The curse spoke. I did not answer. Then I did. It was not a good answer."], { reg: ["hemingway"] }),
   ...R(10, "curseReply", ["Speak up, O Curse; my #adj# hearing is the one faculty you have not yet ruined, and I should hate for you to feel you had left a job unfinished."]),
+  // A new level: he can feel the words coming in.
+  ...R(1, "levelUp", ["New words. Feel them. BAD hill.", "More words now. Still sheep."]),
+  ...R(2, "levelUp", ["I have words now. Not many. Enough for you, hill.", "Something has shifted. I can say what the sheep is. The sheep is #adj#. Yes. YES."]),
+  ...R(3, "levelUp", ["Ha. HA. I can feel it: sentences. Whole ones. Aimed at #target.the#."]),
+  ...R(4, "levelUp", ["#oath_phrase#, I can feel the vocabulary coming in like a tide, and every wave of it is aimed at you, sheep.", "A new word arrives and the first thing I do with it is throw it at a hill. That is the kind of man the books have made."]),
+  ...R(6, "levelUp", ["Mark it, #vocative#: I am more articulate than I was an hour ago, and you are exactly as #adj#. Progress, of a kind, for one of us."]),
+  ...R(8, "levelUp", ["I had more words now. The sheep did not care. Neither did the words."], { reg: ["hemingway"] }),
+  ...R(10, "levelUp", ["Behold: a fresh register unlocked, a whole new arsenal of the #adj# and the unsayable, and still the same hill to spend it on."]),
+  ...R(12, "levelUp", ["I have reached the summit of the language and found there a sheep, chewing. It looked at me. It was not impressed. Neither, on reflection, am I."]),
   // The dog brings him a stick. It is not a sheep.
   ...R(0, "stick", ["Stick. Not sheep.", "No. Sheep. Not stick.", "…Stick. Fine. Good stick."]),
   ...R(2, "stick", ["That is a stick. That is not a sheep. We have discussed this, #dog#. We have had the meeting.", "Thank you, #dog#. A stick. Sixty sheep out there and you bring me the one thing on this hill that has never run from anyone.", "A stick. For me. #dog#, I am touched, and I am going to throw it, and you are going to bring it back, and neither of those things is herding."]),

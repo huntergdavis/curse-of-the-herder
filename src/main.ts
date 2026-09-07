@@ -449,6 +449,23 @@ function maybeQuoteBook(s: Session, nowMs: number): void {
 }
 
 let lastDiaryHour = -1;
+let lastLevelSeen = -1;
+
+/** The level ticked over: a toast with the new name, and he feels the words arrive. */
+function watchLevel(s: Session, nowMs: number): void {
+  const w = s.world;
+  const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
+  if (lastLevelSeen < 0 || w.tick < 40) {
+    lastLevelSeen = level;
+    return;
+  }
+  if (level <= lastLevelSeen) return;
+  lastLevelSeen = level;
+  toast(`<strong>Level ${level} · ${escapeHtml(LEVEL_NAMES[level] ?? "")}.</strong> New words have arrived. The hill is about to hear them.`);
+  const u = speakKind(w, s.map, "levelUp", { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP, 0.25);
+  if (u) s.queue.push({ text: u.text, heat: u.heat, seconds: u.seconds, atMs: nowMs + 2500, force: true });
+  maybeCurseRemarks(s, "levelUp", nowMs);
+}
 /** On the hour, a one-line entry from the herder's day book. */
 function hourlyDiary(s: Session): void {
   const w = s.world;
@@ -504,6 +521,7 @@ const CURSE_LINES: Record<string, string[]> = {
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
   rivalBolt: ["Do not enjoy this.", "That one is coming to live with you.", "I had nothing to do with it. This time."],
+  levelUp: ["It was in a book. He found it. Fine.", "More words. Same sheep.", "I gave him the books. Remember that."],
   inn: ["He is not allowed in. I checked.", "The Cursed Ram. Named after me, in a way.", "Sixty sheep, then ale. Those are the terms."],
   cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
   dogHelps: ["I did not authorise that.", "Do not get used to it.", "Even I am surprised."],
@@ -788,6 +806,7 @@ function frame(nowMs: number): void {
       showExcerpts(s, nowMs);
       if (!catchingUp && w.tick % 40 === 0) maybeQuoteBook(s, nowMs);
       if (!catchingUp && FAST <= 20) hourlyDiary(s);
+      if (!catchingUp) watchLevel(s, performance.now());
     }
     flushQueue(s, nowMs);
     if (nowMs - s.lastSaveMs > SAVE_EVERY_MS) {
