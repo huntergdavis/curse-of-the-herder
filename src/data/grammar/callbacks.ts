@@ -27,6 +27,22 @@ export const CALLBACK_RULES: Rule[] = [
     "#flees.cap# ran. I counted. Counting is what you do when you cannot do anything else.",
     "It rained #rains# times. Each time it was rain. I did not expect it to be anything else.",
   ]),
+  ...R(1, "roof", ["Roof. Why roof.", "A sheep. On a house.", "Down. Now.", "#interj.cap#. A roof."]),
+  ...R(2, "roof", [
+    "You are on a roof. You are a sheep. One of these facts has to give.",
+    "How did you get onto the roof? No. Do not tell me. Come down.",
+    "The people who live here did not order a sheep for the roof.",
+    "Sheep do not go on roofs. It is one of the very few rules.",
+  ]),
+  ...R(4, "roof", [
+    "#oath.cap#, #vocative#, that is a ROOF. Are you a weathervane? You are not a weathervane.",
+    "#pantheon.cap#, a sheep on the thatch, in #village#, in front of everyone.",
+    "Come down, you #insult_np#, before the chimney gets ideas.",
+  ]),
+  ...R(8, "roof", [
+    "The sheep was on the roof. I did not ask how. You do not ask a sheep how. You climb.",
+    "It was a good roof. It was a bad place for a sheep. I went up.",
+  ]),
   ...R(2, "bookPassed", [
     "A book. And my arms are full of sheep. Later, book.",
     "I see you, book. I will come back for you.",

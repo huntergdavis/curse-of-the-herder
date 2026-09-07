@@ -1,5 +1,5 @@
 import { generateMap, isPlaceable, stampLibraries, type GameMap } from "../map/generate";
-import { Terrain } from "../map/terrain";
+import { Deco, Terrain } from "../map/terrain";
 import { herderName } from "../names";
 import { BOOKS } from "../../data/books";
 import { mulberry32 } from "../rng";
@@ -32,6 +32,8 @@ export interface SheepState {
   ty: number;
   /** Tiles per second while moving; fleeing is fast. */
   speed: number;
+  /** Sitting on a village roof; caught from the doorstep. */
+  onRoof?: boolean;
 }
 
 export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading";
@@ -153,8 +155,20 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
   }
   const sheep: SheepState[] = [];
   const taken = new Set<number>();
+  // A few sheep have got onto roofs. Nobody knows how.
+  const roofs: number[] = [];
+  for (let i = 0; i < map.size * map.size; i++) if ((map.deco[i] === Deco.House || map.deco[i] === Deco.HouseRed) && Number.isFinite(map.penDistance[i - 1] ?? Infinity)) roofs.push(i);
+  const roofCount = Math.min(3, roofs.length);
   rings.forEach((ring, r) => {
     let bucket = buckets[r]!;
+    // Swap one sheep of the middle rings for a roof sheep.
+    if (r >= 1 && r <= 3 && sheep.filter((x) => x.onRoof).length < roofCount && roofs.length) {
+      const i = roofs.splice(Math.floor(rnd() * roofs.length), 1)[0]!;
+      const x = i % map.size;
+      const y = Math.floor(i / map.size);
+      sheep.push({ id: sheep.length, x, y, homeX: x, homeY: y, mode: "loose", skittish: 0, flees: 0, absurd: true, seen: false, ring: r, named: false, tx: x, ty: y, speed: 0, onRoof: true });
+      ring = { ...ring, count: ring.count - 1 };
+    }
     // Fall back to the nearest non-empty bucket on odd boards.
     for (let k = 1; bucket.length === 0 && k < rings.length; k++) bucket = buckets[Math.max(0, r - k)] ?? buckets[Math.min(rings.length - 1, r + k)] ?? [];
     for (let c = 0; c < ring.count && bucket.length > 0; c++) {

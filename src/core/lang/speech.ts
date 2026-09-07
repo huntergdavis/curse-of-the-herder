@@ -8,7 +8,7 @@ import { CALLBACK_RULES } from "../../data/grammar/callbacks";
 import { PACKS_5_8 } from "../../data/lexicon/packs-5-8";
 import { PACKS_9_12 } from "../../data/lexicon/packs-9-12";
 import { NON_TERMINALS_9_12, RULES_9_12 } from "../../data/grammar/tiers-9-12";
-import { Terrain } from "../map/terrain";
+import { Deco, Terrain } from "../map/terrain";
 import type { GameMap } from "../map/generate";
 import { sheepName } from "../names";
 import { curseIntervalSeconds, erudition, filthCeiling, levelFor } from "../progression";
@@ -91,6 +91,13 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
   };
 }
 
+function wasOnRoof(w: WorldState, map: GameMap, sheepId: number): boolean {
+  const s = w.sheep[sheepId];
+  if (!s) return false;
+  const d = map.deco[Math.round(s.homeY) * map.size + Math.round(s.homeX)];
+  return d === Deco.House || d === Deco.HouseRed;
+}
+
 const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   flee: "flee",
   caught: "caught",
@@ -111,8 +118,10 @@ function holdSeconds(text: string, heat: number): number {
 }
 
 export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent: string[], bandCap: Band = 4): Utterance | null {
-  const ev = EVENT_MAP[e.kind];
+  let ev = EVENT_MAP[e.kind];
   if (!ev) return null;
+  // Catching a sheep off a roof gets its own material.
+  if (e.kind === "absurd" && wasOnRoof(w, map, e.sheepId)) ev = "roof";
   const ctx = buildContext(w, map, e, recent, bandCap);
   // Events run hotter than the meter says: something just happened.
   const bump: Partial<Record<RuleEvent, number>> = { flee: 0.25, repeatEscape: 0.4, absurd: 0.3, penned: -0.2, finished: 0.5 };

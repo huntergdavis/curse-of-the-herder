@@ -105,7 +105,7 @@ export class Renderer {
       const pose = s.mode === "penned" ? (world.finished ? "asleep" : "idle") : moving ? "walk" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + 0.5), T * 0.9, pose, facing, walkPhase, s.named);
+      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : 0.5)), T * (s.onRoof ? 0.75 : 0.9), pose, facing, walkPhase, s.named);
       // Stranded sheep look faintly puzzled about it, now and then.
       if (s.mode === "loose" && s.absurd && Math.floor(nowMs / 1000 + s.id) % 7 < 2) drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, "?");
     }
@@ -146,6 +146,22 @@ export class Renderer {
       const s = world.sheep[b.anchor];
       if (!s) continue;
       drawEmote(ctx, sx(s.x + 0.5) + T * 0.3, sy(s.y) - T * 0.35, T, b.text);
+    }
+
+    // Village names on their signposts, when close enough to read.
+    if (T >= 36) {
+      ctx.font = `${Math.max(9, T * 0.22)}px "Fredoka", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      for (const v of this.map.villages) {
+        if (Math.abs(v.x - cam.x) * T > W / 2 + T * 4 || Math.abs(v.y - cam.y) * T > H / 2 + T * 4) continue;
+        const px = sx(v.x - 1 + 0.5);
+        const py = sy(v.y + 1) + T * 0.28;
+        ctx.fillStyle = "rgba(43,38,32,0.85)";
+        ctx.fillText(v.name, px, py);
+      }
+      ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
     }
 
     // Emptied libraries get a little "read" tag so the map remembers.

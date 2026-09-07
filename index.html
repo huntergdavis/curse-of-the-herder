@@ -26,7 +26,7 @@
       #hud .label { opacity: 0.7; }
       #meter { height: 10px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--paper-2); }
       #meter > div { height: 100%; width: 0%; background: linear-gradient(90deg, #f2c14e, #e8743a, #c94f4f); transition: width 0.6s; }
-      #toolbar { top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; }
+      #toolbar { top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; z-index: 20; }
       button, select { font: inherit; font-size: 14px; background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
       button:hover, .filebtn:hover { background: #fff3c4; }
       .filebtn { font: inherit; font-size: 14px; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
@@ -37,7 +37,7 @@
       #toast { left: 50%; top: 14px; transform: translateX(-50%); font-size: 15px; background: #fff3c4; animation: drop 0.4s ease-out; }
       #toast[hidden] { display: none; }
       @keyframes drop { from { transform: translate(-50%, -30px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-      #overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(43, 38, 32, 0.55); color: var(--paper); font-size: 22px; text-align: center; padding: 24px; }
+      #overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(43, 38, 32, 0.55); color: var(--paper); font-size: 22px; text-align: center; padding: 24px; }
       #overlay[hidden] { display: none; }
       #overlay .card { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 16px; padding: 24px 32px; max-width: 520px; box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
       #overlay h1 { margin: 0 0 8px; font-size: 32px; }
@@ -50,7 +50,7 @@
       .stone .ep { font-family: var(--hand-font); font-size: 18px; line-height: 1.2; margin: 6px 0 4px; }
       .stone .when { font-size: 11px; opacity: 0.7; }
       .grass-strip { height: 10px; margin: -6px auto 0; width: 250px; background: #7cb548; border-radius: 6px; border: 2px solid var(--ink); }
-      #hall { top: 60px; left: 50%; transform: translateX(-50%); width: min(1100px, 94vw); max-height: calc(100vh - 80px); overflow: auto; padding: 14px 18px; }
+      #hall { z-index: 15; top: 60px; left: 50%; transform: translateX(-50%); width: min(1100px, 94vw); max-height: calc(100vh - 80px); overflow: auto; padding: 14px 18px; }
       #hall header { display: flex; justify-content: space-between; align-items: center; }
       #hall h2 { margin: 0; }
       #hall .hall-sub { margin: 4px 0 12px; opacity: 0.75; }

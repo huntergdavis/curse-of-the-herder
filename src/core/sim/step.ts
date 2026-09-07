@@ -75,6 +75,19 @@ function planPath(w: WorldState, map: GameMap, tx: number, ty: number): boolean 
   return true;
 }
 
+/** Path to a sheep, or to the doorstep beside it when it is on a roof. */
+function planToSheep(w: WorldState, map: GameMap, s: SheepState): boolean {
+  const tx = Math.round(s.tx);
+  const ty = Math.round(s.ty);
+  if (!s.onRoof) return planPath(w, map, tx, ty);
+  for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1]] as const) {
+    const i = (ty + dy) * map.size + (tx + dx);
+    if (map.deco[i] === Deco.House || map.deco[i] === Deco.HouseRed || map.deco[i] === Deco.Fence) continue;
+    if (planPath(w, map, tx + dx, ty + dy)) return true;
+  }
+  return false;
+}
+
 /** Move along the path by up to `budget` tiles; returns tiles actually moved. */
 function walk(w: WorldState, budget: number): number {
   const h = w.herder;
@@ -333,7 +346,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
       pushEvent(w, { tick: w.tick, kind: "finished", sheepId: -1 });
       return;
     }
-    if (!planPath(w, map, Math.round(target.x), Math.round(target.y))) {
+    if (!planToSheep(w, map, target)) {
       // Unreachable: treat as lost to the hills so the day can still end.
       target.mode = "penned";
       w.sheepPenned++;
@@ -416,13 +429,14 @@ function stepHerder(w: WorldState, map: GameMap): void {
           pushEvent(w, { tick: w.tick, kind: "flee", sheepId: s.id });
         }
         h.approachCount = 0;
-        if (!planPath(w, map, Math.round(s.tx), Math.round(s.ty))) h.mode = "idle";
+        if (!planToSheep(w, map, s)) h.mode = "idle";
         return;
       }
     }
     // The sheep may have wandered; re-path when the path is exhausted but we are not there.
     if (h.path.length === 0) {
-      if (d <= 0.75) {
+      if (d <= (s.onRoof ? 1.6 : 0.75)) {
+        s.onRoof = false;
         s.mode = "carried";
         h.carrying = s.id;
         h.carryOdometer = 0;
@@ -435,7 +449,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
         }
         if (planPath(w, map, map.pen.x, map.pen.y)) h.mode = "toPen";
         else h.mode = "idle";
-      } else if (!planPath(w, map, Math.round(s.tx), Math.round(s.ty))) {
+      } else if (!planToSheep(w, map, s)) {
         h.mode = "idle";
       }
     }
