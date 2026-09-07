@@ -163,7 +163,8 @@ async function startSession(world: WorldState): Promise<void> {
     const cx = Math.round(w.herder.x);
     w.rival = { x: cx - 9, y: Math.round(w.herder.y) + 3, dx: 0.11, ticksLeft: 200 };
   }
-  renderer.wanted = world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
+  const enemy = world.sheep.find((sh) => sh.nemesis);
+  renderer.wanted = enemy ? sheepName(world.seed, enemy.id) : world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
   renderer.signatureWord = signatureWord(world.seed);
   renderer.reducedMotion = motionSetting;
   renderer.fontScale = textScale;
