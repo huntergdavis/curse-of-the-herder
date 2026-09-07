@@ -16,15 +16,21 @@ sentence structures. Filthy, never cruel.
 
 **Play:** https://hunterdavis.com/curse-of-the-herder/
 
-![Dawn by the pen: the herder, his crook, and a sheepdog who will not be helping](docs/img/herder-and-dog.png)
+![Twenty seconds of a cursed herder at work](docs/img/rant.gif)
 
-![A morning on the road: the herder carries a sheep past an emptied library box](docs/img/morning-road.png)
+![Dawn by the pen: the herder, his crook, a cow, and a sheepdog who will not be helping](docs/img/herder-and-dog.png)
+
+![Mid-morning: a sheep on his shoulders and a book's worth of new words](docs/img/afternoon.png)
+
+![The neighbour walks past with Patience, Prudence and Also Prudence in a line; even the dog goes to look](docs/img/neighbour.png)
 
 ![A village: Tupsley's signpost, a little free library, and a sheep on a roof](docs/img/village-roof-sheep.png)
 
 ![Winter in Tupsley: snow, grey trees, washing on the line, scarecrows in the field](docs/img/winter-village.png)
 
-![Dusk: the tombstone card at the end of a day](docs/img/ending.png)
+![Dusk: the last sheep is in, the neighbour passes once more, and a stone rises beside the pen with his last words on it](docs/img/ending.png)
+
+![On a phone: the Map button pops the minimap; drag on it to look around the island](docs/img/phone.png)
 
 ## Running it
 

@@ -38,26 +38,26 @@ Frame rate: the draw takes 1–3 ms on a MacBook Air (7 ms outliers), so the gam
 - **Looking around.** The minimap shows the viewport as a reticle; click or hold-and-drag on it to look anywhere on the island, and the view glides back to the herder two seconds after release. Covered by a Playwright test.
 - `scratch/` is ignored by git.
 
-## Backlog (re-cut 2026-09-07, evening)
+## Backlog (2026-09-07, night: release candidate)
 
 ```
  P0  Must be right for a screensaver that runs all day
-     [ ] Confirm on the Air: a full day, then a second herder, no sea over the island (fix deployed)
-     [x] Frame rate: was pinned at 30 by the browser on the Air; the cap now defaults to "display rate"
-         (60, 120 Hz…) and ?stats=1 shows what the browser delivers vs what we draw. Draw is 1–3 ms.
+     [x] Confirmed on the Air: a full day, then a second herder, no sea over the island
+     [x] Frame rate: cap defaults to display rate; draw is 1–3 ms
      [x] Memorial stone text stays on the stone
+     [x] README refreshed: seven stills and a 20 s GIF of him at work
  P1  Things a viewer will notice
-     [x] Phones get the look-around: a Map button in the toolbar pops a larger minimap; drag to look
-     [ ] Language: cut weakest templates per release; `self` facet for "I am #adj#"
-     [ ] Flyting as a real duel (needs a new shape now the dots are gone)
-     [ ] Tombstone rising in the world during the end fade
-     [ ] Sheep walk animation while wandering; flee dash
- P2  Nice to have
-     [ ] README screenshots and a 20 s GIF
-     [ ] A second Jerome-style book for levels 7–8
- Decided
-     Sound: never.  P3: removed.  Web Worker: not planned.
-     Service worker: dropped (too complicated for what it buys).  Keyboard shortcuts: skipped.
+     [x] Phones get the look-around (Map button)
+     [x] Flyting is a duel: he insults the notorious sheep, it baas back, he cannot let that stand, it baas louder, he gets the last word, it says "meh."
+     [x] The tombstone rises out of the ground beside the pen at dusk, his last words engraved
+     [x] Sheep legs keep time with speed; bolting sheep stretch out and kick up dust
+     [x] Speech bubbles never cover the herder or the sheep on his shoulders
+     [ ] Language: cut the weakest templates from a transcript read each release (ongoing housekeeping)
+ Dropped / decided
+     Sound: never.  P3: removed.  Web Worker: not planned.  Service worker: dropped.
+     Keyboard shortcuts: skipped.  Second Jerome-style book: dropped.
+
+ → Awaiting sign-off for 1.0.  On sign-off: bump package.json to 1.0.0, tag v1.0.0, deploy.
 ```
 
 ## How to check things

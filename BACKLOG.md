@@ -96,7 +96,7 @@ long soak.
 
 ## P0 — Must be right for a screensaver that runs all day
 
-- [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (fix deployed 2026-09-07).
+- [x] Confirmed on the MacBook Air 2026-09-07: a full day, then a second herder, no sea over the island.
 - [x] Frame rate: the cap defaults to the display rate (60, 120 Hz…); `?stats=1` shows browser delivery vs drawn frames. Draw is 1–3 ms on the Air; a 30 fps reading was the browser's low-power throttle, not us.
 - [x] Memorial stone text stays on the stone (measured wrap and clip; verified at ratio 3).
 
@@ -111,7 +111,7 @@ long soak.
 
 ## P2 — Nice to have
 
-- [ ] README screenshots refreshed and a 20 s GIF (P0 for 1.0).
+- [x] README screenshots refreshed (seven stills, `node scripts/shot-readme.mjs`) and a 20 s GIF assembled with ffmpeg (`docs/img/rant.gif`, 1.8 MB).
 
 ## Decided
 
