@@ -167,11 +167,13 @@ async function startSession(world: WorldState): Promise<void> {
   if (params.get("rest")) {
     // Screenshot hook: he sits down for a while, and the dog has an idea about a stick.
     const w = session.world;
-    let until = w.tick + 400;
-    while ((until * 7919) % 100 >= 45) until++;
-    w.herder.mode = "resting";
-    w.herder.restUntilTick = until;
-    w.herder.path = [];
+    window.setTimeout(() => {
+      let until = w.tick + 400;
+      while ((until * 7919) % 100 >= 45) until++;
+      w.herder.mode = "resting";
+      w.herder.restUntilTick = until;
+      w.herder.path = [];
+    }, 3000);
   }
   if (params.get("read")) {
     // Screenshot hook: he sits down with a book and the nearest sheep drift over to listen.
