@@ -180,6 +180,16 @@ async function startSession(world: WorldState): Promise<void> {
       w.herder.path = [];
     }, 3000);
   }
+  if (params.get("drink")) {
+    // Screenshot hook: a drink at an imaginary well, bucket and all.
+    const w = session.world;
+    window.setTimeout(() => {
+      w.drankTick = w.tick;
+      w.herder.mode = "resting";
+      w.herder.restUntilTick = w.tick + 36;
+      w.herder.path = [];
+    }, 3000);
+  }
   if (params.get("read")) {
     // Screenshot hook: he sits down with a book and the nearest sheep drift over to listen.
     const w = session.world;
