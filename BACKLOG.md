@@ -50,6 +50,7 @@ long soak.
 - Hall Almanac across herders, Marryat line, washing lines, roof cats, village bell
 - Highlights of the day on cards, milestone cheers
 - Seasons from the calendar (palette, snow, breath, lines), a word for yesterday's herder at dawn
+- Seasonal touches: snowmen, huddled winter flock, autumn leaf fall, spring lambs, summer 'phew'
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
