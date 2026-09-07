@@ -26,4 +26,4 @@ jobs:
           if grep -q "pageerror" soak.log; then echo "page errors during soak"; exit 1; fi
           slope=$(grep -oE "slope=-?[0-9.]+" soak.log | cut -d= -f2)
           echo "heap slope $slope MB/hour"
-          awk -v s="$slope" 'BEGIN { if (s > 60) { print "heap slope too steep"; exit 1 } }'
+          awk -v s="$slope" 'BEGIN { if (s > 40) { print "heap floor slope too steep"; exit 1 } }'

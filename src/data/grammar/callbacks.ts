@@ -27,15 +27,15 @@ export const CALLBACK_RULES: Rule[] = [
     "#flees.cap# ran. I counted. Counting is what you do when you cannot do anything else.",
     "It rained #rains# times. Each time it was rain. I did not expect it to be anything else.",
   ], { reg: ["hemingway"] }),
-  ...R(1, "river", ["Wet sheep.", "River. Sheep. Why.", "Out. Out of the water.", "#interj.cap#. Swimming."]),
+  ...R(1, "river", ["Wet sheep.", "Water. Sheep. Why.", "Out. Out of the water.", "#interj.cap#. Swimming."]),
   ...R(2, "river", [
-    "You are standing in a river. On purpose. I can tell it is on purpose.",
+    "You are standing in the water. On purpose. I can tell it is on purpose.",
     "Sheep do not swim. You are not swimming. You are standing in it, which is worse.",
     "Wet wool weighs twice as much. Did you know that? You do now. So do my arms.",
     "Come out of the river, you #adj# #insult#, before you dissolve.",
   ]),
   ...R(4, "river", [
-    "#oath.cap#, #vocative#, that is a RIVER. You have the buoyancy of #simile#.",
+    "#oath.cap#, #vocative#, that is WATER. You have the buoyancy of #simile#.",
     "#pantheon.cap#, a sheep in the water, #time#, looking at me like I put it there.",
     "Out, you #insult_np#! The river has enough in it without you!",
   ]),

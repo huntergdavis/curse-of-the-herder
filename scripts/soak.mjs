@@ -19,7 +19,11 @@ while (Date.now() - start < Number(minutes) * 60_000) {
   samples.push(m);
   console.log(`${((Date.now() - start) / 1000) | 0}s heap=${m.heap.toFixed(1)}MB ${m.name} ${m.clock} ${m.flock}`);
 }
-const first = samples[Math.min(2, samples.length - 1)].heap;
-const last = samples[samples.length - 1].heap;
-console.log(`heap first=${first.toFixed(1)}MB last=${last.toFixed(1)}MB slope=${((last - first) / (Number(minutes) / 60)).toFixed(1)} MB/hour-of-real-time`);
+// Compare GC floors (minimum heap) of the first and second halves: peaks are just GC timing.
+const half = Math.floor(samples.length / 2);
+const floorOf = (arr) => Math.min(...arr.map((m) => m.heap));
+const first = floorOf(samples.slice(0, Math.max(1, half)));
+const last = floorOf(samples.slice(half));
+const hours = Number(minutes) / 60 / 2;
+console.log(`heap floor first-half=${first.toFixed(1)}MB second-half=${last.toFixed(1)}MB slope=${((last - first) / hours).toFixed(1)} MB/hour-of-real-time (floors)`);
 await browser.close();

@@ -30,6 +30,7 @@ long soak.
 - Hotter/earlier language (stinger pack, faster interval, earlier bands), reading lists with taught words, REAL_BOOKS map
 - Menu (New, Hall, Load, Language, end-of-day, Speed 1-100x, fps, Export/Import), mobile layout
 - Word-usage tallies in reading lists, genuine PD excerpts (Grose, Shakespeare, Bierce, Rabelais), river sheep, hourly diary, names over notorious sheep, weekly soak workflow
+- Scandalised villagers by the wells, favourite word on cards
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -51,7 +52,6 @@ long soak.
 ## P1 — Presentation
 
 - [ ] Sheep walk animation while wandering; flee dash.
-- [ ] Villages: a villager or two; smoke from chimneys.
 - [ ] Sheep on a boulder or a cliff ledge (roof and river sheep done).
 - [ ] Tombstone rises beside the pen in the world (not only on the card).
 - [ ] Pen fills with sleeping sheep in rows; night sky with stars during the fade.
