@@ -28,7 +28,7 @@ function freeSurface(s: Surface): void {
 
 /** A 1×1 canvas for reading probe pixels, so the chunk surfaces themselves are never read back. */
 let probeCanvas: { ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D } | null | undefined;
-function probeContext(): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null {
+export function probeContext(): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null {
   if (probeCanvas !== undefined) return probeCanvas?.ctx ?? null;
   try {
     const c = document.createElement("canvas");
@@ -71,10 +71,12 @@ export class ChunkCache {
   private colours: Record<number, string>;
   private greens: string[];
 
-  constructor(readonly map: GameMap, readonly tilePx: number, readonly capacity: number, readonly season = "summer", readonly offscreen = true) {
+  constructor(readonly map: GameMap, readonly tilePx: number, readonly capacity: number, readonly season = "summer", readonly offscreen = true, pool: Surface[] = []) {
     this.px = CHUNK * tilePx;
     this.colours = seasonalTerrain(season);
     this.greens = seasonalGreens(season);
+    // Surfaces handed down from a previous cache of the same size: reused, never reallocated.
+    this.pool = pool.filter((sf) => sf.width === this.px && sf.height === this.px);
   }
 
   beginFrame(): void {
@@ -91,6 +93,39 @@ export class ChunkCache {
     for (const s of this.pool) freeSurface(s);
     this.cache.clear();
     this.pool = [];
+  }
+
+  /** Hand every surface over for reuse (a new island, same tile size) and forget the entries. */
+  release(): Surface[] {
+    const out = [...this.pool, ...[...this.cache.values()].map((e) => e.surface)];
+    this.cache.clear();
+    this.pool = [];
+    return out;
+  }
+
+  /** The flat colour a plain tile should show, for probes against the screen. */
+  colourOf(t: number): [number, number, number] {
+    return hexRgb(this.colours[t]!);
+  }
+
+  /** A plain, undecorated tile inside the world rectangle, or null. Used by the renderer's screen probe. */
+  plainTileIn(x0: number, y0: number, x1: number, y1: number, avoid: (x: number, y: number) => boolean): { x: number; y: number; t: number } | null {
+    const { map } = this;
+    const n = map.size;
+    for (let y = Math.max(1, y0); y <= Math.min(n - 2, y1); y++) {
+      for (let x = Math.max(1, x0); x <= Math.min(n - 2, x1); x++) {
+        const i = y * n + x;
+        const t = map.terrain[i]!;
+        if (t !== Terrain.Grass && t !== Terrain.Meadow && t !== Terrain.Mud) continue;
+        if (map.deco[i] !== Deco.None || keyedUnit(map.seed, "tex", x, y) < 0.4 || ((x * 37 + y * 101) % 23) === 5) continue;
+        // All eight neighbours the same kind, so blob edges cannot touch the centre pixel.
+        let ok = true;
+        for (let oy = -1; oy <= 1 && ok; oy++) for (let ox = -1; ox <= 1; ox++) if (map.terrain[(y + oy) * n + (x + ox)] !== t) { ok = false; break; }
+        if (!ok || avoid(x, y)) continue;
+        return { x, y, t };
+      }
+    }
+    return null;
   }
 
   /** The cached chunk, or null if the browser could not render it correctly (draw it directly instead). */

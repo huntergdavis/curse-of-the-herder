@@ -6,7 +6,7 @@ import { dogName, sheepName } from "../core/names";
 import { Deco } from "../core/map/terrain";
 import type { Bubbles } from "./bubbles";
 import type { Camera } from "./camera";
-import { CHUNK, ChunkCache } from "./chunks";
+import { CHUNK, ChunkCache, probeContext } from "./chunks";
 import { dayTint } from "./palette";
 import { drawBubble, drawEmote, drawHerder, drawLooseHat, drawSheep, setShadowSkew } from "./sprites";
 import { Terrain } from "../core/map/terrain";
@@ -490,7 +490,7 @@ export class Renderer {
     // Chunks are cached at most 64 px a tile (a 16-tile chunk is then 4 MB) and upscaled on big screens;
     // at 96 px a retina laptop kept 200 MB of canvases and browsers start dropping them.
     this.chunkTilePx = Math.min(64, this.tilePx);
-    this.dropChunks();
+    this.purgeChunks();
   }
 
   /** How the chunk layer is being produced: cached offscreen, cached on-DOM canvases, or painted every frame. */
@@ -498,14 +498,30 @@ export class Renderer {
   private chunkRetryAtMs = 0;
   private lastRecheckMs = 0;
 
+  /** Surfaces kept across islands so a new herder never reallocates canvases (fresh GPU allocations were the failure). */
+  private surfacePool: (OffscreenCanvas | HTMLCanvasElement)[] = [];
+  private screenProbeMisses = 0;
+  private lastScreenProbeMs = 0;
+
+  /** Drop the cache entries but keep the canvases for the next cache of the same size. */
   private dropChunks(): void {
+    if (this.chunks) this.surfacePool = this.chunks.release();
+    this.chunks = null;
+  }
+
+  /** Really free the canvases: size or mode changed, or the browser showed us stale pixels. */
+  private purgeChunks(): void {
     this.chunks?.dispose();
     this.chunks = null;
+    for (const sf of this.surfacePool) {
+      try { sf.width = 0; sf.height = 0; } catch { /* nothing */ }
+    }
+    this.surfacePool = [];
   }
 
   /** A chunk came out wrong: step down a mode, and try the cache again in a while. */
   private demoteChunks(nowMs: number): void {
-    this.dropChunks();
+    this.purgeChunks();
     if (this.chunkMode === "offscreen") this.chunkMode = "canvas";
     else if (this.chunkMode === "canvas") this.chunkMode = "direct";
     this.chunkRetryAtMs = nowMs + 20_000;
@@ -516,7 +532,8 @@ export class Renderer {
     if (!this.chunks) {
       const chunkPx = CHUNK * this.chunkTilePx;
       const visible = (Math.ceil(this.width / chunkPx) + 2) * (Math.ceil(this.height / chunkPx) + 2);
-      this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 6, this.season, this.chunkMode === "offscreen");
+      this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 6, this.season, this.chunkMode === "offscreen", this.surfacePool);
+      this.surfacePool = [];
     }
     return this.chunks;
   }
@@ -609,7 +626,7 @@ export class Renderer {
     if (this.chunkMode !== "offscreen" && nowMs > this.chunkRetryAtMs && this.chunkRetryAtMs > 0) {
       this.chunkMode = "offscreen";
       this.chunkRetryAtMs = 0;
-      this.dropChunks();
+      this.purgeChunks();
     }
     const chunks = this.ensureChunks();
     chunks.beginFrame();
@@ -651,6 +668,34 @@ export class Renderer {
     }
 
     const h = world.herder;
+    // Screen probe: every few seconds read one plain tile back from the main canvas, right after the terrain went down.
+    // The chunk surfaces can hold the right pixels while the GPU composites stale memory; this catches that too.
+    if (nowMs - this.lastScreenProbeMs > 2500 && this.chunkMode !== "direct") {
+      this.lastScreenProbeMs = nowMs;
+      const x0 = Math.ceil(cam.x - W / (2 * T)) + 1;
+      const x1 = Math.floor(cam.x + W / (2 * T)) - 2;
+      const y0 = Math.ceil(cam.y - H / (2 * T)) + 1;
+      const y1 = Math.floor(cam.y + H / (2 * T)) - 2;
+      const tile = chunks.plainTileIn(x0, y0, x1, y1, (x, y) => Math.hypot(x - h.x, y - h.y) < 3);
+      const pc = probeContext();
+      if (tile && pc) {
+        try {
+          pc.clearRect(0, 0, 1, 1);
+          pc.drawImage(this.canvas, Math.floor(sx(tile.x + 0.5)), Math.floor(sy(tile.y + 0.5)), 1, 1, 0, 0, 1, 1);
+          const d = pc.getImageData(0, 0, 1, 1).data;
+          const [r, g, b] = chunks.colourOf(tile.t);
+          const ok = Math.abs(d[0]! - r) <= 28 && Math.abs(d[1]! - g) <= 28 && Math.abs(d[2]! - b) <= 28;
+          this.screenProbeMisses = ok ? 0 : this.screenProbeMisses + 1;
+          if (this.screenProbeMisses >= 2) {
+            this.screenProbeMisses = 0;
+            console.warn(`Curse of the Herder: the terrain on screen did not match the map at tile ${tile.x},${tile.y} (got ${d[0]},${d[1]},${d[2]}, expected ${r},${g},${b})`);
+            this.demoteChunks(nowMs);
+          }
+        } catch {
+          /* a tainted or unreadable canvas: nothing to learn */
+        }
+      }
+    }
     const hourNow = this.hourOverride ?? dayHour(world);
     this.shoutingNow = (bubbles.herderLine()?.heat ?? 0) > 0.7;
     setShadowSkew(Math.max(-0.6, Math.min(0.6, (hourNow - 13.5) * 0.14)));
