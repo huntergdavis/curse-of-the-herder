@@ -47,6 +47,7 @@ long soak.
 - Delighters round: arrival hop and cheer, dog at his feet at the end, shooting stars, shouting mouth, signature word in red, gossiping sheep, frogs, dusk hedgehog, swinging gate
 - Tired stoop, dusk lantern, hay and trough in the pen
 - Scarecrows with remarks, owls, ducklings, grazing sheep, jumping fish, rabbits that bolt, vocabulary pop
+- Hall Almanac across herders, Marryat line, washing lines, roof cats, village bell
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -62,7 +63,6 @@ long soak.
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak. (Weekly soak exists and passes.)
 - [ ] Frame time on a real GPU browser: headless software rendering at 1080p measures ~167 ms/frame regardless of effects (fog +50 ms, wind +33 ms), i.e. the base full-screen passes dominate; effects are cheap. Measure on hardware with `node scripts/frame-time.mjs`; if a laptop struggles, the Eco frame-rate setting is the lever, and the fog gradient could become a cached image.
 - [ ] Auto-update via version.json poll and a service worker.
-- [ ] Real PD excerpts for Smollett/Marryat (nautical) with edition cited (R-REAL-04; Molière, Cervantes, Burns done).
 
 ## P1 — Presentation
 
