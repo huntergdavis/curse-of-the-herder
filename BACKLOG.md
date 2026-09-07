@@ -37,6 +37,7 @@ long soak.
 - Lexicon realness audit (removed hidden slurs and body mockery, fixed glosses, fenced descriptors by target, added genuine bite); dusk flicker fixed with a measured test
 - Engine: `.allit` alliteration slots (tier 9 generates its own runs), `.sylN` syllable slots (haiku that scan), `#selfadj#` for first-person lines
 - The sheepdog: follows, lies down, chases butterflies, bolts from wasps, barks once at runaways; lines about him
+- First words at dawn, crown for thrice-escaped sheep, dog on Hall records, Burns bonus book
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

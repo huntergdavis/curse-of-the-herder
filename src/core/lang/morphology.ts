@@ -178,7 +178,8 @@ export function countSyllables(word: string): number {
 
 /** Capitalise sentence starts and fix spacing around punctuation. */
 export function tidySentence(s: string): string {
-  let t = s.replace(/\s+/g, " ").replace(/\s+([,.!?;:])/g, "$1").replace(/([,;:])(?=\S)/g, "$1 ").trim();
+  // Three dots become an ellipsis so the spacing rules below leave them alone.
+  let t = s.replace(/\.\.\./g, "…").replace(/\s+/g, " ").replace(/\s+([,.!?;:])/g, "$1").replace(/([,;:])(?=\S)/g, "$1 ").trim();
   t = t.replace(/\b(a|an|A|An)(\s+)([A-Za-z][\w-]*)/g, (_m, art: string, sp: string, word: string) => {
     const want = article(word);
     const fixed = art[0] === "A" ? capitalize(want) : want;
