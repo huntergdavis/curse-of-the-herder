@@ -7,7 +7,7 @@ import { step } from "../src/core/sim/step";
 const args = new Map<string, string>();
 for (let i = 2; i < process.argv.length; i += 2) args.set(process.argv[i]!.replace(/^--/, ""), process.argv[i + 1] ?? "");
 const seeds = Number(args.get("seeds") ?? 5);
-const size = Number(args.get("size") ?? 512);
+const size = Number(args.get("size") ?? 576);
 const maxHours = Number(args.get("maxHours") ?? 24);
 const verbose = args.has("verbose");
 

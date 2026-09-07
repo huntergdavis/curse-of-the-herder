@@ -57,7 +57,7 @@ in-game titles to real public-domain sources is in
 
 ## How it works
 
-- **Board.** A 512×512 seeded island: water, sand, grass, meadow,
+- **Board.** A 576×576 seeded island: water, sand, grass, meadow,
   farmland, forest, mud, rock, snow, rivers, roads to five villages, and
   a fenced pen near the centre. Sixty sheep are placed in five rings of
   path distance so the day escalates. Twenty-four little free libraries

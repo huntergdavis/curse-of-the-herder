@@ -23,7 +23,7 @@ let FAST = Math.max(1, Math.min(600, Number(params.get("fast") ?? repository.get
 /** At high speed, lines would flash by; keep at least this much real time between bubbles. */
 const MIN_SAY_GAP_MS = 1400;
 let lastSayMs = -1e9;
-const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 512) || 512));
+const BOARD_SIZE = Math.max(128, Math.min(1024, Number(params.get("size") ?? 576) || 576));
 const TICK_MS = TICK_SECONDS * 1000;
 const SAVE_EVERY_MS = 10_000;
 /** `?fps=15` (or the Eco setting) renders less often for laptops. */

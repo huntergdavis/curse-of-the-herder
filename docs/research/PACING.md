@@ -83,7 +83,9 @@ believable time, and the overview minimap is legible. If we want the
 
 ## Measured (2026-09-07)
 
-`npm run pace -- --seeds 5` on a 512 board: 8.15–8.77 h (median 8.4 h),
+2026-09-07: the board moved from 512 to 576 because at 512 the governor was pinned at its 0.5× floor most of the day and the last sheep still landed at about 17:30. At 576 the natural pace fills the day: `npm run pace -- --seeds 3 --size 576` gives 8.86–9.20 h (median 9.11 h), i.e. the last sheep lands between 17:52 and 18:12 with the governor mostly idle. 640 overshoots (median 9.44 h).
+
+Earlier: `npm run pace -- --seeds 5` on a 512 board: 8.15–8.77 h (median 8.4 h),
 60/60 sheep every seed, 12–27 flights, frustration 70–92 at the end.
 Raw content without the governor is ~5.5 h; the governor supplies the
 rest. About 20 of 24 books get read.

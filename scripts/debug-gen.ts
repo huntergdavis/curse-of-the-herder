@@ -4,7 +4,7 @@ const seed = process.argv[2] ?? "pace-1";
 let t = performance.now();
 setGenLog((stage) => { console.log(stage, (performance.now() - t) | 0, "ms"); t = performance.now(); });
 console.log("generating", seed);
-const map = generateMap(seed, { size: 512 });
+const map = generateMap(seed, { size: 576 });
 console.log("map", (performance.now() - t) | 0, "ms; villages", map.villages.length);
 t = performance.now();
 const w = createWorld(seed, map, 0);

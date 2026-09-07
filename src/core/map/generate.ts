@@ -41,7 +41,7 @@ export interface GenerateOptions {
 }
 
 export function generateMap(seed: string, opts: GenerateOptions = {}): GameMap {
-  const size = opts.size ?? 512;
+  const size = opts.size ?? 576;
   const villageCount = opts.villageCount ?? 5;
   const riverCount = opts.riverCount ?? Math.round(size / 85);
   const n = size;

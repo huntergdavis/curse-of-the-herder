@@ -12,7 +12,7 @@ const seed = args.get("seed") ?? "demo";
 const hours = Number(args.get("hours") ?? 9);
 const filth = args.get("filth"); // "max" pins frustration high
 
-const map = generateMap(seed, { size: 512 });
+const map = generateMap(seed, { size: 576 });
 const w = createWorld(seed, map, 0);
 const recent: string[] = [];
 const recentRules: string[] = [];

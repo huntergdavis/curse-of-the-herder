@@ -8,12 +8,27 @@ export const CHUNK = 16;
 type Surface = OffscreenCanvas | HTMLCanvasElement;
 type Ctx = OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
 
-function makeSurface(px: number): Surface {
-  if (typeof OffscreenCanvas !== "undefined") return new OffscreenCanvas(px, px);
+function makeSurface(px: number, offscreen: boolean): Surface {
+  if (offscreen && typeof OffscreenCanvas !== "undefined") return new OffscreenCanvas(px, px);
   const c = document.createElement("canvas");
   c.width = px;
   c.height = px;
   return c;
+}
+
+/** Release a canvas's backing store now rather than whenever the GC gets to it. */
+function freeSurface(s: Surface): void {
+  try {
+    s.width = 0;
+    s.height = 0;
+  } catch {
+    /* nothing to free */
+  }
+}
+
+function hexRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 /**
@@ -21,16 +36,26 @@ function makeSurface(px: number): Surface {
  * blob autotile: flat fill, then each layer in priority order paints rounded
  * squares that overlap their neighbours, so transitions come out rounded.
  */
+interface Entry {
+  surface: Surface;
+  used: number;
+  /** A pixel that should hold a known flat terrain colour, for health checks. */
+  probe: { x: number; y: number; rgb: [number, number, number] } | null;
+}
+
 export class ChunkCache {
-  private cache = new Map<number, { surface: Surface; used: number }>();
+  private cache = new Map<number, Entry>();
   private pool: Surface[] = [];
   private frame = 0;
   readonly px: number;
+  /** Set when a rendered chunk failed its pixel check: the browser is dropping or refusing canvases. */
+  broken = false;
+  private recheckCursor = 0;
 
   private colours: Record<number, string>;
   private greens: string[];
 
-  constructor(readonly map: GameMap, readonly tilePx: number, readonly capacity: number, readonly season = "summer") {
+  constructor(readonly map: GameMap, readonly tilePx: number, readonly capacity: number, readonly season = "summer", readonly offscreen = true) {
     this.px = CHUNK * tilePx;
     this.colours = seasonalTerrain(season);
     this.greens = seasonalGreens(season);
@@ -40,7 +65,16 @@ export class ChunkCache {
     this.frame++;
   }
 
-  get(cx: number, cy: number): Surface {
+  /** Free every surface now. A dropped cache of two dozen 4 MB canvases should not wait for the GC. */
+  dispose(): void {
+    for (const e of this.cache.values()) freeSurface(e.surface);
+    for (const s of this.pool) freeSurface(s);
+    this.cache.clear();
+    this.pool = [];
+  }
+
+  /** The cached chunk, or null if the browser could not render it correctly (draw it directly instead). */
+  get(cx: number, cy: number): Surface | null {
     const key = cy * 4096 + cx;
     const hit = this.cache.get(key);
     if (hit) {
@@ -50,11 +84,89 @@ export class ChunkCache {
     let surface = this.pool.pop();
     if (!surface) {
       if (this.cache.size >= this.capacity) surface = this.evict();
-      else surface = makeSurface(this.px);
+      else {
+        try {
+          surface = makeSurface(this.px, this.offscreen);
+        } catch {
+          this.broken = true;
+          return null;
+        }
+      }
     }
-    this.draw(surface, cx, cy);
-    this.cache.set(key, { surface, used: this.frame });
+    const ctx = surface.getContext("2d") as Ctx | null;
+    if (!ctx) {
+      this.broken = true;
+      freeSurface(surface);
+      return null;
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.paint(ctx, cx, cy);
+    const probe = this.probeFor(cx, cy);
+    const entry: Entry = { surface, used: this.frame, probe };
+    if (!this.healthy(ctx, entry)) {
+      this.broken = true;
+      freeSurface(surface);
+      return null;
+    }
+    this.cache.set(key, entry);
     return surface;
+  }
+
+  /** Every so often re-read one cached chunk's probe pixel; a canvas the browser has blanked comes back wrong. */
+  recheck(): boolean {
+    if (this.cache.size === 0) return true;
+    const entries = [...this.cache.values()];
+    const e = entries[this.recheckCursor++ % entries.length]!;
+    const ctx = e.surface.getContext("2d") as Ctx | null;
+    if (!ctx || !this.healthy(ctx, e)) {
+      this.broken = true;
+      return false;
+    }
+    return true;
+  }
+
+  /** Paint a chunk straight onto another canvas at tile size `T`, clipped to the chunk's own square. */
+  paintDirect(ctx: Ctx, cx: number, cy: number, px: number, py: number, T: number): void {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px, py, CHUNK * T + 0.5, CHUNK * T + 0.5);
+    ctx.clip();
+    ctx.translate(px, py);
+    const k = T / this.tilePx;
+    ctx.scale(k, k);
+    this.paint(ctx, cx, cy);
+    ctx.restore();
+  }
+
+  /** A plain tile inside the chunk whose centre pixel must come out as its flat colour. */
+  private probeFor(cx: number, cy: number): Entry["probe"] {
+    const { map, tilePx: T } = this;
+    const n = map.size;
+    for (let y = 1; y < CHUNK - 1; y++) {
+      for (let x = 1; x < CHUNK - 1; x++) {
+        const wx = cx * CHUNK + x;
+        const wy = cy * CHUNK + y;
+        if (wx <= 0 || wy <= 0 || wx >= n - 1 || wy >= n - 1) continue;
+        const i = wy * n + wx;
+        const t = map.terrain[i]!;
+        if (t !== Terrain.Grass && t !== Terrain.Meadow && t !== Terrain.Sand && t !== Terrain.Mud && t !== Terrain.Road) continue;
+        if (map.deco[i] !== Deco.None || keyedUnit(map.seed, "tex", wx, wy) < 0.4) continue;
+        // Neighbours of another kind grow into this tile by a quarter; the centre stays its own colour.
+        return { x: Math.floor(x * T + T / 2), y: Math.floor(y * T + T / 2), rgb: hexRgb(this.colours[t]!) };
+      }
+    }
+    return null;
+  }
+
+  private healthy(ctx: Ctx, e: Entry): boolean {
+    if (!e.probe) return true;
+    try {
+      const d = ctx.getImageData(e.probe.x, e.probe.y, 1, 1).data;
+      const [r, g, b] = e.probe.rgb;
+      return Math.abs(d[0]! - r) <= 24 && Math.abs(d[1]! - g) <= 24 && Math.abs(d[2]! - b) <= 24 && d[3]! > 200;
+    } catch {
+      return false;
+    }
   }
 
   private evict(): Surface {
@@ -66,16 +178,14 @@ export class ChunkCache {
     return entry.surface;
   }
 
-  private draw(surface: Surface, cx: number, cy: number): void {
-    const ctx = surface.getContext("2d") as Ctx;
+  private paint(ctx: Ctx, cx: number, cy: number): void {
     const { map, tilePx: T } = this;
     const n = map.size;
     const ox = cx * CHUNK;
     const oy = cy * CHUNK;
     const M = 2; // margin tiles so neighbours can encroach
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = this.colours[Terrain.Water]!;
-    ctx.fillRect(0, 0, this.px, this.px);
+    ctx.fillRect(-M * T, -M * T, this.px + 2 * M * T, this.px + 2 * M * T);
     const terrainAt = (x: number, y: number): number => (x < 0 || y < 0 || x >= n || y >= n ? Terrain.Water : map.terrain[y * n + x]!);
 
     // Flat pass.

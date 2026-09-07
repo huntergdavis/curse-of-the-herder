@@ -44,13 +44,16 @@ export class Renderer {
 
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
+    // If the browser drops the canvas's GPU backing, every cached chunk is suspect too.
+    canvas.addEventListener("contextlost", () => this.dropChunks());
+    canvas.addEventListener("contextrestored", () => this.dropChunks());
     this.indexHouses();
     this.resize();
   }
 
   setMap(map: GameMap): void {
     this.map = map;
-    this.chunks = null;
+    this.dropChunks();
     this.indexHouses();
   }
 
@@ -404,15 +407,36 @@ export class Renderer {
     this.canvas.height = this.height;
     // About 22 tiles tall on any screen, clamped for legibility.
     this.tilePx = Math.max(20, Math.min(120, Math.round(Math.min(cssW, cssH) / 20))) * this.dpr;
-    this.chunkTilePx = Math.min(96, this.tilePx);
+    // Chunks are cached at most 64 px a tile (a 16-tile chunk is then 4 MB) and upscaled on big screens;
+    // at 96 px a retina laptop kept 200 MB of canvases and browsers start dropping them.
+    this.chunkTilePx = Math.min(64, this.tilePx);
+    this.dropChunks();
+  }
+
+  /** How the chunk layer is being produced: cached offscreen, cached on-DOM canvases, or painted every frame. */
+  private chunkMode: "offscreen" | "canvas" | "direct" = "offscreen";
+  private chunkRetryAtMs = 0;
+  private lastRecheckMs = 0;
+
+  private dropChunks(): void {
+    this.chunks?.dispose();
     this.chunks = null;
+  }
+
+  /** A chunk came out wrong: step down a mode, and try the cache again in a while. */
+  private demoteChunks(nowMs: number): void {
+    this.dropChunks();
+    if (this.chunkMode === "offscreen") this.chunkMode = "canvas";
+    else if (this.chunkMode === "canvas") this.chunkMode = "direct";
+    this.chunkRetryAtMs = nowMs + 20_000;
+    console.warn(`Curse of the Herder: chunk canvases failed a pixel check; terrain now drawn in "${this.chunkMode}" mode`);
   }
 
   private ensureChunks(): ChunkCache {
     if (!this.chunks) {
       const chunkPx = CHUNK * this.chunkTilePx;
       const visible = (Math.ceil(this.width / chunkPx) + 2) * (Math.ceil(this.height / chunkPx) + 2);
-      this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 8, this.season);
+      this.chunks = new ChunkCache(this.map, this.chunkTilePx, visible + 6, this.season, this.chunkMode === "offscreen");
     }
     return this.chunks;
   }
@@ -425,7 +449,7 @@ export class Renderer {
   setSeason(season: string): void {
     if (season !== this.season) {
       this.season = season;
-      this.chunks = null;
+      this.dropChunks();
     }
   }
   /** Multiplier on bubble text for viewing from a distance. */
@@ -495,8 +519,18 @@ export class Renderer {
   draw(world: WorldState, cam: Camera, bubbles: Bubbles, nowMs: number): void {
     const ctx = this.ctx;
     const T = this.tilePx;
+    // Terrain layer health: after a failure, come back up a mode once in a while; otherwise re-probe a cached chunk every few seconds.
+    if (this.chunkMode !== "offscreen" && nowMs > this.chunkRetryAtMs && this.chunkRetryAtMs > 0) {
+      this.chunkMode = "offscreen";
+      this.chunkRetryAtMs = 0;
+      this.dropChunks();
+    }
     const chunks = this.ensureChunks();
     chunks.beginFrame();
+    if (nowMs - this.lastRecheckMs > 3000) {
+      this.lastRecheckMs = nowMs;
+      if (!chunks.recheck()) this.demoteChunks(nowMs);
+    }
     const W = this.width;
     const H = this.height;
     // World → screen: screen = (world - cam) * T + centre. Snap to whole pixels.
@@ -520,8 +554,13 @@ export class Renderer {
     const chunkDraw = chunkWorld * T;
     for (let cy = Math.max(0, c0y); cy <= Math.min(maxChunk - 1, c1y); cy++) {
       for (let cx = Math.max(0, c0x); cx <= Math.min(maxChunk - 1, c1x); cx++) {
-        const surface = chunks.get(cx, cy);
-        ctx.drawImage(surface as CanvasImageSource, sx(cx * chunkWorld), sy(cy * chunkWorld), chunkDraw + 0.5, chunkDraw + 0.5);
+        const live = this.chunks ?? chunks;
+        const surface = this.chunkMode === "direct" ? null : live.get(cx, cy);
+        if (surface) ctx.drawImage(surface as CanvasImageSource, sx(cx * chunkWorld), sy(cy * chunkWorld), chunkDraw + 0.5, chunkDraw + 0.5);
+        else {
+          if (live.broken && this.chunkMode !== "direct") this.demoteChunks(nowMs);
+          live.paintDirect(ctx, cx, cy, sx(cx * chunkWorld), sy(cy * chunkWorld), T);
+        }
       }
     }
 
