@@ -126,6 +126,8 @@ export interface HerderPose {
   /** Mid-shout: an open mouth. */
   shouting?: boolean;
   winter?: boolean;
+  /** The hat is elsewhere. */
+  hatless?: boolean;
   /** 0..1 how late and tired: he stoops. */
   tired?: number;
   /** After sundown he carries a lantern in the crook hand. */
@@ -358,6 +360,15 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(T * 0.2, -T * 1.12 - bob);
     ctx.stroke();
   }
+  // Bare head when the wind has the hat: a tuft of hair.
+  if (p.hatless) {
+    ctx.fillStyle = "#c9c2b5";
+    ctx.beginPath();
+    ctx.ellipse(0, -T * 1.26 - bob, T * 0.17, T * 0.07, 0, Math.PI, 0);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
   // Hat: wide brim, tall dome; tilts back when furious and jumps clean off mid-rant.
   ctx.save();
   const hop = p.ranting ? Math.abs(Math.sin(p.phase * Math.PI * 4)) * T * 0.45 : 0;
@@ -385,6 +396,28 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     }
   }
   ctx.restore();
+  ctx.restore();
+}
+
+/** The hat on its own, for when the wind has it. */
+export function drawLooseHat(ctx: Ctx, x: number, y: number, T: number, angle: number): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.lineWidth = Math.max(1, T * 0.05);
+  ctx.strokeStyle = INK;
+  ctx.fillStyle = "#5b7a3a";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, T * 0.36, T * 0.09, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-T * 0.2, 0);
+  ctx.quadraticCurveTo(-T * 0.16, -T * 0.32, 0, -T * 0.34);
+  ctx.quadraticCurveTo(T * 0.16, -T * 0.32, T * 0.2, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
   ctx.restore();
 }
 

@@ -8,7 +8,7 @@ import type { Bubbles } from "./bubbles";
 import type { Camera } from "./camera";
 import { CHUNK, ChunkCache } from "./chunks";
 import { dayTint } from "./palette";
-import { drawBubble, drawEmote, drawHerder, drawSheep, setShadowSkew } from "./sprites";
+import { drawBubble, drawEmote, drawHerder, drawLooseHat, drawSheep, setShadowSkew } from "./sprites";
 import { Terrain } from "../core/map/terrain";
 import { keyedUnit } from "../core/rng";
 
@@ -261,6 +261,10 @@ export class Renderer {
   }
 
   private shoutingNow = false;
+  /** The wind took his hat: when, and where it went. */
+  private hat = { lostAt: -1e9, dx: 0, dy: 0 };
+  /** Name on the wanted poster by the pen, if a sheep has broken out. */
+  wanted: string | null = null;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
   private arrivals: { id: number; atMs: number }[] = [];
   /** The herder's signature word, drawn in colour when it appears in a bubble. */
@@ -651,6 +655,29 @@ export class Renderer {
       }
     }
 
+    // A wanted poster on the fence once a sheep has broken out.
+    if (this.wanted && Math.abs(this.map.pen.x - cam.x) * T < W && Math.abs(this.map.pen.y - cam.y) * T < H) {
+      const px = sx(this.map.pen.x + 2 + 0.5) + T * 0.3;
+      const py = sy(this.map.pen.y - 1 + 0.5) - T * 0.35;
+      ctx.fillStyle = "#f4e9c8";
+      ctx.strokeStyle = "#2b2620";
+      ctx.lineWidth = Math.max(1, T * 0.03);
+      ctx.beginPath();
+      ctx.rect(px, py, T * 0.62, T * 0.5);
+      ctx.fill();
+      ctx.stroke();
+      if (T >= 36) {
+        ctx.fillStyle = "#2b2620";
+        ctx.font = `bold ${Math.max(7, T * 0.11)}px "Fredoka", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText("WANTED", px + T * 0.31, py + T * 0.14);
+        ctx.font = `${Math.max(7, T * 0.1)}px "Patrick Hand", cursive`;
+        ctx.fillText(this.wanted, px + T * 0.31, py + T * 0.42);
+        ctx.textAlign = "left";
+      }
+      drawSheep(ctx, px + T * 0.31, py + T * 0.27, T * 0.28, "idle", 0, 0, false);
+    }
+
     // The pen gate swings open as he arrives with a sheep.
     if (h.carrying >= 0 && Math.hypot(h.x - this.map.pen.x, h.y - (this.map.pen.y + 2)) < 3) {
       const gx = sx(this.map.pen.x + 0.5);
@@ -790,6 +817,21 @@ export class Renderer {
 
     // Summer afternoons: a "phew" now and then.
     if (this.season === "summer" && hourNow > 12 && hourNow < 16 && Math.floor(nowMs / 1000) % 23 === 5) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "phew");
+    // In a wind, every few minutes, the hat goes. It tumbles off downwind and reappears on his head a little later.
+    const hatGone = nowMs - this.hat.lostAt < 6500;
+    if (isWindy(world) && !hatGone && !world.finished && Math.floor(nowMs / 1000) % 170 === 7 && (nowMs % 1000) < 40) {
+      this.hat.lostAt = nowMs;
+      this.hat.dx = 0;
+      this.hat.dy = 0;
+    }
+    if (hatGone) {
+      const t = (nowMs - this.hat.lostAt) / 6500;
+      const dist = Math.min(1, t * 1.6) * T * 4.5;
+      const hx0 = sx(h.x + 0.5) + dist;
+      const hy0 = sy(h.y + 0.95) - T * 1.3 + Math.sin(t * Math.PI * 5) * T * 0.4 + t * T * 1.2;
+      if (t < 0.75) drawLooseHat(ctx, hx0, hy0, T, t * 14);
+      if (t > 0.1 && t < 0.4 && Math.floor(nowMs / 400) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hat!");
+    }
     // Whistling while he works, when the day has not yet got to him.
     if (walkingHerder(world) && world.frustration < 18 && Math.floor(nowMs / 1000) % 11 < 3) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "♪");
 
@@ -1291,6 +1333,7 @@ export class Renderer {
       level: levelFor(erudition(world.booksRead, world.sheepPenned, hoursElapsed(world))),
       shouting: this.shoutingNow,
       winter: this.season === "winter",
+      hatless: nowMs - this.hat.lostAt < 6500 && (nowMs - this.hat.lostAt) / 6500 < 0.85,
       tired: Math.max(0, Math.min(1, (dayHour(world) - 14) / 4)),
       lantern: (this.hourOverride ?? dayHour(world)) > 17.9,
       resting: h.mode === "resting" || h.mode === "done",

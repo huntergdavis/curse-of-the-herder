@@ -134,6 +134,7 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   renderer.setSeason(world.season);
+  renderer.wanted = world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
   renderer.signatureWord = signatureWord(world.seed);
   renderer.reducedMotion = motionSetting;
   renderer.fontScale = textScale;
@@ -294,6 +295,7 @@ function handleEvents(s: Session, nowMs: number): void {
       s.renderer.dogReact("flee", nowMs);
       s.bubbles.emote(e.sheepId, "!", 3, nowMs);
       toast(`<strong>${escapeHtml(sheepName(w.seed, e.sheepId))}</strong> has jumped the fence. It was in. It was <em>in</em>.`);
+      s.renderer.wanted = sheepName(w.seed, e.sheepId);
     }
     if (e.kind === "bookFound") s.renderer.dogReact("book", nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
