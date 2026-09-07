@@ -43,6 +43,24 @@
       #overlay p { margin: 8px 0; font-size: 16px; }
       #overlay .epitaph { font-family: var(--hand-font); font-size: 22px; margin: 12px 0; }
       .badge { display: inline-block; background: var(--accent); color: var(--paper); border-radius: 6px; padding: 0 6px; font-size: 12px; margin-left: 6px; vertical-align: middle; }
+      .stone { position: relative; width: 220px; margin: 12px auto 4px; padding: 26px 16px 18px; background: linear-gradient(#b9b5ab, #8f8b82); border: 2px solid var(--ink); border-radius: 110px 110px 8px 8px; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.15), 3px 3px 0 rgba(0,0,0,0.3); text-align: center; color: #2b2620; }
+      .stone .rip { font-family: var(--hud-font); font-weight: 600; letter-spacing: 2px; font-size: 13px; opacity: 0.75; }
+      .stone .who { font-family: var(--hud-font); font-weight: 600; margin: 4px 0; }
+      .stone .ep { font-family: var(--hand-font); font-size: 18px; line-height: 1.2; margin: 6px 0 4px; }
+      .stone .when { font-size: 11px; opacity: 0.7; }
+      .grass-strip { height: 10px; margin: -6px auto 0; width: 250px; background: #7cb548; border-radius: 6px; border: 2px solid var(--ink); }
+      #hall { top: 60px; left: 50%; transform: translateX(-50%); width: min(1100px, 94vw); max-height: calc(100vh - 80px); overflow: auto; padding: 14px 18px; }
+      #hall header { display: flex; justify-content: space-between; align-items: center; }
+      #hall h2 { margin: 0; }
+      #hall .hall-sub { margin: 4px 0 12px; opacity: 0.75; }
+      #hall-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+      .hall-card { background: var(--paper-2); border: 2px solid var(--ink); border-radius: 12px; padding: 8px 10px 10px; }
+      .hall-card .stone { width: 190px; margin-top: 6px; }
+      .hall-card .stone .ep { font-size: 16px; }
+      .hall-card dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12px; margin: 8px 0 0; }
+      .hall-card dt { opacity: 0.65; }
+      .hall-card dd { margin: 0; text-align: right; }
+      .hall-card .longest { font-family: var(--hand-font); font-size: 13px; margin-top: 6px; opacity: 0.85; }
       @media (max-width: 720px) { #line { display: none; } #minimap { width: 100px; height: 100px; } #hud { min-width: 0; } }
     </style>
   </head>
@@ -61,12 +79,24 @@
       <button id="btn-pause" title="Pause (space)">Pause</button>
       <button id="btn-new" title="Start a new herder (N)">New herder</button>
       <select id="sel-load" title="Load a herder in progress"><option value="">Load…</option></select>
+      <button id="btn-hall" title="Hall of Herders (H)">Hall</button>
+      <select id="sel-end" title="What happens when the last sheep is penned">
+        <option value="loop">Then: new herder</option>
+        <option value="hall">Then: show the Hall</option>
+        <option value="stop">Then: stop</option>
+      </select>
       <span id="hud-mode"></span>
     </nav>
     <div id="minimap-wrap" class="panel"><canvas id="minimap" width="160" height="160"></canvas></div>
     <div id="line" class="panel" aria-live="polite"><span class="label">Last heard</span><span id="line-text">…</span></div>
     <div id="toast" class="panel" hidden></div>
     <div id="overlay"><div class="card" id="overlay-card"><h1>Curse of the Herder</h1><p>Waking the herder and laying out the pasture…</p></div></div>
+    <section id="hall" class="panel" hidden aria-label="Hall of Herders">
+      <header><h2>Hall of Herders</h2><button id="btn-hall-close">Close</button></header>
+      <p class="hall-sub">Every herder who penned the last sheep, and what he said when he did.</p>
+      <div id="hall-grid"></div>
+      <p id="hall-empty">No herder has finished a day yet. Leave one running; the Hall fills itself.</p>
+    </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

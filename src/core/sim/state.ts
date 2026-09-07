@@ -1,4 +1,4 @@
-import { generateMap, isPlaceable, type GameMap } from "../map/generate";
+import { generateMap, isPlaceable, stampLibraries, type GameMap } from "../map/generate";
 import { Terrain } from "../map/terrain";
 import { herderName } from "../names";
 import { BOOKS } from "../../data/books";
@@ -108,6 +108,7 @@ export interface WorldState {
   nextWeatherTick: number;
   lastShameTick: number;
   lastBreatherTick: number;
+  longestLine: string;
 }
 
 export const MAX_EVENTS = 16;
@@ -211,7 +212,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     finishedTick: -1,
     eventCount: 1,
     totalWork: sheep.reduce((a, s) => a + map.penDistance[s.y * map.size + s.x]!, 0),
-    libraries: assignBooks(map, rnd),
+    libraries: placeLibraries(map, sheep, rnd),
     knownPacks: [],
     registers: [],
     reading: null,
@@ -220,27 +221,50 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     nextWeatherTick: 4 * TICKS_PER_HOUR * 0.6,
     lastShameTick: -100000,
     lastBreatherTick: -100000,
+    longestLine: "",
   };
 }
 
-/** Books are handed out in catalogue order along the distance-sorted libraries, with a little shuffle. */
-function assignBooks(map: GameMap, rnd: () => number): LibraryState[] {
-  const ordered = [...BOOKS].sort((a, b) => a.when - b.when);
+const LIBRARY_COUNT = 24;
+
+/**
+ * One box for roughly every two and a half sheep, planted a few tiles from a
+ * sheep so his route passes it. Books are assigned when a box is opened (see
+ * step.ts), so the bookId here is a placeholder cover.
+ */
+function placeLibraries(map: GameMap, sheep: SheepState[], rnd: () => number): LibraryState[] {
   const out: LibraryState[] = [];
-  const count = map.libraries.length;
-  void rnd;
+  const byDistance = [...sheep].sort((a, b) => map.penDistance[a.y * map.size + a.x]! - map.penDistance[b.y * map.size + b.x]!);
+  const count = Math.min(LIBRARY_COUNT, byDistance.length);
+  const used = new Set<number>();
   for (let k = 0; k < count; k++) {
-    const lib = map.libraries[k]!;
-    // Catalogue order along the distance-sorted libraries; when there are more
-    // libraries than books, mid-catalogue books repeat evenly (bonus reading).
-    const bi = count <= 1 ? ordered.length - 1 : Math.round((k / (count - 1)) * (ordered.length - 1));
-    out.push({ x: lib.x, y: lib.y, bookId: ordered[bi]!.id, taken: false });
+    // Bias anchors toward far sheep: near sheep go quickly, so an even spread front-loads the books.
+    const anchor = byDistance[Math.round(Math.pow(k / Math.max(1, count - 1), 0.75) * (byDistance.length - 1))]!;
+    let placed = false;
+    for (let tries = 0; tries < 60 && !placed; tries++) {
+      const r = 3 + rnd() * 4;
+      const a = rnd() * Math.PI * 2;
+      const x = Math.round(anchor.x + Math.cos(a) * r);
+      const y = Math.round(anchor.y + Math.sin(a) * r);
+      if (x < 2 || y < 2 || x >= map.size - 2 || y >= map.size - 2) continue;
+      const i = y * map.size + x;
+      if (used.has(i) || !isPlaceable(map, x, y)) continue;
+      if (sheep.some((s) => s.x === x && s.y === y)) continue;
+      if (out.some((l) => Math.hypot(l.x - x, l.y - y) < 10)) continue;
+      used.add(i);
+      out.push({ x, y, bookId: BOOKS[0]!.id, taken: false });
+      placed = true;
+    }
   }
+  out.sort((a, b) => map.penDistance[a.y * map.size + a.x]! - map.penDistance[b.y * map.size + b.x]!);
+  stampLibraries(map, out);
   return out;
 }
 
 export function mapForWorld(world: WorldState): GameMap {
-  return generateMap(world.seed, { size: world.size });
+  const map = generateMap(world.seed, { size: world.size });
+  stampLibraries(map, world.libraries);
+  return map;
 }
 
 export function dayHour(world: WorldState): number {
@@ -275,6 +299,19 @@ export function upgradeWorld(w: unknown): WorldState {
     (o["herder"] as Record<string, unknown>)["targetLibrary"] = -1;
     (o["herder"] as Record<string, unknown>)["tripTiles"] = 0;
     o["schemaVersion"] = 2;
+  }
+  if (o && o["schemaVersion"] === 2) {
+    // Fields added within v2 during development; default them.
+    if (typeof o["longestLine"] !== "string") o["longestLine"] = "";
+    if (typeof o["lastReadTick"] !== "number") o["lastReadTick"] = -100000;
+    if (typeof o["rainUntilTick"] !== "number") o["rainUntilTick"] = 0;
+    if (typeof o["nextWeatherTick"] !== "number") o["nextWeatherTick"] = 0;
+    if (typeof o["lastShameTick"] !== "number") o["lastShameTick"] = -100000;
+    if (typeof o["lastBreatherTick"] !== "number") o["lastBreatherTick"] = -100000;
+    if (typeof o["eventCount"] !== "number") o["eventCount"] = 0;
+    if (typeof o["totalWork"] !== "number") o["totalWork"] = 0;
+    const h = o["herder"] as Record<string, unknown> | undefined;
+    if (h && typeof h["tripTiles"] !== "number") h["tripTiles"] = 0;
   }
   assertWorld(o);
   return o;

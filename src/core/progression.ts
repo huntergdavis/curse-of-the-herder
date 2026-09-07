@@ -13,8 +13,8 @@ export function erudition(booksRead: number, sheepPenned: number, hoursElapsed: 
   return 100 * booksRead + 8 * sheepPenned + 3 * hoursElapsed;
 }
 
-/** Linear in erudition: with ~13 books read over the day this is roughly one level per 45 minutes. */
-export const ERUDITION_PER_LEVEL = 150;
+/** Linear in erudition: with ~20 books read over the day this is roughly one level per 45 minutes. */
+export const ERUDITION_PER_LEVEL = 210;
 
 export function levelFor(eruditionScore: number): number {
   return Math.max(0, Math.min(MAX_LEVEL, Math.floor(Math.max(0, eruditionScore) / ERUDITION_PER_LEVEL)));

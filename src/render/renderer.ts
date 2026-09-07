@@ -53,6 +53,9 @@ export class Renderer {
     return this.chunks;
   }
 
+  /** When set, the sky follows this hour instead of the world clock (ending fade). */
+  hourOverride: number | null = null;
+
   draw(world: WorldState, cam: Camera, bubbles: Bubbles, nowMs: number): void {
     const ctx = this.ctx;
     const T = this.tilePx;
@@ -153,7 +156,7 @@ export class Renderer {
     }
 
     // Day tint over the world, under the bubble.
-    const tint = dayTint(dayHour(world));
+    const tint = dayTint(this.hourOverride ?? dayHour(world));
     if (!tint.endsWith("0)") && !tint.endsWith("0.000)")) {
       ctx.fillStyle = tint;
       ctx.fillRect(0, 0, W, H);

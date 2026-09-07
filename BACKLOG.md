@@ -5,64 +5,51 @@ Priorities: **P0** blocks the next phase · **P1** needed for launch ·
 `R-` and detailed in `docs/research/`. Prune this file; do not let it
 become an archive.
 
-## Current implementation priority — 2026-09-06
+## Current implementation priority — 2026-09-06 (evening)
 
-Phase 1: a board and a walk. See `PLAN.md`.
+Phases 1-3 and most of 4-5 are in. Next: tiers 9-12 content (in progress),
+runtime robustness (worker, watchdog), self-hosted fonts, sound, and the
+long soak.
 
-## P0 — Phase 1: a board and a walk
+## Done (kept for one release, then pruned)
 
-- [ ] Map generator: seeded noise → terrain classes (water, sand, grass, farm, forest, rock, snow, mud), rivers, roads to 3–5 villages, pen on flat grass near centre. `Uint8Array` storage. (`docs/research/ART.md`, `PACING.md`)
-- [ ] Autotile renderer: 4-bit bitmask transitions, chunk cache (32×32 tiles, LRU 48, pooled `OffscreenCanvas` with fallback), camera follow with soft lead, DPR cap 2.
-- [ ] Terrain cost grid + A* + distance field from pen.
-- [ ] Herder state machine: target → path → walk → catch → carry → pen. Sheep placed by distance ring.
-- [ ] Sheep SVG (idle/walk/carried) and herder SVG (idle/walk/carry) drawn and rasterised into an atlas. (R-ART-04)
-- [ ] Headless pacing simulator CLI: `npm run pace -- --seeds 1000` → finish-time histogram. (R-PACE-01)
-- [ ] World state schema v1 with `assertState`; save/load seed + tick to IndexedDB.
-- [ ] Playwright smoke: `?fast=1` day completes; zero external network requests.
-- [ ] Replace teaser `main.ts` with the module layout in `PLAN.md`.
+- Map generator, autotile chunk renderer, camera, minimap, A*, distance fields
+- Herder and sheep sim, rings, flee/absurd/repeat-escape, names
+- Grammar engine, morphology, ban list, never-emit test, tiers 0-8 content
+- Libraries and books (catalogue order, cooldown, register drift, excerpts)
+- Frustration baseline, rain, walk of shame, breathers, speed governor
+- IndexedDB saves, resume, New/Load, wall-clock catch-up, ?fast, ?clean
+- Ending: epitaph, dusk fade, tombstone card, Hall of Herders, loop setting
+- Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
-## P0 — Phase 2: the mouth
+## P0 — Finish the language arc
 
-- [ ] Grammar engine: symbol expansion, modifiers (`.a .pl .cap .3s .past`), band and level gating, weights, event rules, deterministic given `(seed, tick, ctx)`.
-- [ ] Morphology tables: a/an by phoneme, plurals + irregulars, verb conjugation + `-eth/-est`, thou/thee/thy.
-- [ ] Lexicon loader with `reviewedAt` gate; `banned.txt` + inflection regexes; build-time ban test.
-- [ ] Never-emit test: 200k generations across all level × band combos; zero bans, zero over-ceiling, zero unlisted proper nouns.
-- [ ] Repeat-rate test over a simulated day.
-- [ ] Structure lint: reject templates with only one possible expansion.
-- [ ] Tiers 0–4 structures (~670) and packs `primer`, `farmyard`, `insults-classic`, `similes`, `minced-oaths`, `pantheon`, `sheep-names`, `herder-names`.
-- [ ] Frustration meter and curse scheduler (interval formula in `CURSE_PROGRESSION.md`), event-triggered lines with 3 s debounce.
-- [ ] Canvas speech bubbles with wrap at 44 chars, two-bubble sequences for long lines, `aria-live` mirror.
-- [ ] `?clean=1` (ceiling F1, badge) and `?filth=max` (test only).
+- [ ] Tiers 9-12 (nautical, baroque, verse, meta) packs and structures. (fork in progress)
+- [ ] Epitaph quality pass: only `tombstoneSafe`/short rules for the stone; test that epitaphs are ≤ 110 chars.
+- [ ] Callbacks: 5% of idle lines reference an event from the ring ("This is the third river today.").
+- [ ] Wistful line when passing a library while carrying ("I will come back for you, book.").
+- [ ] Sheep-name lines when the *carried* sheep is named.
+- [ ] Register-specific idle weighting so a fresh book audibly changes his voice for ten minutes (partly done via reg ×3).
 
-## P1 — Phase 3: the library
+## P1 — Runtime robustness (Phase 4 leftovers)
 
-- [ ] Little Free Library placement along predicted routes; loose books; waterlogged book.
-- [ ] Reading beat: sit, 3–6 excerpts in the book's font, frustration −10, "Learned: N words, M structures" toast, register drift ×3 for 10 min.
-- [ ] Book catalog (30 titles) with pack/grammar unlocks. (`docs/research/BOOKS.md`)
-- [ ] Curation pipeline scripts for Grose and Farmer & Henley → review CSV. (R-LEX-01, R-LEX-02)
-- [ ] Shakespeare harvest from Folger XML. (R-LEX-03)
-- [ ] Foreign packs with native review before `reviewedAt`. (R-LEX-04)
-- [ ] Tiers 5–8 structures and packs.
-- [ ] PD confirmation per quoted title. (R-BOOK-01)
+- [ ] Simulation in a Web Worker behind a versioned protocol.
+- [ ] Liveness watchdog (pure predicate, 5 s cadence).
+- [ ] Cap catch-up at 4 h and say something about having had a sit-down.
+- [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
+- [ ] Self-host Patrick Hand and Fredoka (OFL) and make the no-network test strict.
+- [ ] Auto-update via version.json poll and a service worker.
+- [ ] "Workday" FPS mode (15 FPS) and reduced-motion mode.
 
-## P1 — Phase 4: the day
+## P1 — Presentation
 
-- [ ] Day clock 09:00→18:00 from sim time; 5-stop palette shift as a tint pass.
-- [ ] Weather (rain, wind, fog) with movement and frustration effects.
-- [ ] Events: absurd locations, flee, walk of shame, breathers, sheep names after second escape, 16-entry callback ring.
-- [ ] Speed governor with hysteresis, 10-min update period, range [0.6, 1.0]. (R-PACE-03)
-- [ ] Web Worker sim + versioned protocol; wall-clock catch-up capped at 4 h; liveness watchdog.
-- [ ] IndexedDB repository (`herders`, `hall`, `settings`), sessionStorage mirror, save every 10 s and on beats, migrations chain.
-- [ ] Toolbar: play/pause, New herder, Load herder dropdown, Export/Import JSON.
-- [ ] Minimap with fog of war.
-
-## P1 — Phase 5: the end
-
-- [ ] Tiers 9–12 structures and packs (nautical, baroque-latinate, verse-rhymes with CMUdict pipeline, meta). (R-LEX-05)
-- [ ] Epitaph grammar; `tombstoneSafe` subset review. (R-LEX-09)
-- [ ] Ending sequence: still, epitaph, dusk, sleeping sheep, tombstone rise.
-- [ ] Hall of Herders: immutable content-hashed records, view with 64-card cap, tombstone graphic, stats.
-- [ ] Loop-at-end setting (loop / hold on Hall / stop); new herder dawn.
+- [ ] Sheep walk animation while wandering; flee dash.
+- [ ] Villages: signposts with names; a villager or two; smoke from chimneys.
+- [ ] Better absurd-location staging: sheep drawn *on* the rock / mid-river with a "?" emote until approached.
+- [ ] Tombstone rises beside the pen in the world (not only on the card).
+- [ ] Pen fills with sleeping sheep in rows; night sky with stars during the fade.
+- [ ] Export/Import of a herder and of the Hall as JSON.
+- [ ] Settings panel (speed governor toggle, band cap, FPS mode).
 
 ## P2 — Polish
 

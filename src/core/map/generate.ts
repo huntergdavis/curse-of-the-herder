@@ -16,8 +16,6 @@ export interface GameMap extends Grid {
   deco: Uint8Array;
   pen: { x: number; y: number };
   villages: Village[];
-  /** Little free libraries, sorted by path distance from the pen. */
-  libraries: { x: number; y: number }[];
   /** Path cost from the pen to every tile (Infinity = unreachable). */
   penDistance: Float64Array;
   /** Tiles a sheep may be placed on: walkable, not road, not pen, reachable. */
@@ -257,59 +255,10 @@ export function generateMap(seed: string, opts: GenerateOptions = {}): GameMap {
   penDistance = distanceField(grid, pen.x, pen.y);
   genLog?.("distance");
 
-  // --- 7. Little free libraries: beside roads, spread across the distance range
-  const libraries: { x: number; y: number }[] = [];
-  {
-    const candidates: { i: number; d: number }[] = [];
-    for (let y = 2; y < n - 2; y++) {
-      for (let x = 2; x < n - 2; x++) {
-        const i = idx(x, y);
-        if (deco[i] !== Deco.None || terrain[i] === Terrain.Water || terrain[i] === Terrain.Road || terrain[i] === Terrain.Bridge) continue;
-        if (!Number.isFinite(penDistance[i]!)) continue;
-        const nearRoad = [idx(x + 1, y), idx(x - 1, y), idx(x, y + 1), idx(x, y - 1)].some((j) => terrain[j] === Terrain.Road);
-        if (!nearRoad) continue;
-        if (Math.max(Math.abs(x - pen.x), Math.abs(y - pen.y)) < 6) continue;
-        candidates.push({ i, d: penDistance[i]! });
-      }
-    }
-    candidates.sort((a, b) => a.d - b.d);
-    const want = Math.max(8, Math.round((n / 512) * 24));
-    // Spread across the range where sheep live (see DEFAULT_RINGS), not the whole road network.
-    const minD = 20 * (n / 512);
-    const maxD = 380 * (n / 512);
-    for (let k = 0; k < want && candidates.length > 0; k++) {
-      // Target distances spaced evenly from near to far, jittered.
-      const t = (k + 0.5 + (rnd() - 0.5) * 0.6) / want;
-      const targetD = minD + (maxD - minD) * Math.min(1, Math.max(0, t));
-      let best = -1;
-      let bestScore = Infinity;
-      for (let c = 0; c < candidates.length; c++) {
-        const cand = candidates[c]!;
-        const cx0 = cand.i % n;
-        const cy0 = Math.floor(cand.i / n);
-        let spacing = Infinity;
-        for (const l of libraries) spacing = Math.min(spacing, Math.hypot(l.x - cx0, l.y - cy0));
-        if (spacing < 14) continue;
-        const score = Math.abs(cand.d - targetD);
-        if (score < bestScore) {
-          bestScore = score;
-          best = c;
-        }
-      }
-      if (best < 0) break;
-      const cand = candidates.splice(best, 1)[0]!;
-      const lx = cand.i % n;
-      const ly = Math.floor(cand.i / n);
-      deco[cand.i] = Deco.Library;
-      libraries.push({ x: lx, y: ly });
-    }
-    libraries.sort((a, b) => penDistance[idx(a.x, a.y)]! - penDistance[idx(b.x, b.y)]!);
-  }
-
   let walkableCount = 0;
   for (let i = 0; i < n * n; i++) if (Number.isFinite(penDistance[i]!)) walkableCount++;
 
-  return { seed, size: n, terrain, deco, pen, villages, libraries, penDistance, walkableCount };
+  return { seed, size: n, terrain, deco, pen, villages, penDistance, walkableCount };
 }
 
 function findPenSite(terrain: Uint8Array, n: number): { x: number; y: number } {
@@ -340,6 +289,11 @@ function hashSeed(seed: string): number {
     h = Math.imul(h, 0x01000193);
   }
   return h >>> 0;
+}
+
+/** Mark library boxes on the decoration layer (called for a fresh world and again after load). */
+export function stampLibraries(map: GameMap, libraries: { x: number; y: number }[]): void {
+  for (const l of libraries) map.deco[l.y * map.size + l.x] = Deco.Library;
 }
 
 /** Tiles a sheep or library may occupy: reachable, plain ground, not built on. */

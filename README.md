@@ -2,25 +2,72 @@
 
 A no-input browser screensaver. A herder, cursed like Sisyphus to gather
 his flock for all eternity, spends a nine-hour day carrying sheep home
-across a vast tile map. He starts the morning barely able to grunt.
+across a large tile map. He starts the morning barely able to grunt.
 By evening, after finding books in little free libraries along the way,
-he curses in Shakespearean iambs, Hemingway declaratives, Québécois
-sacres and Rabelaisian catalogs. When the last sheep is penned he
-retires to the Hall of Herders, and his final curse goes on his
+he curses in Shakespearean thou-and-thee, Hemingway declaratives,
+Québécois sacres and Rabelaisian catalogs. When the last sheep is penned
+he retires to the Hall of Herders, and his final curse goes on his
 tombstone.
 
-No LLM. Every line comes from a deterministic grammar over thousands of
-curated words and sentence structures. Filthy, never cruel.
+No LLM. Every line comes from a deterministic grammar over a curated
+lexicon (about 1,600 words in eighteen packs) and several hundred
+sentence structures. Filthy, never cruel.
 
-**Play:** https://hunterdavis.com/curse-of-the-herder/ (pre-alpha teaser)
+**Play:** https://hunterdavis.com/curse-of-the-herder/
+
+![A morning on the road: the herder carries a sheep past an emptied library box](docs/img/morning-road.png)
+
+![Dusk: the tombstone card at the end of a day](docs/img/ending.png)
+
+## Running it
 
 ```sh
 npm install
-npm run dev
+npm run dev          # local dev server
+npm run check        # typecheck, unit tests, production build (the deploy gate)
+npm run test:e2e     # Playwright smoke test against the built site
+npm run pace -- --seeds 5      # headless pacing: how long does a board take?
+npx tsx scripts/transcript.ts --seed demo   # print a whole day's lines
 ```
 
-`npm run check` runs typecheck, tests and the production build; it is
-the same gate the Pages deploy uses.
+Useful URL parameters: `?fast=60` runs the day sixty times faster
+(`600` finishes in about a minute), `?new=1` starts a fresh herder,
+`?seed=word` fixes the board, `?clean=1` caps the language at minced
+oaths for shared screens, `?filth=max` removes the frustration gate.
+
+Keys: space pauses, N starts a new herder, H opens the Hall.
+
+## How it works
+
+- **Board.** A 512×512 seeded island: water, sand, grass, meadow,
+  farmland, forest, mud, rock, snow, rivers, roads to five villages, and
+  a fenced pen near the centre. Sixty sheep are placed in five rings of
+  path distance so the day escalates. Twenty-four little free libraries
+  sit a few tiles from sheep along the way.
+- **Herder.** A* pathfinding over terrain costs; catch, carry, pen,
+  repeat. Sheep flee, some are on rocks or in rivers ("how did you get up
+  there"), repeat escapees earn names and a red ribbon. He detours for a
+  book when empty-handed, sits and reads for a minute or two, and talks
+  like the book for ten minutes afterwards.
+- **Two axes drive every line.** *Eloquence* (level 0–12) comes from
+  books; *frustration* (0–100) rises through the day with distance, rain,
+  fleeing sheep and the walk of shame, and sets both curse frequency and
+  the filthiness ceiling. Filth caps at R-rated; eloquence goes to twelve.
+- **Language.** A Tracery-style grammar with morphology (a/an by sound,
+  plurals, conjugation, thou/thee), band and level gating on every word,
+  register weighting after reading, named sheep, time-of-day phrases, a
+  per-herder signature word, and a repeat filter. A master ban list is
+  enforced at build time (no lexicon or template may contain a banned
+  word) and by a 15,000-generation never-emit test.
+- **Time.** Real time drives the day; close the laptop and he catches up
+  on return. A governor slows him (never speeds him) so the last sheep
+  lands near six o'clock.
+- **Rendering.** Plain Canvas2D: procedural blob-autotiled terrain in a
+  chunk cache, procedural sheep and herder sprites, a following camera,
+  day tint from dawn to dusk, rain, speech bubbles, wordless sheep emotes.
+- **Persistence.** IndexedDB. Start a new herder whenever; load any
+  herder in progress; the Hall of Herders keeps every retired one with
+  his epitaph, vocabulary size and longest outburst.
 
 ## Documents
 
@@ -34,28 +81,11 @@ the same gate the Pages deploy uses.
   [BOOKS](docs/research/BOOKS.md) ·
   [PACING](docs/research/PACING.md) ·
   [ART](docs/research/ART.md)
-- [CREDITS.md](CREDITS.md): third-party assets and sources.
-
-## How it works, briefly
-
-- A 512×512 seeded board (water, farmland, forest, mountains, villages,
-  roads) with about 60 sheep placed in rings around a central pen, so
-  the day escalates.
-- The herder pathfinds to a sheep, carries it back, repeats. Sheep flee.
-  Some are on roofs. Frustration rises; it falls when he pens a sheep or
-  sits down with a book.
-- Two axes drive every line: **eloquence** (level 0–12, unlocked by
-  books) and **frustration** (0–100, sets frequency and the filthiness
-  ceiling). Filth caps at R-rated; eloquence goes to eleven.
-- Real time drives the day. Close the laptop and he catches up when you
-  return. Start a herder whenever; load any herder in progress.
-- Rendered in plain Canvas2D from procedural vector terrain and CC0 SVG
-  props, so it looks right on a 4K monitor and a small laptop.
+- [CREDITS.md](CREDITS.md): third-party sources.
 
 Inspired by, and borrowing runtime lessons from,
 [The Grind 2](https://github.com/huntergdavis/the-grind-2).
 
 ## License
 
-Code: MIT (see `LICENSE`). Third-party art, fonts and word sources are
-listed with their licenses in `CREDITS.md`.
+Code: MIT (see `LICENSE`). Third-party sources are listed in `CREDITS.md`.

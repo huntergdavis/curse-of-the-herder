@@ -48,7 +48,7 @@ export const NON_TERMINALS: NonTerminal[] = [
       { t: "the #target# has not helped", weight: 1, minLevel: 3 },
       { t: "you are as #adj# as #simile#", weight: 2, minLevel: 3 },
       { t: "I am as #adj# as #simile#", weight: 1, minLevel: 3 },
-      { t: "it is #time# and I am #adj#", weight: 1, minLevel: 3 },
+      { t: "#time#, I am #adj#", weight: 1, minLevel: 3 },
       { t: "nobody asked the #target#", weight: 1, minLevel: 3 },
       { t: "I did not choose this", weight: 1, minLevel: 2 },
       { t: "the #sig# was better than this", weight: 1, minLevel: 2 },

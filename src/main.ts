@@ -2,11 +2,12 @@ import { generateMap, type GameMap } from "./core/map/generate";
 import { LEVEL_NAMES, erudition, levelFor } from "./core/progression";
 import { nextIdleCurseTicks, speakEpitaph, speakForEvent, speakIdle } from "./core/lang/speech";
 import type { Band } from "./core/lang/types";
-import { createWorld, dayHour, hoursElapsed, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
+import { createWorld, dayHour, hoursElapsed, mapForWorld, TICKS_PER_HOUR, TICK_SECONDS, type WorldState } from "./core/sim/state";
 import { step } from "./core/sim/step";
 import { repository } from "./persist/db";
 import { BOOK_BY_ID } from "./data/books";
-import { grammar, buildContext } from "./core/lang/speech";
+import { grammar, buildContext, signatureWord } from "./core/lang/speech";
+import { makeHallRecord, type HallRecord } from "./core/hall";
 import { Bubbles } from "./render/bubbles";
 import { Camera } from "./render/camera";
 import { Minimap } from "./render/minimap";
@@ -42,6 +43,9 @@ interface Session {
   recent: string[];
   /** Which excerpt of the current book is showing. */
   excerptShown: number;
+  /** Wall ms when the last sheep was penned; drives the dusk fade. */
+  finishedAtMs: number;
+  endHandled: boolean;
 }
 
 let session: Session | null = null;
@@ -66,7 +70,7 @@ function hideOverlay(): void {
 async function startSession(world: WorldState): Promise<void> {
   showOverlay(`<h1>${world.name}</h1><p>Laying out the pasture…</p>`);
   await new Promise((r) => setTimeout(r, 30)); // let the overlay paint
-  const map = generateMap(world.seed, { size: world.size });
+  const map = mapForWorld(world);
   const renderer = session?.renderer ?? new Renderer(canvas, map);
   renderer.setMap(map);
   const camera = new Camera(world.herder.x, world.herder.y);
@@ -82,7 +86,10 @@ async function startSession(world: WorldState): Promise<void> {
     seenSeq: world.eventCount - 1,
     recent: [],
     excerptShown: -1,
+    finishedAtMs: 0,
+    endHandled: false,
   };
+  renderer.hourOverride = null;
   repository.setActiveId(world.id);
   await refreshLoadList();
   hideOverlay();
@@ -190,19 +197,66 @@ function say(s: Session, text: string, heat: number, seconds: number, nowMs: num
   s.world.totalCurses++;
   s.recent.push(text);
   if (s.recent.length > 32) s.recent.shift();
+  if (text.length > s.world.longestLine.length) s.world.longestLine = text;
   $("line-text").textContent = text;
 }
 
+const END_FADE_MS = 24_000;
+const END_HOLD_MS = 60_000;
+
+function stoneHtml(r: { name: string; epitaph: string; finishedClock: string; inductedAt: string }): string {
+  const date = new Date(r.inductedAt);
+  return `<div class="stone"><div class="rip">HERE LIES</div><div class="who">${escapeHtml(r.name)}</div><div class="ep">“${escapeHtml(r.epitaph)}”</div><div class="when">retired ${r.finishedClock}, ${date.toLocaleDateString()}</div></div><div class="grass-strip"></div>`;
+}
+
+function escapeHtml(t: string): string {
+  return t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] ?? c);
+}
+
+/** The last sheep is in. He says his piece, night falls, a stone rises. */
 function onFinished(s: Session): void {
+  if (s.endHandled) return;
+  s.endHandled = true;
   const w = s.world;
   const epitaph = speakEpitaph(w, s.map, s.recent, BAND_CAP);
-  say(s, epitaph.text, 1, 30, performance.now());
-  showOverlay(
-    `<h1>${w.name}</h1><p>penned the last of ${w.sheep.length} sheep at ${fmtClock(dayHour(w))} and was retired to the Hall of Herders.</p>` +
-      `<p class="epitaph">"${epitaph.text}"</p><p>Curses uttered: ${w.totalCurses}. A new herder wakes at dawn.</p>`,
-  );
+  say(s, epitaph.text, 1, END_FADE_MS / 1000, performance.now());
+  s.finishedAtMs = performance.now();
+  const vocabulary = grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP));
+  const record = makeHallRecord(w, epitaph.text, vocabulary, signatureWord(w.seed));
   void repository.save(w);
-  window.setTimeout(() => void newHerder(), 60_000);
+  void repository.induct(record);
+  window.setTimeout(() => showEndCard(record), END_FADE_MS);
+}
+
+function showEndCard(r: HallRecord): void {
+  const mode = repository.getSetting("end", "loop");
+  const next = mode === "loop" ? "A new herder wakes at dawn in a minute." : mode === "hall" ? "" : "The pasture is quiet.";
+  showOverlay(
+    `<h1>${escapeHtml(r.name)}</h1><p>penned the last of ${r.sheep} sheep at ${r.finishedClock} and was retired to the Hall of Herders.</p>` +
+      stoneHtml(r) +
+      `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}</p>` +
+      (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +
+      `<p>${next}</p>`,
+  );
+  if (mode === "loop") window.setTimeout(() => void newHerder(), END_HOLD_MS);
+  else if (mode === "hall") window.setTimeout(() => { hideOverlay(); void showHall(); }, 8000);
+}
+
+async function showHall(): Promise<void> {
+  const hall = $<HTMLElement>("hall");
+  const grid = $("hall-grid");
+  const records = await repository.hall();
+  grid.innerHTML = records
+    .slice(0, 64)
+    .map(
+      (r) =>
+        `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd></dl>` +
+        (r.longestLine ? `<div class="longest">“${escapeHtml(r.longestLine)}”</div>` : "") +
+        `</article>`,
+    )
+    .join("");
+  $("hall-empty").hidden = records.length > 0;
+  hall.hidden = false;
 }
 
 function frame(nowMs: number): void {
@@ -245,6 +299,11 @@ function frame(nowMs: number): void {
   } else {
     w.lastWallMs = Date.now();
   }
+  if (w.finished) {
+    if (!s.endHandled) onFinished(s);
+    const t = Math.min(1, (nowMs - s.finishedAtMs) / END_FADE_MS);
+    s.renderer.hourOverride = Math.max(dayHour(w), 17.6) + t * 2.2;
+  }
 
   const h = w.herder;
   // Lead the camera a little toward where he is going.
@@ -269,6 +328,13 @@ async function boot(): Promise<void> {
     updateHud(true);
   });
   $("btn-new").addEventListener("click", () => void newHerder());
+  $("btn-hall").addEventListener("click", () => void showHall());
+  $("btn-hall-close").addEventListener("click", () => {
+    $<HTMLElement>("hall").hidden = true;
+  });
+  const selEnd = $<HTMLSelectElement>("sel-end");
+  selEnd.value = repository.getSetting("end", "loop");
+  selEnd.addEventListener("change", () => repository.setSetting("end", selEnd.value));
   $<HTMLSelectElement>("sel-load").addEventListener("change", async (e) => {
     const id = (e.target as HTMLSelectElement).value;
     if (!id) return;
@@ -281,6 +347,11 @@ async function boot(): Promise<void> {
       paused = !paused;
       updateHud(true);
     } else if (e.key.toLowerCase() === "n") void newHerder();
+    else if (e.key.toLowerCase() === "h") {
+      const hall = $<HTMLElement>("hall");
+      if (hall.hidden) void showHall();
+      else hall.hidden = true;
+    } else if (e.key === "Escape") $<HTMLElement>("hall").hidden = true;
   });
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && session) session.renderer.resize();

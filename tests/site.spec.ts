@@ -1,0 +1,29 @@
+import { expect, test } from "@playwright/test";
+
+test("a compressed day starts, the herder pens sheep, and nothing external is fetched", async ({ page }) => {
+  const errors: string[] = [];
+  const external: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("request", (r) => {
+    const u = new URL(r.url());
+    if (u.hostname !== "localhost" && !/fonts\.(googleapis|gstatic)\.com$/.test(u.hostname)) external.push(r.url());
+  });
+  await page.goto("?fast=120&new=1");
+  await expect(page.locator("#hud-name")).not.toHaveText("Curse of the Herder", { timeout: 60_000 });
+  await expect(page.locator("#overlay")).toBeHidden({ timeout: 60_000 });
+  // At 120x, a few sheep are home within half a minute.
+  await expect.poll(async () => Number((await page.textContent("#hud-flock"))?.split("/")[0]), { timeout: 60_000 }).toBeGreaterThan(2);
+  // He has said something.
+  await expect(page.locator("#line-text")).not.toHaveText("…");
+  expect(errors).toEqual([]);
+  expect(external).toEqual([]);
+});
+
+test("the Hall opens and closes", async ({ page }) => {
+  await page.goto("?new=1");
+  await expect(page.locator("#overlay")).toBeHidden({ timeout: 60_000 });
+  await page.click("#btn-hall");
+  await expect(page.locator("#hall")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#hall")).toBeHidden();
+});

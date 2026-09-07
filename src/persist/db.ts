@@ -1,4 +1,5 @@
 import { assertWorld, upgradeWorld, type WorldState } from "../core/sim/state";
+import type { HallRecord } from "../core/hall";
 
 const DB_NAME = "curse-of-the-herder";
 const DB_VERSION = 1;
@@ -70,6 +71,30 @@ export const repository = {
   },
   async remove(id: string): Promise<void> {
     await tx("herders", "readwrite", (s) => s.delete(id));
+  },
+  async induct(record: HallRecord): Promise<void> {
+    // Immutable: never overwrite an existing record.
+    const existing = await tx<unknown>("hall", "readonly", (s) => s.get(record.id));
+    if (existing) return;
+    await tx("hall", "readwrite", (s) => s.add(record));
+  },
+  async hall(): Promise<HallRecord[]> {
+    const all = await tx<HallRecord[]>("hall", "readonly", (s) => s.getAll());
+    return all.filter((r) => r && r.schemaVersion === 1).sort((a, b) => b.inductedAt.localeCompare(a.inductedAt));
+  },
+  getSetting(key: string, fallback: string): string {
+    try {
+      return localStorage.getItem(`curse-of-the-herder:${key}`) ?? fallback;
+    } catch {
+      return fallback;
+    }
+  },
+  setSetting(key: string, value: string): void {
+    try {
+      localStorage.setItem(`curse-of-the-herder:${key}`, value);
+    } catch {
+      /* ignore */
+    }
   },
   getActiveId(): string | null {
     try {

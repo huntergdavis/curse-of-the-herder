@@ -23,12 +23,12 @@ score, never stored independently:
 
 ```
 erudition = 100 * booksRead + 8 * sheepPenned + 3 * hoursElapsed
-level     = clamp(floor(erudition / 150), 0, 12)
+level     = clamp(floor(erudition / 210), 0, 12)
 ```
 
-Books dominate: about 13 books read over the day (of 24 boxes placed) is
-one level every ~45 minutes. A herder who never finds a book still reaches
-level 3 from sheep and hours alone.
+Books dominate: about 20 books read over the day (24 boxes are planted a
+few tiles from sheep, biased toward the far ones) is one level every ~45
+minutes. A herder who never finds a book still reaches level 2.
 
 | Lvl | Name | Register | Sample (calm) | Sample (furious) |
 | --- | --- | --- | --- | --- |

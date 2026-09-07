@@ -278,7 +278,8 @@ export interface BubbleStyle {
 
 /** Speech bubble whose tail points at (tx, ty). Returns nothing; clamps to canvas. */
 export function drawBubble(ctx: Ctx, tx: number, ty: number, text: string, fontPx: number, style: BubbleStyle, canvasW: number, canvasH: number): void {
-  const lines = wrapText(text, 40);
+  // Verse uses " / " as a hard line break; prose wraps.
+  const lines = text.includes(" / ") ? text.split(" / ").flatMap((l) => wrapText(l, 44)) : wrapText(text, 40);
   ctx.font = `${fontPx}px ${style.font}`;
   const lineH = fontPx * 1.22;
   let w = 0;
