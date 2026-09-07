@@ -8,9 +8,9 @@
                        S T A T U S   R E P O R T   ·   2 0 2 6 - 0 9 - 0 7
 ```
 
-## Clock
+## Clock and frame rate
 
-One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:00 to 18:00 is nine real hours, a day that ends at 18:30 is 9.5 real hours. At 10× that is 57 minutes; at 100×, about 5.7 minutes; at 600× (the test speed), under a minute.
+Frame rate: the draw takes 1–3 ms on a MacBook Air (7 ms outliers), so the game is never the limit; the browser decides how many frames it delivers (a low-power mode gives 30). The cap defaults to the display rate; the menu still offers 60/30/15 for battery. One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:00 to 18:00 is nine real hours, a day that ends at 18:30 is 9.5 real hours. At 10× that is 57 minutes; at 100×, about 5.7 minutes; at 600× (the test speed), under a minute.
 
 ## Where we are
 
@@ -38,31 +38,27 @@ One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:
 - **Looking around.** The minimap shows the viewport as a reticle; click or hold-and-drag on it to look anywhere on the island, and the view glides back to the herder two seconds after release. Covered by a Playwright test.
 - `scratch/` is ignored by git.
 
-## Backlog (re-cut 2026-09-07 after the bug-report round)
+## Backlog (re-cut 2026-09-07, evening)
 
 ```
  P0  Must be right for a screensaver that runs all day
-     [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (the fix is deployed)
-     [ ] Frame time on real hardware: open with ?stats=1, note frame ms at 1x and 100x (Orion is fine; Chrome also shows heap)
-     [x] Memorial stone text stays on the stone (fixed and verified at ratio 3 with a long epitaph)
+     [ ] Confirm on the Air: a full day, then a second herder, no sea over the island (fix deployed)
+     [x] Frame rate: was pinned at 30 by the browser on the Air; the cap now defaults to "display rate"
+         (60, 120 Hz…) and ?stats=1 shows what the browser delivers vs what we draw. Draw is 1–3 ms.
+     [x] Memorial stone text stays on the stone
  P1  Things a viewer will notice
-     [ ] Language: cut the weakest templates from a transcript read each release; `self` target facet for "I am #adj#"
-     [ ] Flyting as a real duel (escalating sheep emotes, herder reacting) — the "..." indicator is gone, so this needs a new shape
-     [ ] Tombstone rising in the world beside the pen during the end fade (it is on the card today)
+     [x] Phones get the look-around: a Map button in the toolbar pops a larger minimap; drag to look
+     [ ] Language: cut weakest templates per release; `self` facet for "I am #adj#"
+     [ ] Flyting as a real duel (needs a new shape now the dots are gone)
+     [ ] Tombstone rising in the world during the end fade
      [ ] Sheep walk animation while wandering; flee dash
-     [ ] Minimap is hidden on narrow phones: decide whether phones get the look-around
  P2  Nice to have
-     [ ] Keyboard shortcuts (space pause, N new, H hall)
      [ ] README screenshots and a 20 s GIF
      [ ] A second Jerome-style book for levels 7–8
  Decided
-     Sound: never.   P3 list: removed.   Web Worker sim: not planned.
-     Service worker: not planned unless offline use matters (see below).
+     Sound: never.  P3: removed.  Web Worker: not planned.
+     Service worker: dropped (too complicated for what it buys).  Keyboard shortcuts: skipped.
 ```
-
-### The service worker, explained
-
-A service worker would let the site load with no network (offline cache), open instantly from cache, and let us control when a new build takes over. The costs: a second update path competing with the version.json poll that already reloads a running tab, cache-invalidation bugs where a viewer is stuck on a stale build, and harder debugging. For a screensaver that runs on a connected machine and already self-updates, it buys almost nothing. Recommendation: drop it.
 
 ## How to check things
 

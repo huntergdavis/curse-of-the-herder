@@ -96,29 +96,29 @@ long soak.
 ## P0 — Must be right for a screensaver that runs all day
 
 - [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (fix deployed 2026-09-07).
-- [ ] Frame time on real hardware via `?stats=1` (frame ms, draw ms, heap) at 1× and 100×.
-- [x] Memorial stone text stays on the stone: fixed with a measured wrap and clip; verified at ratio 3 with a long epitaph (`node scripts/shot-memorial.mjs`).
+- [x] Frame rate: the cap defaults to the display rate (60, 120 Hz…); `?stats=1` shows browser delivery vs drawn frames. Draw is 1–3 ms on the Air; a 30 fps reading was the browser's low-power throttle, not us.
+- [x] Memorial stone text stays on the stone (measured wrap and clip; verified at ratio 3).
 
 ## P1 — Things a viewer will notice
 
-- [ ] Read a full simulated day as a script (`npx tsx scripts/transcript.ts`) once per release and cut the weakest templates.
+- [x] Phones get the look-around: a Map button in the toolbar (narrow screens only) pops a 200 px minimap; drag on it to look, it glides back two seconds after release.
+- [ ] Read a full simulated day as a script once per release and cut the weakest templates.
 - [ ] Template audit: `self` target facet so "I am #adj#" only draws adjectives that fit a person.
-- [ ] Flyting as a real duel: escalating sheep emotes and the herder reacting (the "…" indicator is gone; needs a new shape).
-- [ ] Tombstone rises beside the pen in the world during the end fade (it is on the card today).
+- [ ] Flyting as a real duel: escalating sheep emotes and the herder reacting (needs a new shape now the "…" indicator is gone).
+- [ ] Tombstone rises beside the pen in the world during the end fade.
 - [ ] Sheep walk animation while wandering; flee dash.
-- [ ] The minimap is hidden on narrow phones; decide whether phones get the look-around.
 
 ## P2 — Nice to have
 
-- [ ] Keyboard shortcuts (space pause, N new, H hall).
 - [ ] README screenshots and a 20 s GIF of a late-day rant.
 - [ ] A second Jerome-style book for levels 7–8.
 
 ## Decided
 
-- Sound: never. It is a silent screensaver.
-- Web Worker sim: not planned (the sim is negligible at 1×; catch-up is budgeted).
-- Service worker: not planned unless offline use matters. It would add offline loading and controlled rollout at the cost of a second update path, stale-cache bugs and harder debugging; the version.json poll already reloads a running tab.
+- Sound: never.
+- Web Worker sim: not planned.
+- Service worker: dropped 2026-09-07 (too complicated for what it buys; the version.json poll already reloads a running tab).
+- Keyboard shortcuts: skipped.
 - The P3 list was removed on 2026-09-07.
 
 ## Research backlog index

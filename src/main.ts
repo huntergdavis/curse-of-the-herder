@@ -29,10 +29,12 @@ const SAVE_EVERY_MS = 10_000;
 /** `?fps=15` (or the Eco setting) renders less often for laptops. */
 /** `?stats=1`: a small overlay with frame interval and draw time, for measuring on real hardware. */
 const SHOW_STATS = params.has("stats");
-const stats = { frames: 0, intervalSum: 0, drawSum: 0, worst: 0, lastReportMs: 0, lastFrameMs: 0 };
+const stats = { frames: 0, intervalSum: 0, drawSum: 0, worst: 0, lastReportMs: 0, lastFrameMs: 0, rafFrames: 0, rafSum: 0 };
 
-const FPS_CAP = Math.max(5, Math.min(60, Number(params.get("fps") ?? repository.getSetting("fps", "60")) || 60));
-const FRAME_MIN_MS = 1000 / FPS_CAP;
+// Frame cap. 0 means "whatever the display delivers" (60, 120, 144 Hz…); a 2 ms draw needs no cap. Default: uncapped.
+const FPS_RAW = params.get("fps") ?? repository.getSetting("fps", "0");
+const FPS_CAP = FPS_RAW === "0" || FPS_RAW === "max" ? 0 : Math.max(5, Math.min(240, Number(FPS_RAW) || 0));
+const FRAME_MIN_MS = FPS_CAP > 0 ? 1000 / FPS_CAP : 0;
 void TICKS_PER_HOUR;
 /** `?clean=1` caps filth at F1 for shared displays; the toolbar setting persists; `?filth=max` removes the frustration gate for testing. */
 let BAND_CAP: Band = params.get("clean") ? 1 : (Number(repository.getSetting("band", "4")) as Band);
@@ -863,6 +865,10 @@ function frame(nowMs: number): void {
   const s = session;
   if (!s) return;
   const dt = Math.min(0.1, (nowMs - lastFrameMs) / 1000);
+  if (SHOW_STATS && lastFrameMs) {
+    stats.rafFrames++;
+    stats.rafSum += nowMs - lastFrameMs;
+  }
   lastFrameMs = nowMs;
   const w = s.world;
 
@@ -948,7 +954,7 @@ function frame(nowMs: number): void {
     if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) > 8) s.camera.snap(h.x, h.y);
   }
   s.bubbles.prune(nowMs);
-  if (!document.hidden && nowMs - lastDrawMs >= FRAME_MIN_MS - 1) {
+  if (!document.hidden && (FRAME_MIN_MS === 0 || nowMs - lastDrawMs >= FRAME_MIN_MS - 1)) {
     lastDrawMs = nowMs;
     const drawStart = SHOW_STATS ? performance.now() : 0;
     s.renderer.draw(w, s.camera, s.bubbles, nowMs);
@@ -966,7 +972,10 @@ function frame(nowMs: number): void {
         const el = $("stats");
         el.hidden = false;
         const mem = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
-        el.textContent = `frame ${(stats.intervalSum / stats.frames).toFixed(1)} ms (${(1000 / (stats.intervalSum / stats.frames)).toFixed(0)} fps)\ndraw  ${(stats.drawSum / stats.frames).toFixed(1)} ms avg · ${stats.worst.toFixed(1)} ms worst\ntile  ${s.renderer.tilePx} px · ${s.renderer.width}×${s.renderer.height} · ${FAST}×${mem ? `\nheap  ${(mem.usedJSHeapSize / 1048576).toFixed(0)} MB` : ""}`;
+        const rafMs = stats.rafFrames ? stats.rafSum / stats.rafFrames : 0;
+        el.textContent = `frame ${(stats.intervalSum / stats.frames).toFixed(1)} ms (${(1000 / (stats.intervalSum / stats.frames)).toFixed(0)} fps drawn)\nbrowser delivers ${rafMs.toFixed(1)} ms (${rafMs ? (1000 / rafMs).toFixed(0) : "?"} Hz) · cap ${FPS_CAP || "none"}\ndraw  ${(stats.drawSum / stats.frames).toFixed(1)} ms avg · ${stats.worst.toFixed(1)} ms worst\ntile  ${s.renderer.tilePx} px · ${s.renderer.width}×${s.renderer.height} · ${FAST}×${mem ? `\nheap  ${(mem.usedJSHeapSize / 1048576).toFixed(0)} MB` : ""}`;
+        stats.rafFrames = 0;
+        stats.rafSum = 0;
         stats.frames = 0;
         stats.intervalSum = 0;
         stats.drawSum = 0;
@@ -1026,6 +1035,10 @@ async function boot(): Promise<void> {
     if (!menu.hidden) void refreshLoadList();
   };
   $("btn-menu").addEventListener("click", () => toggleMenu());
+  $("btn-map").addEventListener("click", () => {
+    const on = document.body.classList.toggle("show-map");
+    $("btn-map").setAttribute("aria-pressed", String(on));
+  });
   $("btn-menu-close").addEventListener("click", () => toggleMenu(false));
   $("btn-new").addEventListener("click", () => {
     toggleMenu(false);
@@ -1083,7 +1096,7 @@ async function boot(): Promise<void> {
     applyMotion(selMotion.value);
   });
   const selFps = $<HTMLSelectElement>("sel-fps");
-  selFps.value = String(FPS_CAP === 60 || FPS_CAP === 30 || FPS_CAP === 15 ? FPS_CAP : 60);
+  selFps.value = String(FPS_CAP === 60 || FPS_CAP === 30 || FPS_CAP === 15 ? FPS_CAP : 0);
   selFps.addEventListener("change", () => {
     repository.setSetting("fps", selFps.value);
     toast("Frame rate applies after the next reload.");

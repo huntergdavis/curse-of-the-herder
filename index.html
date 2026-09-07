@@ -34,6 +34,7 @@
       @keyframes pop { 0% { transform: scale(1); } 35% { transform: scale(1.35); color: var(--accent); } 100% { transform: scale(1); } }
       @keyframes tremble { 0% { transform: translate(0, 0); } 25% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, 1px); } 100% { transform: translate(0, 0); } }
       #toolbar { top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; z-index: 20; }
+      #btn-map { display: none; }
       button, select { font: inherit; font-size: 14px; background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
       button:hover, .filebtn:hover { background: #fff3c4; }
       .filebtn { font: inherit; font-size: 14px; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
@@ -104,7 +105,11 @@
         #toolbar { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); gap: 6px; }
         button, select, .filebtn { font-size: 13px; padding: 4px 8px; }
         #line { left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); max-width: none; font-size: 14px; }
+        /* Phones: the map is behind a toolbar button; when shown it is larger and sits above the last-heard line. */
         #minimap-wrap { display: none; }
+        #btn-map { display: inline-block !important; }
+        body.show-map #minimap-wrap { display: block; right: max(8px, env(safe-area-inset-right)); bottom: 88px; }
+        body.show-map #minimap { width: 200px; height: 200px; }
         #menu { top: 52px; }
         .menu-grid { grid-template-columns: 1fr; }
         #hall { top: 52px; width: calc(100vw - 16px); max-height: calc(100vh - 64px); }
@@ -129,6 +134,7 @@
     <nav id="toolbar" class="panel" aria-label="Controls">
       <button id="btn-pause" title="Pause (space)">Pause</button>
       <button id="btn-menu" title="Menu (M)" aria-haspopup="true" aria-controls="menu">☰ Menu</button>
+      <button id="btn-map" title="Show or hide the island map" aria-pressed="false">Map</button>
       <span id="hud-mode"></span>
     </nav>
     <section id="menu" class="panel" hidden aria-label="Menu">
@@ -170,6 +176,7 @@
           <option value="reduced">Reduced (calmer picture)</option>
         </select></label>
         <label>Frame rate<select id="sel-fps">
+          <option value="0">Display rate (60, 120 Hz…)</option>
           <option value="60">Smooth (60)</option>
           <option value="30">Balanced (30)</option>
           <option value="15">Eco (15)</option>
