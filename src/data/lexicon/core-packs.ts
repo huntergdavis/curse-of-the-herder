@@ -311,7 +311,7 @@ export const fungi: LexPack = {
   level: 4,
   entries: [
     ins("puffball", { reg: ["fungi"] }), ins("stinkhorn", { reg: ["fungi"] }), ins("toadstool", { reg: ["fungi"] }), ins("slime mould", { reg: ["fungi"] }), ins("bracket fungus", { reg: ["fungi"], pl: "bracket fungi" }),
-    ins("damp puffball", { reg: ["fungi"] }), ins("mildew", { reg: ["fungi"], pl: "-" }), ins("mushroom with legs", { reg: ["fungi"] }), ins("truffle nobody wanted", { reg: ["fungi"] }), ins("dead man's fingers", { reg: ["fungi"], pl: "-", gloss: "a real black fungus, Xylaria" }),
+    ins("damp puffball", { reg: ["fungi"] }), ins("mildew", { reg: ["fungi"] }), ins("mushroom with legs", { reg: ["fungi"] }), ins("truffle nobody wanted", { reg: ["fungi"] }), ins("dead man's fingers", { reg: ["fungi"], pl: "-", gloss: "a real black fungus, Xylaria" }),
     ins("jelly ear", { reg: ["fungi"], gloss: "a real fungus, Auricularia" }), ins("sulphur tuft", { reg: ["fungi"] }), ins("shaggy inkcap", { reg: ["fungi"] }), ins("yellow brain", { reg: ["fungi"], gloss: "a real fungus, Tremella" }),
     adj("spore-laden", { reg: ["fungi"] }), adj("mouldering", { reg: ["fungi"] }), adj("mildewed", { reg: ["fungi"] }), adj("saprophytic", { reg: ["fungi"], gloss: "living on rot" }),
     adj("fruiting", { reg: ["fungi"] }), adj("gilled", { reg: ["fungi"] }), adj("musty", { reg: ["fungi"] }), adj("fungal", { reg: ["fungi"] }), adj("sporulating", { reg: ["fungi"] }),
