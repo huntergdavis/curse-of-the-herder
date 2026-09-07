@@ -441,11 +441,23 @@ const CURSE_LINES: Record<string, string[]> = {
 };
 let lastCurseMs = -1e9;
 /** From level 10, the Curse itself occasionally remarks on events, drily, in its own voice. */
+/** Before he has any words, the Curse comments on the lack. */
+const CURSE_EARLY = [
+  "He will learn words. Give him time. I have all of it.",
+  "That was a sentence. Technically.",
+  "Day one of forever. He is taking it well.",
+  "I have cursed better men. They also shouted at sheep.",
+  "He does not know yet that the sheep are the easy part.",
+  "There are libraries. He will find them. Then it gets worse.",
+];
+
 function maybeCurseRemarks(s: Session, kind: string, nowMs: number): void {
   const w = s.world;
   const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
-  if (level < 10 || nowMs - lastCurseMs < 8 * 60 * 1000 / Math.max(1, FAST) && kind !== "finished") return;
-  const pool = CURSE_LINES[kind];
+  // Rare and dry before he is eloquent; a regular heckle once he is.
+  const gapMs = (level >= 10 ? 8 : 25) * 60 * 1000 / Math.max(1, FAST);
+  if (nowMs - lastCurseMs < gapMs && kind !== "finished") return;
+  const pool = level < 4 && keyedUnit(w.seed, "curse-early", w.tick) < 0.6 ? CURSE_EARLY : CURSE_LINES[kind];
   if (!pool || keyedUnit(w.seed, "curse-remark", w.tick) > 0.45) return;
   lastCurseMs = nowMs;
   const line = pool[Math.floor(keyedUnit(w.seed, "curse-remark-line", w.tick) * pool.length)] ?? pool[0]!;

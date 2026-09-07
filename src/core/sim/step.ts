@@ -209,6 +209,17 @@ function stepSheep(w: WorldState, map: GameMap): void {
       }
       continue;
     }
+    // While he reads aloud, nearby sheep drift over to listen. Nobody asked them to.
+    if (w.herder.mode === "reading" && d < 9 && d > 2.5 && w.tick % 8 === s.id % 8) {
+      const nx = Math.round(s.x) + Math.sign(Math.round(w.herder.x) - Math.round(s.x));
+      const ny = Math.round(s.y) + Math.sign(Math.round(w.herder.y) - Math.round(s.y));
+      const i = ny * map.size + nx;
+      if (nx > 0 && ny > 0 && nx < map.size - 1 && ny < map.size - 1 && isWalkable(map.terrain[i]!) && map.deco[i] !== Deco.Fence && map.deco[i] !== Deco.House && map.deco[i] !== Deco.HouseRed && map.deco[i] !== Deco.Library) {
+        s.tx = nx;
+        s.ty = ny;
+        s.speed = 0.45;
+      }
+    }
     if (w.tick % 40 === s.id % 40 && keyedUnit(w.seed, "wander", s.id, w.tick) < 0.5 && d > 3) {
       const dir = Math.floor(keyedUnit(w.seed, "wander-dir", s.id, w.tick) * 4);
       const nx = Math.round(s.x) + [1, -1, 0, 0][dir]!;

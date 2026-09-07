@@ -58,6 +58,8 @@ long soak.
 - Nemesis arc: the first sheep to bolt three times is declared the enemy ("Everyone else is a sheep. You are a project."), gets a triumph line and a Curse remark when finally caught, and is named in the hourly diary
 - The rival: every couple of hours a neighbour in a blue coat strolls past with three sheep that follow him in a line, waving; our herder seethes at every level ("Three sheep. He has three sheep and a smile. I have sixty and a hernia."), the Curse remarks, `?rival=1` forces one for screenshots
 - Jailbreaks are plotted first: the sheep whispers "psst" to its neighbours for half a minute before it goes, called off if the herder wanders back
+- The Curse heckles from the start, rarely and dryly ("That was a sentence. Technically."), and every eight minutes once he is eloquent
+- Loose sheep within earshot drift over to listen while he reads aloud, then stand there
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
