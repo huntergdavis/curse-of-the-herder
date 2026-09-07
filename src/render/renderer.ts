@@ -469,6 +469,8 @@ export class Renderer {
   onHatLost: (() => void) | null = null;
   /** Screenshot hook: hold the wave pose. */
   forceWave = false;
+  /** Whoever is passing this frame, real or finale, for the wave. */
+  private rivalNow: { x: number; y: number } | null = null;
   /** He has walked up to a cow; the caller may have him say something about it. */
   onCowNear: (() => void) | null = null;
   /** The hens have just scattered in front of him. */
@@ -1191,6 +1193,7 @@ export class Renderer {
     const finaleT = world.finished ? (nowMs - this.finaleStartMs - 4000) / 26000 : -1;
     const finaleRival = finaleT >= 0 && finaleT <= 1 ? { x: h.x - 12 + finaleT * 24, y: h.y + 3.5, dx: 0.11, finale: true } : undefined;
     const rivalNow = world.rival ?? finaleRival;
+    this.rivalNow = rivalNow ? { x: rivalNow.x, y: rivalNow.y } : null;
     if (rivalNow) {
       const r = rivalNow;
       const back = r.dx > 0 ? -1 : 1;
@@ -1221,7 +1224,8 @@ export class Renderer {
       for (const v of this.villagers) {
         if (Math.hypot(v.x - r.x, v.y - r.y) < 6 && Math.floor(nowMs / 1000) % 4 === 2) drawEmote(ctx, sx(v.x + 0.5) + T * 0.3, sy(v.y) - T * 0.9, T * 0.8, "Morning!");
       }
-      drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: !stopped, carrying: false, phase, fury: stopped ? 0.5 : 0, resting: false, coat: "#4a6a8a" });
+      const nearHim = Math.abs(r.x - h.x) < 4;
+      drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: !stopped, carrying: false, phase, fury: stopped ? 0.5 : 0, resting: false, coat: "#4a6a8a", wave: nearHim && !stopped, ranting: "finale" in r && nearHim });
       const beat = Math.floor(nowMs / 1000) % 9;
       if ("finale" in r) {
         if (Math.abs(r.x - h.x) < 3) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "sixty?");
@@ -1784,7 +1788,7 @@ export class Renderer {
       tired: Math.max(0, Math.min(1, (dayHour(world) - 14) / 4)),
       lantern: (this.hourOverride ?? dayHour(world)) > 17.9,
       resting: h.mode === "resting" || h.mode === "done",
-      wave: this.forceWave || (!!world.rival && Math.abs(world.rival.x - h.x) < 5 && Math.abs(world.rival.y - h.y) < 6 && h.carrying < 0 && h.mode !== "reading" && h.mode !== "mishap"),
+      wave: this.forceWave || (!!this.rivalNow && Math.abs(this.rivalNow.x - h.x) < 5 && Math.abs(this.rivalNow.y - h.y) < 6 && h.carrying < 0 && h.mode !== "reading" && h.mode !== "mishap"),
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",
     });

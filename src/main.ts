@@ -140,6 +140,7 @@ async function startSession(world: WorldState): Promise<void> {
     if (!session || keyedUnit(session.world.seed, "signpost-say", session.world.tick) > 0.5) return;
     const u = speakKind(session.world, session.map, "signpost", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.25);
     if (u) say(session, u.text, u.heat, u.seconds, performance.now(), false, u);
+    if (u) maybeCurseRemarks(session, "signpost", performance.now());
   };
   renderer.onInnNear = () => {
     if (!session) return;
@@ -541,6 +542,7 @@ const CURSE_LINES: Record<string, string[]> = {
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
   rivalBolt: ["Do not enjoy this.", "That one is coming to live with you.", "I had nothing to do with it. This time."],
   drink: ["Water. He is celebrating.", "The well is not cursed. I checked that too.", "He will want a lie-down next."],
+  signpost: ["The sign is right. It usually is.", "He argues with furniture now.", "It points at the village. He points at nothing."],
   levelUp: ["It was in a book. He found it. Fine.", "More words. Same sheep.", "I gave him the books. Remember that."],
   inn: ["He is not allowed in. I checked.", "The Cursed Ram. Named after me, in a way.", "Sixty sheep, then ale. Those are the terms."],
   cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
