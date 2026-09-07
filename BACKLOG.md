@@ -25,6 +25,8 @@ long soak.
 - Liveness watchdog, capped catch-up with a "long sit-down" line, self-hosted OFL fonts
 - Roof sheep, village names on signposts, flyting follow-ups, quoting books back at the day
 - Quiet screensaver mode, ?cam dev parameter, memory soak script, full-day end-to-end test
+- Chimney smoke, birds, bleats, snoring flock, stomp dust, sitting by the stone
+- Automatic update (version.json), pack-level word gating fix (124 → 2,338 words)
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
@@ -37,7 +39,7 @@ long soak.
 
 ## P1 — Runtime robustness (Phase 4 leftovers)
 
-- [ ] Simulation in a Web Worker behind a versioned protocol (main thread stays smooth during 4-hour catch-ups).
+- [ ] Simulation in a Web Worker behind a versioned protocol (main thread stays smooth during 4-hour catch-ups). Deferred: at 1× the sim costs ~nothing on the main thread; only the rare long catch-up janks for a few seconds.
 - [ ] Heap-slope check in a nightly 9-minute fast day; weekly true soak.
 - [ ] Auto-update via version.json poll and a service worker.
 - [ ] Reduced-motion mode; a Settings panel for fps/band/end-of-day instead of toolbar selects.
@@ -56,7 +58,7 @@ long soak.
 
 - [ ] Auto-update (`version.json` poll, SW cache name check script).
 - [ ] Workday FPS mode; heap slope test nightly; weekly true 9-hour soak.
-- [ ] Sound, off by default: sheep, wind, grumble, page turn.
+- [ ] Sound, off by default: sheep, wind, grumble, page turn. (Decision so far: it is a silent screensaver; revisit if asked.)
 - [ ] Settings panel, keyboard shortcuts (space pause, N new, H hall).
 - [ ] Bonus books (fungi, geology, anatomy, cookery, law, knitting).
 - [ ] Flyting duel beat (herder vs. named sheep, alternating lines).

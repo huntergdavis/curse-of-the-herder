@@ -38,7 +38,7 @@ export interface LexEntry {
   tombstoneSafe?: boolean;
 }
 
-export type RuleEvent = "idle" | "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "finished" | "book" | "epitaph" | "rain" | "dusk" | "walkOfShame" | "breather" | "bookPassed" | "callback" | "roof";
+export type RuleEvent = "idle" | "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "finished" | "book" | "epitaph" | "rain" | "dusk" | "walkOfShame" | "breather" | "bookPassed" | "callback" | "roof" | "rant" | "fog";
 
 export interface Rule {
   id: string;

@@ -1,5 +1,5 @@
 import type { GameMap } from "../core/map/generate";
-import { dayHour, isRaining, type WorldState } from "../core/sim/state";
+import { dayHour, isFoggy, isRaining, type WorldState } from "../core/sim/state";
 import { BOOK_BY_ID } from "../data/books";
 import { Deco } from "../core/map/terrain";
 import type { Bubbles } from "./bubbles";
@@ -259,6 +259,15 @@ export class Renderer {
       ctx.fillRect(0, 0, W, H);
     }
 
+    // Fog: a soft white veil that thins toward the herder.
+    if (isFoggy(world)) {
+      const g = ctx.createRadialGradient(sx(h.x + 0.5), sy(h.y + 0.5), T * 3, sx(h.x + 0.5), sy(h.y + 0.5), Math.max(W, H) * 0.7);
+      g.addColorStop(0, "rgba(235, 238, 240, 0.15)");
+      g.addColorStop(1, "rgba(235, 238, 240, 0.78)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+
     // Day tint over the world, under the bubble.
     const hour = this.hourOverride ?? dayHour(world);
     const tint = dayTint(hour);
@@ -309,7 +318,7 @@ export class Renderer {
       walking,
       carrying: h.carrying >= 0,
       phase: walking ? (nowMs / (stomping ? 300 : 420)) % 1 : phase,
-      fury: world.frustration / 100,
+      fury: h.mode === "ranting" ? 1 : world.frustration / 100,
       resting: h.mode === "resting" || h.mode === "done",
       reading: !!reading,
       bookColour: reading ? BOOK_BY_ID.get(world.reading!.bookId)?.colour ?? "#c94f4f" : "#c94f4f",

@@ -43,6 +43,28 @@ export const CALLBACK_RULES: Rule[] = [
     "The sheep was on the roof. I did not ask how. You do not ask a sheep how. You climb.",
     "It was a good roof. It was a bad place for a sheep. I went up.",
   ]),
+  ...R(2, "rant", [
+    "Sky! Yes, you! You have been up there all day doing NOTHING.",
+    "I am talking to you, hill. I know you can hear me. You are a hill. You have nothing else to do.",
+    "Why are there so many of you? Who needs sixty sheep? WHO?",
+    "Every one of you knows where the pen is. EVERY ONE.",
+  ], { minBand: 2 }),
+  ...R(4, "rant", [
+    "#oath.cap#! #oath.cap#! Hear me, O sky, O #target#, O #insult_np#: I have HAD it!",
+    "#pantheon.cap#, I ask for so little. A sheep that stays. A hill that is flat. A day that ENDS.",
+    "You! Curse! I know you are watching! Is this FUNNY to you? It is a little funny. I am still angry.",
+  ], { minBand: 2 }),
+  ...R(8, "rant", [
+    "I stopped walking. I shook my fist at the sky. The sky did not notice. I felt better anyway.",
+    "There is a point in every day where a man shouts at a hill. This was the point.",
+  ], { minBand: 2 }),
+  ...R(10, "rant", [
+    "Let the record reflect, O Curse, that on this day, at this hour, in front of these #insult_np.pl#, I raised my fists to heaven and heaven RAISED NOTHING BACK.",
+  ], { minBand: 2 }),
+  ...R(1, "fog", ["Fog. Lovely.", "Fog now. Fog.", "Where sheep. Fog."]),
+  ...R(2, "fog", ["Fog. Now I cannot see the sheep I cannot catch.", "The fog has come to watch. Good. Nobody else has.", "Somewhere in this fog there is a sheep laughing at me."]),
+  ...R(4, "fog", ["#oath.cap#, fog. As if the sheep were not hard enough to find when I could SEE them.", "#pantheon.cap#, the fog. The hill has put on a disguise."]),
+  ...R(8, "fog", ["The fog came in. I could not see the sheep. It was not much different from before.", "Fog. I walked into it. That is what you do with fog."]),
   ...R(2, "bookPassed", [
     "A book. And my arms are full of sheep. Later, book.",
     "I see you, book. I will come back for you.",

@@ -48,6 +48,12 @@ export class Minimap {
       ctx.arc(sh.x * s, sh.y * s, 1.6, 0, Math.PI * 2);
       ctx.fill();
     }
+    // Unread libraries
+    for (const l of world.libraries) {
+      if (l.taken) continue;
+      ctx.fillStyle = "#ffd37a";
+      ctx.fillRect(l.x * s - 1.5, l.y * s - 1.5, 3, 3);
+    }
     // Herder
     ctx.fillStyle = "#ff5a3c";
     ctx.beginPath();

@@ -23,6 +23,8 @@ const SHAME_RADIUS = 4;
 const SHAME_COOLDOWN = 15 * 60 * 4;
 const BREATHER_TICKS = 80; // 20 s sit-down
 const BREATHER_COOLDOWN = 25 * 60 * 4;
+const RANT_TICKS = 12; // 3 s of shaking fists at the sky
+const RANT_COOLDOWN = 3 * 60 * 4;
 
 function pushEvent(w: WorldState, e: Omit<WorldEvent, "seq">): void {
   w.events.push({ ...e, seq: w.eventCount++ });
@@ -301,12 +303,19 @@ function stepWeather(w: WorldState): void {
     w.rainUntilTick = 0;
     pushEvent(w, { tick: w.tick, kind: "rainStops", sheepId: -1 });
   }
+  if (w.fogUntilTick && w.tick >= w.fogUntilTick) {
+    w.fogUntilTick = 0;
+    pushEvent(w, { tick: w.tick, kind: "fogLifts", sheepId: -1 });
+  }
   if (w.tick >= w.nextWeatherTick) {
     const u = keyedUnit(w.seed, "weather", w.tick);
     if (u < 0.45 && !w.rainUntilTick) {
       w.rainUntilTick = w.tick + 8 * 60 * 4 + Math.floor(keyedUnit(w.seed, "rain-len", w.tick) * 14 * 60 * 4);
       w.stats.rains++;
       pushEvent(w, { tick: w.tick, kind: "rain", sheepId: -1 });
+    } else if (u < 0.62 && !w.fogUntilTick && !w.rainUntilTick) {
+      w.fogUntilTick = w.tick + 6 * 60 * 4 + Math.floor(keyedUnit(w.seed, "fog-len", w.tick) * 10 * 60 * 4);
+      pushEvent(w, { tick: w.tick, kind: "fog", sheepId: -1 });
     }
     w.nextWeatherTick = w.tick + 30 * 60 * 4 + Math.floor(keyedUnit(w.seed, "weather-gap", w.tick) * 50 * 60 * 4);
   }
@@ -322,6 +331,10 @@ function stepHerder(w: WorldState, map: GameMap): void {
   }
   if (h.mode === "reading") {
     if (!w.reading || w.tick >= w.reading.untilTick) finishReading(w);
+    return;
+  }
+  if (h.mode === "ranting") {
+    if (w.tick >= h.restUntilTick) h.mode = h.rantReturnMode ?? "idle";
     return;
   }
   if (h.mode === "idle") {
@@ -358,6 +371,16 @@ function stepHerder(w: WorldState, map: GameMap): void {
     // Is there a library near the route? Read first, then fetch the sheep.
     const onWay = readingAllowed(w) ? libraryAlongPath(w) : -1;
     if (onWay >= 0 && goToLibrary(w, map, onWay)) return;
+  }
+
+  // When he is unhinged he stops now and then to shake his fists at the sky.
+  if ((h.mode === "toSheep" || h.mode === "toPen") && w.frustration >= 75 && w.tick - w.lastRantTick > RANT_COOLDOWN && keyedUnit(w.seed, "rant", w.tick) < 0.004) {
+    w.lastRantTick = w.tick;
+    h.restUntilTick = w.tick + RANT_TICKS;
+    h.rantReturnMode = h.mode;
+    h.mode = "ranting";
+    pushEvent(w, { tick: w.tick, kind: "rant", sheepId: -1 });
+    return;
   }
 
   const tile = tileAt(map, h.x, h.y);

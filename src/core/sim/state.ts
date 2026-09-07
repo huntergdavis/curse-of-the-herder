@@ -36,7 +36,7 @@ export interface SheepState {
   onRoof?: boolean;
 }
 
-export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading";
+export type HerderMode = "idle" | "toSheep" | "toPen" | "resting" | "done" | "toLibrary" | "reading" | "ranting";
 
 export interface LibraryState {
   x: number;
@@ -68,13 +68,15 @@ export interface HerderState {
   targetLibrary: number;
   /** Tiles walked since he last stood in the pen. */
   tripTiles: number;
+  /** Mode to resume after a rant. */
+  rantReturnMode?: HerderMode;
 }
 
 export interface WorldEvent {
   /** Monotonic sequence number so consumers can track what they have seen despite the ring cap. */
   seq: number;
   tick: number;
-  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed";
+  kind: "flee" | "caught" | "penned" | "absurd" | "repeatEscape" | "started" | "finished" | "book" | "bookFound" | "walkOfShame" | "breather" | "rain" | "rainStops" | "bookPassed" | "rant" | "fog" | "fogLifts";
   sheepId: number;
   bookId?: string;
 }
@@ -118,6 +120,9 @@ export interface WorldState {
   longestLine: string;
   lastBookPassTick: number;
   stats: { flees: number; absurds: number; shames: number; rains: number; breathers: number; books: number };
+  lastRantTick: number;
+  /** Fog until this tick (0 = clear). */
+  fogUntilTick: number;
 }
 
 export const MAX_EVENTS = 16;
@@ -248,6 +253,8 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
     longestLine: "",
     lastBookPassTick: -100000,
     stats: { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 },
+    lastRantTick: -100000,
+    fogUntilTick: 0,
   };
 }
 
@@ -301,6 +308,10 @@ export function isRaining(world: WorldState): boolean {
   return world.rainUntilTick > world.tick;
 }
 
+export function isFoggy(world: WorldState): boolean {
+  return world.fogUntilTick > world.tick;
+}
+
 export function hoursElapsed(world: WorldState): number {
   return world.tick / TICKS_PER_HOUR;
 }
@@ -339,6 +350,8 @@ export function upgradeWorld(w: unknown): WorldState {
     const h = o["herder"] as Record<string, unknown> | undefined;
     if (h && typeof h["tripTiles"] !== "number") h["tripTiles"] = 0;
     if (typeof o["lastBookPassTick"] !== "number") o["lastBookPassTick"] = -100000;
+    if (typeof o["lastRantTick"] !== "number") o["lastRantTick"] = -100000;
+    if (typeof o["fogUntilTick"] !== "number") o["fogUntilTick"] = 0;
     if (!o["stats"]) o["stats"] = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
     for (const sh of (o["sheep"] as Record<string, unknown>[]) ?? []) {
       if (typeof sh["tx"] !== "number") { sh["tx"] = sh["x"]; sh["ty"] = sh["y"]; sh["speed"] = 0; }
