@@ -611,6 +611,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
         } else if (s.nemesis) {
           pushEvent(w, { tick: w.tick, kind: "nemesisCaught", sheepId: s.id, detail: String(s.flees) });
+        } else if (s.thief) {
+          pushEvent(w, { tick: w.tick, kind: "thiefCaught", sheepId: s.id });
         } else if (s.escapee) {
           pushEvent(w, { tick: w.tick, kind: "recaptured", sheepId: s.id });
         } else if (s.black) {

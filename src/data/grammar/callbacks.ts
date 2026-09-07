@@ -109,6 +109,11 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "lunchStolen", ["#oath_phrase#! My lunch! Eaten by #vocative#, a creature with four stomachs and NO SHAME!", "#pantheon.cap#, you saw that. You saw that #adj# #insult# eat my cheese. Let it be recorded that I did not strike it. Yet."]),
   ...R(6, "lunchStolen", ["Note for the record, #vocative#: you have eaten my lunch, and I have eaten nothing since dawn but my own words, which are #adj# and do not fill a man."]),
   ...R(8, "lunchStolen", ["The sheep ate the bread. Then it ate the cheese. I watched. It was a good cheese."], { reg: ["hemingway"] }),
+  // The lunch thief, caught at last.
+  ...R(0, "thiefCaught", ["You. Cheese breath. Up.", "Got you. Where cheese.", "Thief. UP."]),
+  ...R(2, "thiefCaught", ["You. Cheese breath. Up you come, and if you so much as burp on the way I am leaving you on the roof of the pen.", "Well, well. The lunch thief. You are heavier than you were this morning and I know EXACTLY why.", "I can smell it on you, #vocative#. My cheese. On your breath. All the way to the pen."]),
+  ...R(4, "thiefCaught", ["#oath_phrase#, the thief! On my shoulders, where my lunch should be, in a manner of speaking, and I hope it is giving you WIND.", "#pantheon.cap#, I have him, the #adj# cheese-thief, and I intend to carry him with less care than I carried my sandwich."]),
+  ...R(8, "thiefCaught", ["I caught the one that ate my lunch. It was heavier. I did not say anything about it. I thought about it the whole way."], { reg: ["hemingway"] }),
   // The Curse said something. He heard it.
   ...R(0, "curseReply", ["Heard that.", "Shut up, sky.", "Not funny."]),
   ...R(2, "curseReply", ["I heard that. I hear everything. It is the worst part.", "Oh good, it has opinions. The curse has OPINIONS. Nobody asked the curse.", "Yes. Thank you. Very helpful. Go and haunt a cow."]),
