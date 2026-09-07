@@ -263,6 +263,8 @@ export class Renderer {
   private shoutingNow = false;
   /** The wind took his hat: when, and where it went. */
   private hat = { lostAt: -1e9, dx: 0, dy: 0 };
+  /** Seconds between hat-losing windows in wind (development: ?hat=1 shortens it). */
+  hatPeriod = 170;
   /** Name on the wanted poster by the pen, if a sheep has broken out. */
   wanted: string | null = null;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
@@ -819,7 +821,7 @@ export class Renderer {
     if (this.season === "summer" && hourNow > 12 && hourNow < 16 && Math.floor(nowMs / 1000) % 23 === 5) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "phew");
     // In a wind, every few minutes, the hat goes. It tumbles off downwind and reappears on his head a little later.
     const hatGone = nowMs - this.hat.lostAt < 6500;
-    if (isWindy(world) && !hatGone && !world.finished && Math.floor(nowMs / 1000) % 170 === 7 && (nowMs % 1000) < 40) {
+    if (isWindy(world) && !hatGone && !world.finished && Math.floor(nowMs / 1000) % this.hatPeriod === 7 && (nowMs % 1000) < 40) {
       this.hat.lostAt = nowMs;
       this.hat.dx = 0;
       this.hat.dy = 0;
