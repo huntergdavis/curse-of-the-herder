@@ -31,6 +31,8 @@ export class Renderer {
   private houses: { x: number; y: number }[] = [];
   /** Villagers stand by their wells; each remembers when it last heard something. */
   private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }[] = [];
+  /** Cows: one per village and one by the pen, chewing, explaining the cowpats. */
+  private cows: { x: number; y: number; facing: number; variant: number }[] = [];
 
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
@@ -53,6 +55,91 @@ export class Renderer {
       if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
       if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3, offences: 0 });
     }
+    this.cows = [];
+    const spots = [...this.villagers.map((v) => ({ x: v.x, y: v.y })), { x: this.map.pen.x, y: this.map.pen.y }];
+    spots.forEach((sp, k) => {
+      // Walk a ring of candidate tiles a few steps out until one is plain grass with grass around it.
+      for (let r = 5; r <= 9 && this.cows.length <= k; r++) {
+        for (let a = 0; a < 8; a++) {
+          const ang = ((a + k * 3) % 8) * Math.PI / 4;
+          const x = Math.round(sp.x + Math.cos(ang) * r);
+          const y = Math.round(sp.y + Math.sin(ang) * r);
+          if (x < 2 || y < 2 || x >= n - 2 || y >= n - 2) continue;
+          let ok = true;
+          for (let oy = -1; oy <= 1 && ok; oy++) for (let ox = -1; ox <= 1; ox++) {
+            const j = (y + oy) * n + (x + ox);
+            if (this.map.terrain[j] !== Terrain.Grass || this.map.deco[j] !== Deco.None) { ok = false; break; }
+          }
+          if (ok) { this.cows.push({ x, y, facing: (k + a) % 2 === 0 ? 0 : 2, variant: (k * 5 + a) % 3 }); break; }
+        }
+      }
+    });
+  }
+
+  /** A cow. It is not his problem and it knows it. */
+  private drawCow(px: number, py: number, T: number, facing: number, variant: number, nowMs: number, chewing: boolean): void {
+    const ctx = this.ctx;
+    const flip = facing === 2 ? -1 : 1;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(flip, 1);
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, T * 0.5, T * 0.11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    const hide = variant === 1 ? "#6b4a3a" : "#f2eee4";
+    const patch = variant === 1 ? "#f2eee4" : variant === 2 ? "#3a3330" : "#5a4438";
+    ctx.strokeStyle = "#2b2620";
+    ctx.lineWidth = Math.max(1, T * 0.04);
+    // Legs
+    ctx.fillStyle = hide;
+    for (const lx of [-0.34, -0.18, 0.14, 0.3]) {
+      ctx.beginPath();
+      ctx.roundRect(lx * T - T * 0.05, -T * 0.34, T * 0.1, T * 0.34, T * 0.03);
+      ctx.fill();
+      ctx.stroke();
+    }
+    // Body
+    ctx.beginPath();
+    ctx.roundRect(-T * 0.48, -T * 0.78, T * 0.9, T * 0.5, T * 0.16);
+    ctx.fill();
+    ctx.stroke();
+    // Patches
+    ctx.fillStyle = patch;
+    ctx.beginPath();
+    ctx.ellipse(-T * 0.2, -T * 0.6, T * 0.14, T * 0.1, 0.3, 0, Math.PI * 2);
+    ctx.ellipse(T * 0.15, -T * 0.45, T * 0.1, T * 0.08, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail, swishing
+    const sw = Math.sin(nowMs / 600 + variant) * T * 0.12;
+    ctx.beginPath();
+    ctx.moveTo(-T * 0.46, -T * 0.7);
+    ctx.quadraticCurveTo(-T * 0.62, -T * 0.55, -T * 0.58 + sw, -T * 0.3);
+    ctx.stroke();
+    // Head, nodding while it chews
+    const nod = chewing ? Math.sin(nowMs / 350) * T * 0.02 : 0;
+    ctx.fillStyle = hide;
+    ctx.beginPath();
+    ctx.roundRect(T * 0.32, -T * 0.86 + nod, T * 0.3, T * 0.3, T * 0.09);
+    ctx.fill();
+    ctx.stroke();
+    // Muzzle
+    ctx.fillStyle = "#d9a89a";
+    ctx.beginPath();
+    ctx.roundRect(T * 0.46, -T * 0.7 + nod, T * 0.17, T * 0.14, T * 0.05);
+    ctx.fill();
+    // Eye and horns
+    ctx.fillStyle = "#2b2620";
+    ctx.beginPath();
+    ctx.arc(T * 0.42, -T * 0.77 + nod, T * 0.025, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(T * 0.36, -T * 0.86 + nod);
+    ctx.lineTo(T * 0.3, -T * 0.96 + nod);
+    ctx.moveTo(T * 0.54, -T * 0.86 + nod);
+    ctx.lineTo(T * 0.6, -T * 0.96 + nod);
+    ctx.stroke();
+    ctx.restore();
   }
 
   private static VILLAGER_LINES = ["Language!", "Well I never.", "There are children!", "We heard that.", "Not in front of the well.", "Charming.", "My mother is in.", "Say it again, I am writing it down.", "The vicar is about!", "Honestly."];
@@ -791,6 +878,12 @@ export class Renderer {
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
+    for (const c of this.cows) {
+      if (Math.abs(c.x - cam.x) * T > W + T * 2 || Math.abs(c.y - cam.y) * T > H + T * 2) continue;
+      const near = Math.hypot(c.x - h.x, c.y - h.y) < 3.5;
+      this.drawCow(sx(c.x + 0.5), sy(c.y + 0.95), T, c.facing, c.variant, nowMs, true);
+      if (near && Math.floor(nowMs / 1000) % 6 < 2) drawEmote(ctx, sx(c.x + 0.5) + T * 0.4, sy(c.y) - T * 0.35, T * 0.8, "moo");
+    }
     for (const v of this.villagers) {
       if (Math.abs(v.x - cam.x) * T > W / 2 + T * 2 || Math.abs(v.y - cam.y) * T > H / 2 + T * 2) continue;
       this.drawVillager(v, sx, sy, T, nowMs);
