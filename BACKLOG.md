@@ -52,6 +52,7 @@ long soak.
 - Seasons from the calendar (palette, snow, breath, lines), a word for yesterday's herder at dawn
 - Seasonal touches: snowmen, huddled winter flock, autumn leaf fall, spring lambs, summer 'phew'
 - Jailbreak with wanted poster, the wind steals his hat, language audit fixes (uncountables, .own registers, foreign leakage)
+- The Curse's dry remarks from level 10, hat lines, bats after dark, French miscounting
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
