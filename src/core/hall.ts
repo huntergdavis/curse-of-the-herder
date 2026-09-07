@@ -43,7 +43,7 @@ export interface HallRecord {
   /** The day's best lines. */
   highlights?: { text: string; clock: string }[] | undefined;
   /** Every sheep that earned a name today. */
-  namedSheep?: { name: string; flees: number }[] | undefined;
+  namedSheep?: { name: string; flees: number; note?: string | undefined }[] | undefined;
   /** Most-used lexicon word and its favourite target. */
   favouriteWord?: { w: string; n: number; mostly: string } | undefined;
   /** What he read, in order, and a taste of what each book gave him. */
@@ -106,7 +106,11 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
       return n ? { name: sheepName(w.seed, n.id), flees: n.flees } : undefined;
     })(),
     highlights: [...w.highlights].sort((a, b) => b.score - a.score).slice(0, 5).map((h) => ({ text: h.text, clock: h.clock })),
-    namedSheep: w.sheep.filter((s) => s.named).sort((a, b) => b.flees - a.flees).map((s) => ({ name: sheepName(w.seed, s.id), flees: s.flees })),
+    namedSheep: w.sheep.filter((s) => s.named).sort((a, b) => b.flees - a.flees).map((s) => ({
+      name: sheepName(w.seed, s.id),
+      flees: s.flees,
+      note: s.nemesis ? "nemesis" : s.thief ? "ate his lunch" : s.escapee ? "jailbreak" : undefined,
+    })),
     favouriteWord: (() => {
       const top = Object.entries(w.wordUse).sort((a, b) => b[1].n - a[1].n)[0];
       if (!top || top[1].n < 2) return undefined;
