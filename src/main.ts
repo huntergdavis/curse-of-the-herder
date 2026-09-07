@@ -230,6 +230,7 @@ async function startSession(world: WorldState): Promise<void> {
   renderer.wanted = enemy ? sheepName(world.seed, enemy.id) : world.jailbreaks > 0 ? (world.sheep.filter((sh) => sh.named && sh.flees > 0).map((sh) => sheepName(world.seed, sh.id))[0] ?? null) : null;
   renderer.signatureWord = signatureWord(world.seed);
   renderer.reducedMotion = motionSetting;
+  renderer.fast = FAST;
   renderer.fontScale = textScale;
   renderer.highContrast = contrastSetting;
   repository.setActiveId(world.id);
@@ -975,6 +976,7 @@ async function boot(): Promise<void> {
   selSpeed.value = [1, 2, 5, 10, 20, 50, 100].includes(FAST) ? String(FAST) : "1";
   selSpeed.addEventListener("change", () => {
     FAST = Number(selSpeed.value) || 1;
+    if (session) session.renderer.fast = FAST;
     repository.setSetting("speed", String(FAST));
     if (session) session.world.lastWallMs = Date.now();
     updateHud(true);

@@ -296,30 +296,48 @@ export class Renderer {
     ctx.moveTo(-T * 0.28, bodyY - T * 0.02);
     ctx.lineTo(-T * 0.42, bodyY - T * 0.18 + (lying ? Math.sin(nowMs / 200) * T * 0.06 : Math.sin(nowMs / 300) * T * 0.03));
     ctx.stroke();
-    // Head
+    // Collar: a dog, not a cat.
+    ctx.strokeStyle = "#c0392b";
+    ctx.lineWidth = Math.max(1.5, T * 0.05);
+    ctx.beginPath();
+    ctx.arc(T * 0.2, bodyY - T * 0.05, T * 0.1, -0.9, 1.4);
+    ctx.stroke();
+    // Head, with a proper snout.
     ctx.fillStyle = "#2b2620";
     ctx.beginPath();
-    ctx.ellipse(T * 0.3, bodyY - T * 0.1, T * 0.13, T * 0.11, 0, 0, Math.PI * 2);
+    ctx.ellipse(T * 0.3, bodyY - T * 0.1, T * 0.14, T * 0.12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(T * 0.44, bodyY - T * 0.05, T * 0.09, T * 0.06, 0.15, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#f4f1e6";
     ctx.beginPath();
-    ctx.ellipse(T * 0.37, bodyY - T * 0.06, T * 0.07, T * 0.05, 0, 0, Math.PI * 2);
+    ctx.ellipse(T * 0.4, bodyY - T * 0.04, T * 0.08, T * 0.05, 0.15, 0, Math.PI * 2);
     ctx.fill();
-    // Ear and eye
+    // Floppy ear hanging beside the head, nose, eye.
     ctx.fillStyle = "#2b2620";
     ctx.beginPath();
-    ctx.ellipse(T * 0.24, bodyY - T * 0.2, T * 0.05, T * 0.08, -0.4, 0, Math.PI * 2);
+    ctx.ellipse(T * 0.21, bodyY - T * 0.1, T * 0.055, T * 0.11, 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(T * 0.52, bodyY - T * 0.06, T * 0.025, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#f4f1e6";
     ctx.beginPath();
-    ctx.arc(T * 0.32, bodyY - T * 0.12, T * 0.025, 0, Math.PI * 2);
+    ctx.arc(T * 0.33, bodyY - T * 0.13, T * 0.028, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#2b2620";
+    ctx.beginPath();
+    ctx.arc(T * 0.34, bodyY - T * 0.13, T * 0.014, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     // A thought, now and then: never about sheep.
     const beat = Math.floor(nowMs / 1000) % 29;
-    if (beat === 0) drawEmote(ctx, px + T * 0.45, py - T * 0.75, T * 0.8, lying ? "z" : "?");
-    else if (beat === 14 && !lying) drawEmote(ctx, px + T * 0.45, py - T * 0.75, T * 0.8, "woof");
-    else if (beat === 21 || beat === 22) drawEmote(ctx, px + T * 0.5, py - T * 0.75, T * 0.9, Renderer.DOG_THOUGHTS[Math.floor(nowMs / 29000) % Renderer.DOG_THOUGHTS.length] ?? "hm.");
+    // Bubbles come from the head end, whichever way he faces.
+    const hx = px + flip * T * 0.4;
+    if (beat === 0) drawEmote(ctx, hx, py - T * 0.95, T * 0.8, lying ? "z" : "?");
+    else if (beat === 14 && !lying) drawEmote(ctx, hx, py - T * 0.95, T * 0.8, "woof");
+    else if (beat === 21 || beat === 22) drawEmote(ctx, hx, py - T * 0.95, T * 0.9, Renderer.DOG_THOUGHTS[Math.floor(nowMs / 29000) % Renderer.DOG_THOUGHTS.length] ?? "hm.");
   }
 
   private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
@@ -493,6 +511,8 @@ export class Renderer {
   onHatLost: (() => void) | null = null;
   /** Screenshot hook: hold the wave pose. */
   forceWave = false;
+  /** Current fast-forward factor, so per-frame motion (the dog) keeps up with the sim. */
+  fast = 1;
   /** Whoever is passing this frame, real or finale, for the wave. */
   private rivalNow: { x: number; y: number } | null = null;
   /** He has walked up to a cow; the caller may have him say something about it. */
@@ -757,13 +777,13 @@ export class Renderer {
         const back = r.dx > 0 ? -1 : 1;
         const bx = r.x + 0.5 + back * 5.8 + Math.sin(nowMs / 700) * 0.3;
         const by = r.y + 0.3;
-        d.vx = (bx - d.x) * 0.05;
-        d.vy = (by - d.y) * 0.05;
+        d.vx = (bx - d.x) * Math.min(1, 0.05 * this.fast);
+        d.vy = (by - d.y) * Math.min(1, 0.05 * this.fast);
         d.x += d.vx;
         d.y += d.vy;
         if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
         chasing = true;
-        if (Math.floor(nowMs / 1000) % 9 === 7 && Math.hypot(bx - d.x, by - d.y) < 1) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.7, "?");
+        if (Math.floor(nowMs / 1000) % 9 === 7 && Math.hypot(bx - d.x, by - d.y) < 1) drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.35, sy(d.y + 0.9) - T * 0.95, T * 0.7, "?");
       }
       if (!moving && !chasing) {
         const fx = Math.round(d.x);
@@ -773,8 +793,8 @@ export class Renderer {
           if (this.map.deco[i] === Deco.Flowers && Math.hypot(fx + ox - h.x, fy + oy - h.y) < 6) {
             const bx = fx + ox + Math.sin(nowMs / 900) * 0.4;
             const by = fy + oy + Math.cos(nowMs / 1100) * 0.3;
-            d.vx = (bx - d.x) * 0.03;
-            d.vy = (by - d.y) * 0.03;
+            d.vx = (bx - d.x) * Math.min(1, 0.03 * this.fast);
+            d.vy = (by - d.y) * Math.min(1, 0.03 * this.fast);
             d.x += d.vx;
             d.y += d.vy;
             if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
@@ -784,7 +804,12 @@ export class Renderer {
         }
       }
       if (!chasing && (moving || dist > (world.finished ? 0.3 : 3))) {
-        const k = 1 - Math.exp(-(1 / 60) * 3.2);
+        // At fast-forward the dog would fall behind a per-frame ease; scale the ease and snap if he still gets away.
+        const k = 1 - Math.exp(-(1 / 60) * 3.2 * Math.min(12, this.fast));
+        if (dist > 6 + 2 * Math.min(12, this.fast)) {
+          d.x = targetX;
+          d.y = targetY;
+        }
         d.vx = (targetX - d.x) * k;
         d.vy = (targetY - d.y) * k;
         d.x += d.vx;
@@ -829,8 +854,8 @@ export class Renderer {
         ctx.restore();
         if (this.stick.thrownAt && nowMs - this.stick.thrownAt > 300 && nowMs - this.stick.thrownAt < 3500) {
           // The dog fetches. This is the fastest it moves all day.
-          d.vx = (this.stick.tx + 0.2 - d.x) * 0.16;
-          d.vy = (this.stick.ty - 0.3 - d.y) * 0.16;
+          d.vx = (this.stick.tx + 0.2 - d.x) * Math.min(1, 0.16 * this.fast);
+          d.vy = (this.stick.ty - 0.3 - d.y) * Math.min(1, 0.16 * this.fast);
           d.x += d.vx;
           d.y += d.vy;
           if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
@@ -839,7 +864,7 @@ export class Renderer {
       }
       // Reactions: bolt from a wasp, one bark at a runaway, then lose interest.
       const reacting = nowMs < d.reactUntil;
-      if (reacting && d.react === "stick" && Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.75, "stick!");
+      if (reacting && d.react === "stick" && Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.35, sy(d.y + 0.9) - T * 0.95, T * 0.75, "stick!");
       if (reacting && d.react === "wasp") {
         d.x += (d.facing === 0 ? -1 : 1) * 0.06;
         d.vx = (d.facing === 0 ? -1 : 1) * 0.06;
@@ -849,12 +874,12 @@ export class Renderer {
       if (herded && herded.mode === "loose") {
         const ax = herded.x + Math.sign(herded.x - h.x) * 1.1;
         const ay = herded.y + 0.4;
-        d.vx = (ax - d.x) * 0.12;
-        d.vy = (ay - d.y) * 0.12;
+        d.vx = (ax - d.x) * Math.min(1, 0.12 * this.fast);
+        d.vy = (ay - d.y) * Math.min(1, 0.12 * this.fast);
         d.x += d.vx;
         d.y += d.vy;
         if (Math.abs(d.vx) > 0.002) d.facing = d.vx > 0 ? 0 : 2;
-        if (Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + T * 0.25, sy(d.y + 0.2), T * 0.7, "hup!");
+        if (Math.floor(nowMs / 500) % 2 === 0) drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.35, sy(d.y + 0.9) - T * 0.95, T * 0.7, "hup!");
       }
       // Underfoot: flat out exactly where his boot was going, and unbothered.
       const underfoot = reacting && d.react === "underfoot";
@@ -869,7 +894,7 @@ export class Renderer {
         this.drawDog(sx(d.x + 0.5), sy(d.y + 0.9), T, d.facing, (dogMoving || chasing) && !underfoot, (!moving && !dogMoving && !reacting && !chasing) || underfoot, nowMs);
         if (reacting) {
           const glyph = d.react === "wasp" ? "!" : d.react === "flee" ? (nowMs < d.reactUntil - 1100 ? "woof" : "…") : d.react === "bite" ? "?" : "…";
-          drawEmote(ctx, sx(d.x + 0.5) + T * 0.45, sy(d.y + 0.9) - T * 0.85, T * 0.8, glyph);
+          drawEmote(ctx, sx(d.x + 0.5) + (d.facing === 2 ? -1 : 1) * T * 0.4, sy(d.y + 0.9) - T * 0.95, T * 0.8, glyph);
         }
         if (T >= 40 && !moving) {
           ctx.font = `${Math.max(9, T * 0.18)}px "Fredoka", sans-serif`;
