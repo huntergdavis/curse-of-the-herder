@@ -42,12 +42,12 @@ export const BOOKS: Book[] = [
     excerpts: ["'Damn' is a small word for a large feeling.", "'Bloody', as in 'bloody hill', refers to no blood. It refers to the hill.", "'Sod it' may be said to a bucket, a gate, or the sky.", "Never say these words to your mother. Say them to a sheep."],
   },
   {
-    id: "vulgar-tongue", title: "A Classical Dictionary of the Vulgar Tongue", author: "Capt. Grose (abridged)", pack: "grose-vulgar-tongue", register: "grose", when: 0.36, colour: "#6b4a2b",
-    excerpts: ["ADDLE-PATE: one whose head is full of nothing, loosely arranged.", "GUNDIGUTS: a fat, pursy fellow. Also: a sheep, in this reader's opinion.", "DEW-BEATERS: feet. Yours, after a morning in the wet grass.", "NICKUMPOOP: a fool. See also: everyone who told you herding was restful."],
+    id: "vulgar-tongue", title: "A Classical Dictionary of the Vulgar Tongue", author: "Francis Grose, 1785 (genuine entries)", pack: "grose-vulgar-tongue", register: "grose", when: 0.36, colour: "#6b4a2b",
+    excerpts: ["ADDLE PATE. An inconsiderate foolish fellow.", "DEW BEATERS. Feet. Mind your dew beaters; mind your feet.", "NICKUMPOOP, or NINCUMPOOP. A foolish fellow.", "LOBCOCK. A large relaxed fellow; also an inactive fellow.", "CLUNCH. An awkward clownish fellow."],
   },
   {
-    id: "bard", title: "The Complete Insults of William Shakespeare", author: "arranged for shepherds", pack: "bard", register: "bard", when: 0.44, colour: "#7b2d3a",
-    excerpts: ["Thou art a boil, a plague-sore, an embossed carbuncle in my corrupted blood.", "Away, thou fen-sucked, beslubbering hedge-pig!", "Would thou wert clean enough to spit upon.", "I do desire we may be better strangers, sheep."],
+    id: "bard", title: "The Complete Insults of William Shakespeare", author: "W. Shakespeare (genuine lines)", pack: "bard", register: "bard", when: 0.44, colour: "#7b2d3a",
+    excerpts: ["Thou art a boil, a plague-sore, an embossed carbuncle in my corrupted blood. (King Lear)", "I do desire we may be better strangers. (As You Like It)", "Would thou wert clean enough to spit upon! (Timon of Athens)", "Thou clay-brained guts, thou knotty-pated fool! (Henry IV, Part 1)", "More of your conversation would infect my brain. (Coriolanus)"],
   },
   {
     id: "drover", title: "The Drover's Private Vocabulary", author: "not for publication", pack: "strong-profanity", register: null, when: 0.5, colour: "#333333",
@@ -84,6 +84,14 @@ export const BOOKS: Book[] = [
   {
     id: "boatswain", title: "The Boatswain's Book of Oaths", author: "Bosun Anon", pack: "nautical", register: "nautical", when: 0.9, colour: "#1e5f74",
     excerpts: ["Ten thousand thundering typhoons! (For when one typhoon will not do.)", "Blistering barnacles: a general-purpose oath, good in all weathers.", "A landlubber is anyone who is not you. Including sheep.", "Alliterate. It doubles the force and halves the thought."],
+  },
+  {
+    id: "devils-dictionary", title: "The Devil's Dictionary", author: "Ambrose Bierce, 1911 (genuine entries)", pack: "baroque-latinate", register: "baroque", when: 0.8, colour: "#4a2c5a",
+    excerpts: ["PATIENCE, n. A minor form of despair, disguised as a virtue.", "SHEEP, n. Not in Bierce. He had never met one. (This entry is ours.)", "CYNIC, n. A blackguard whose faulty vision sees things as they are, not as they ought to be.", "PERSEVERANCE, n. A lowly virtue whereby mediocrity achieves an inglorious success.", "DAY, n. A period of twenty-four hours, mostly misspent."],
+  },
+  {
+    id: "gargantua", title: "Gargantua and Pantagruel", author: "Rabelais, tr. Urquhart 1653 (genuine catalogue)", pack: "baroque-latinate", register: "baroque", when: 0.82, colour: "#8b5a2b",
+    excerpts: ["...you ninny lobcocks, you gaping changelings, you codsheads, you loggerheads, you noddy-peaks, you bloated wind-bags...", "He that hath patience may compass anything. (Rabelais did not herd sheep.)", "The appetite grows by eating. So does the list.", "A list of nine insults is a list of nine insults. Rabelais would have made it forty."],
   },
   {
     id: "notes", title: "Notes on the Curse", author: "the herder before you", pack: null, register: null, when: 0.97, colour: "#5a3b1e",

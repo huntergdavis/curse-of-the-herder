@@ -7,7 +7,7 @@ import { step } from "./core/sim/step";
 import { repository } from "./persist/db";
 import { BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
-import { makeHallRecord, type HallRecord } from "./core/hall";
+import { makeHallRecord, tasteOfPack, type HallRecord } from "./core/hall";
 import { catchUpPlan, shouldRecover } from "./runtime/liveness";
 import { startUpdatePolling } from "./update/automatic-update";
 import { Bubbles } from "./render/bubbles";
@@ -225,7 +225,7 @@ function handleEvents(s: Session, nowMs: number): void {
   for (const e of fresh) {
     if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
     const u = speakForEvent(w, s.map, e, s.recent, BAND_CAP);
-    if (u) say(s, u.text, u.heat, u.seconds, nowMs);
+    if (u) say(s, u.text, u.heat, u.seconds, nowMs, false, u);
     if (e.kind === "flee" || e.kind === "repeatEscape") s.bubbles.emote(e.sheepId, "!", 2.5, nowMs);
     if (e.kind === "caught" || e.kind === "absurd") s.bubbles.emote(e.sheepId, "?", 2, nowMs);
     if (e.kind === "bookFound") {
@@ -235,7 +235,10 @@ function handleEvents(s: Session, nowMs: number): void {
     }
     if (e.kind === "book") {
       const b = e.bookId ? BOOK_BY_ID.get(e.bookId) : undefined;
-      if (b) toast(`Read <em>${b.title}</em>. Vocabulary: ${grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP))} words.`);
+      if (b) {
+        const sample = b.pack ? tasteOfPack(grammar.packEntries(b.pack), w.seed + b.id + "toast", 3) : [];
+        toast(`Read <em>${b.title}</em>${sample.length ? `: ${sample.map(escapeHtml).join(", ")}…` : ""} Vocabulary: ${grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP))} words.`);
+      }
       if (e.bookId) s.lastBook = { id: e.bookId, tick: w.tick, quoted: false };
     }
     // A notorious sheep, finally caught, gets a proper telling-off: a short flyting.
@@ -247,7 +250,7 @@ function handleEvents(s: Session, nowMs: number): void {
         for (const salt of salts) {
           const line = speakForEvent(w, s.map, { ...e, kind: "repeatEscape", seq: e.seq * 10 + salt }, s.recent, BAND_CAP);
           if (!line) continue;
-          s.queue.push({ text: line.text, heat: Math.min(1, line.heat + 0.15), seconds: line.seconds, sheepId: e.sheepId, emote: salt === 101 ? "!" : "…", atMs: at });
+          s.queue.push({ text: line.text, heat: Math.min(1, line.heat + (salt === 101 ? 0.15 : 0.3)), seconds: line.seconds, sheepId: e.sheepId, emote: salt === 101 ? "!" : "?!", atMs: at });
           at += line.seconds * 1000 + 400;
         }
       }
@@ -319,9 +322,19 @@ function toast(html: string): void {
   }, 6000);
 }
 
-function say(s: Session, text: string, heat: number, seconds: number, nowMs: number, force = false): void {
+function tallyUse(w: WorldState, used: string[] | undefined, at: string | undefined): void {
+  if (!used) return;
+  for (const word of used) {
+    const rec = (w.wordUse[word] ??= { n: 0, at: {} });
+    rec.n++;
+    if (at) rec.at[at] = (rec.at[at] ?? 0) + 1;
+  }
+}
+
+function say(s: Session, text: string, heat: number, seconds: number, nowMs: number, force = false, u?: { used?: string[]; targetLabel?: string }): void {
   if (!force && FAST > 1 && nowMs - lastSayMs < MIN_SAY_GAP_MS) return;
   lastSayMs = nowMs;
+  if (u) tallyUse(s.world, u.used, u.targetLabel);
   s.bubbles.say(text, heat, seconds, nowMs);
   s.world.totalCurses++;
   s.recent.push(text);
@@ -341,7 +354,11 @@ function stoneHtml(r: { name: string; epitaph: string; finishedClock: string; in
 function readingHtml(r: HallRecord, compact = false): string {
   if (!r.reading?.length) return "";
   const items = r.reading
-    .map((b) => `<li><span class="rl-title">${escapeHtml(b.title)}</span> <span class="rl-when">${b.clock}</span>${b.taught.length ? `<span class="rl-taught">taught him ${b.taught.map(escapeHtml).join(", ")}</span>` : ""}</li>`)
+    .map((b) => {
+      const use = b.used?.length ? b.used.map((x) => `${escapeHtml(x.w)} (${x.n}×${x.mostly ? `, mostly at ${escapeHtml(x.mostly)}` : ""})`).join("; ") : "";
+      const taught = use ? `taught him ${use}` : b.taught.length ? `taught him ${b.taught.map(escapeHtml).join(", ")}` : "";
+      return `<li><span class="rl-title">${escapeHtml(b.title)}</span> <span class="rl-when">${b.clock}</span>${taught ? `<span class="rl-taught">${taught}</span>` : ""}</li>`;
+    })
     .join("");
   return `<details class="reading" ${compact ? "" : "open"}><summary>Reading list (${r.reading.length} book${r.reading.length === 1 ? "" : "s"})</summary><ol>${items}</ol></details>`;
 }
@@ -429,7 +446,7 @@ function frame(nowMs: number): void {
           if (FILTH_MAX) w.frustration = Math.max(w.frustration, 90);
           const u = speakIdle(w, s.map, s.recent, BAND_CAP);
           if (u) {
-            say(s, u.text, u.heat, u.seconds, nowMs);
+            say(s, u.text, u.heat, u.seconds, nowMs, false, u);
             // The addressed sheep has nothing to say for itself.
             if (u.sheepId !== undefined && Math.hypot((w.sheep[u.sheepId]?.x ?? 0) - w.herder.x, (w.sheep[u.sheepId]?.y ?? 0) - w.herder.y) < 14) s.bubbles.emote(u.sheepId, "…", Math.min(4, u.seconds), nowMs + 700);
           }

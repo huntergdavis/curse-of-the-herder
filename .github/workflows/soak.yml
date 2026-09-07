@@ -1,0 +1,29 @@
+name: Weekly soak
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  soak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Serve and soak (eight minutes of compressed days)
+        run: |
+          npx vite preview --port 4174 --strictPort &
+          sleep 4
+          node scripts/soak.mjs "http://localhost:4174/curse-of-the-herder/?fast=600&new=1" 8 | tee soak.log
+          if grep -q "pageerror" soak.log; then echo "page errors during soak"; exit 1; fi
+          slope=$(grep -oE "slope=-?[0-9.]+" soak.log | cut -d= -f2)
+          echo "heap slope $slope MB/hour"
+          awk -v s="$slope" 'BEGIN { if (s > 60) { print "heap slope too steep"; exit 1 } }'

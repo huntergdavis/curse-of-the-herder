@@ -27,7 +27,7 @@ export interface HallRecord {
   epitaph: string;
   signatureWord: string;
   /** What he read, in order, and a taste of what each book gave him. */
-  reading: { title: string; author: string; clock: string; taught: string[] }[];
+  reading: { title: string; author: string; clock: string; taught: string[]; used?: { w: string; n: number; mostly: string }[] }[];
 }
 
 export function fmtClock(hour: number): string {
@@ -70,11 +70,19 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     signatureWord,
     reading: w.readingList.map((r) => {
       const b = BOOK_BY_ID.get(r.bookId);
+      const entries = b?.pack ? packEntries(b.pack) : [];
+      const used = entries
+        .map((e) => ({ w: e.w, u: w.wordUse[e.w] }))
+        .filter((x): x is { w: string; u: { n: number; at: Record<string, number> } } => !!x.u)
+        .sort((a, b2) => b2.u.n - a.u.n)
+        .slice(0, 3)
+        .map((x) => ({ w: x.w, n: x.u.n, mostly: Object.entries(x.u.at).sort((a, b2) => b2[1] - a[1])[0]?.[0] ?? "" }));
       return {
         title: b?.title ?? r.bookId,
         author: b?.author ?? "",
         clock: fmtClock(9 + r.tick / 14400),
-        taught: b?.pack ? tasteOfPack(packEntries(b.pack), w.seed + r.bookId) : [],
+        taught: used.length >= 2 ? used.map((x) => x.w) : b?.pack ? tasteOfPack(entries, w.seed + r.bookId) : [],
+        used,
       };
     }),
   };

@@ -25,6 +25,9 @@ export interface Utterance {
   ruleId: string;
   /** The sheep being addressed, if any, so it can react. */
   sheepId?: number;
+  /** Lexicon words used, and who they were aimed at. */
+  used?: string[];
+  targetLabel?: string;
 }
 
 const packs = [...CORE_PACKS, ...PACKS_5_8, ...PACKS_9_12].filter((p) => p.reviewedAt);
@@ -130,7 +133,11 @@ export function speakForEvent(w: WorldState, map: GameMap, e: WorldEvent, recent
   ctx.heat = Math.max(0, Math.min(1, ctx.heat + (bump[ev] ?? 0)));
   const r = grammar.generate(ev, ctx, e.sheepId) ?? (ev === "rant" ? grammar.generate("idle", ctx, e.sheepId) : null);
   if (!r) return null;
-  return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
+  return { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId, used: r.used, targetLabel: targetLabel(ctx) };
+}
+
+function targetLabel(ctx: Context): string {
+  return ctx.target.name ?? (ctx.target.kind === "sheep" ? "the sheep" : ctx.target.kind === "terrain" ? `the ${ctx.target.noun}` : ctx.target.kind === "day" ? "the day" : ctx.target.kind === "curse" ? "the Curse" : ctx.target.noun);
 }
 
 export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap: Band = 4): Utterance | null {
@@ -142,7 +149,7 @@ export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap
   else if (u > 0.92 && w.stats.flees >= 2 && w.stats.rains >= 1 && w.stats.shames >= 1) ev = "callback";
   const r = grammar.generate(ev, ctx) ?? grammar.generate("idle", ctx);
   if (!r) return null;
-  const out: Utterance = { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };
+  const out: Utterance = { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId, used: r.used, targetLabel: targetLabel(ctx) };
   if (ctx.target.kind === "sheep" && w.herder.targetSheep >= 0) out.sheepId = w.herder.targetSheep;
   return out;
 }
@@ -155,7 +162,7 @@ export function speakEpitaph(w: WorldState, map: GameMap, recent: string[], band
   const opts = { minTier: Math.max(0, ctx.level - 1) };
   let r = grammar.generate("epitaph", ctx, 0, opts);
   for (let salt = 1; (!r || r.text.length > 110) && salt < 12; salt++) r = grammar.generate("epitaph", ctx, salt, opts);
-  if (!r || r.text.length > 110) r = { text: "Sheep.", ruleId: "fallback", tier: 0 };
+  if (!r || r.text.length > 110) r = { text: "Sheep.", ruleId: "fallback", tier: 0, used: [] };
   return { text: r.text, heat: 1, seconds: 30, ruleId: r.ruleId };
 }
 

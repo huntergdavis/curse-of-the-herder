@@ -10,6 +10,8 @@ export interface GenerateResult {
   text: string;
   ruleId: string;
   tier: number;
+  /** Lexicon words that went into the line (for usage tallies). */
+  used: string[];
 }
 
 const POS_SET = new Set<Pos>(["noun", "insult", "adj", "interj", "oath", "swear", "intensifier", "simile", "verb", "bodypart", "abstract", "pantheon", "threat", "adverb"]);
@@ -100,6 +102,7 @@ export class Grammar {
     if (candidates.length === 0) return null;
     for (let attempt = 0; attempt < 6; attempt++) {
       const rule = this.pickRule(candidates, ctx, rnd);
+      this.usedThisLine = [];
       const raw = this.expand(rule.template, ctx, rnd, 0, 4);
       if (raw === null) continue;
       let text = tidySentence(raw);
@@ -112,10 +115,12 @@ export class Grammar {
         console.error("Curse of the Herder: banned word reached the generator; rule", rule.id);
         continue;
       }
-      return { text, ruleId: rule.id, tier: rule.tier };
+      return { text, ruleId: rule.id, tier: rule.tier, used: [...new Set(this.usedThisLine)] };
     }
     return null;
   }
+
+  private usedThisLine: string[] = [];
 
   private ruleAllowed(r: Rule, ctx: Context): boolean {
     const minLevel = r.minLevel ?? r.tier;
@@ -179,6 +184,7 @@ export class Grammar {
       if (pool.length === 0) return null;
       const weights = pool.map((e) => this.entryWeight(e, ctx));
       const e = pool[pickIndex(weights, rnd)]!;
+      this.usedThisLine.push(e.w);
       return { text: e.w, entry: e };
     }
     return null;
