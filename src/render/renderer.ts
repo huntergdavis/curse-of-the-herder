@@ -667,6 +667,53 @@ export class Renderer {
       ctx.stroke();
     }
 
+    // Seasonal touches: snowmen by the wells in winter, drifting leaves in autumn.
+    if (this.season === "winter") {
+      for (const v of this.map.villages) {
+        if (Math.abs(v.x - cam.x) * T > W / 2 + T * 3 || Math.abs(v.y - cam.y) * T > H / 2 + T * 3) continue;
+        const px = sx(v.x - 1 + 0.5);
+        const py = sy(v.y + 1 + 0.9);
+        ctx.fillStyle = "#f4f6f8";
+        ctx.strokeStyle = "#2b2620";
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        for (const [r, dy] of [[0.28, 0], [0.2, 0.42], [0.14, 0.72]] as const) {
+          ctx.beginPath();
+          ctx.arc(px, py - T * dy, T * r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#e0782b";
+        ctx.beginPath();
+        ctx.moveTo(px + T * 0.06, py - T * 0.72);
+        ctx.lineTo(px + T * 0.3, py - T * 0.7);
+        ctx.lineTo(px + T * 0.06, py - T * 0.66);
+        ctx.fill();
+        ctx.fillStyle = "#2b2620";
+        ctx.beginPath();
+        ctx.arc(px - T * 0.04, py - T * 0.76, T * 0.02, 0, Math.PI * 2);
+        ctx.arc(px + T * 0.02, py - T * 0.77, T * 0.02, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(px - T * 0.16, py - T * 0.92, T * 0.32, T * 0.05);
+        ctx.fillRect(px - T * 0.1, py - T * 1.12, T * 0.2, T * 0.22);
+      }
+    }
+    if (this.season === "autumn" && !this.reducedMotion && !isWindy(world)) {
+      const cols = ["rgba(217, 130, 43, 0.8)", "rgba(201, 80, 47, 0.8)", "rgba(224, 179, 60, 0.8)"];
+      for (let i = 0; i < 10; i++) {
+        const t = ((nowMs / 9000) + i * 0.1) % 1;
+        const x = (((i * 7919) % 1000) / 1000) * W + Math.sin(t * Math.PI * 4 + i) * T * 0.8;
+        const y = t * (H + T) - T * 0.5;
+        ctx.fillStyle = cols[i % 3]!;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(t * 12 + i);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, T * 0.08, T * 0.04, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
@@ -691,6 +738,12 @@ export class Renderer {
       const pose = s.mode === "penned" ? (world.finished ? "asleep" : grazing ? "graze" : "idle") : moving ? "walk" : s.temper === "dozy" && s.mode === "loose" ? "asleep" : grazing && !s.absurd ? "graze" : "idle";
       const facing = moving ? (s.tx < s.x ? 2 : 0) : s.x < h.x ? 0 : 2;
       const walkPhase = moving && s.speed > 2 ? (nowMs / 160) % 1 : (nowMs / 500 + s.id * 0.13) % 1;
+      // Spring: some sheep have a lamb at heel.
+      if (this.season === "spring" && s.id % 5 === 0 && s.mode !== "carried") {
+        const lx = sx(s.x + 0.5) - T * 0.45;
+        const ly = sy(s.y + 0.5) + T * 0.12 + (s.mode === "loose" ? Math.abs(Math.sin(nowMs / 250 + s.id)) * -T * 0.06 : 0);
+        drawSheep(ctx, lx, ly, T * 0.45, s.mode === "penned" && world.finished ? "asleep" : "idle", s.x < h.x ? 0 : 2, (nowMs / 500) % 1, false);
+      }
       // A newly penned sheep hops for a second; its neighbours in the pen cheer.
       const arrival = this.arrivals.find((a) => a.id === s.id && nowMs - a.atMs < 1200);
       const hopY = arrival ? -Math.abs(Math.sin(((nowMs - arrival.atMs) / 1200) * Math.PI * 3)) * T * 0.25 : 0;
@@ -707,7 +760,8 @@ export class Renderer {
           ctx.stroke();
         }
       }
-      drawSheep(ctx, sx(s.x + 0.5), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5)) + hopY, T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
+      const huddle = this.season === "winter" && s.mode === "penned" ? 0.3 : 0;
+      drawSheep(ctx, sx(s.x + 0.5 + (this.map.pen.x - s.x) * huddle), sy(s.y + (s.onRoof ? 0.12 : s.inRiver ? 0.6 : s.onBoulder && s.mode === "loose" ? 0.25 : 0.5) + (this.map.pen.y - s.y) * huddle) + hopY, T * (s.onRoof ? 0.75 : s.inRiver ? 0.8 : 0.9), s.inRiver && s.mode === "loose" ? "asleep" : pose, facing, walkPhase, s.named, s.flees >= 3, !!s.black);
       if (s.named && s.mode === "loose" && T >= 32) {
         ctx.font = `${Math.max(9, T * 0.2)}px "Fredoka", sans-serif`;
         ctx.textAlign = "center";
@@ -734,6 +788,8 @@ export class Renderer {
     }
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
+    // Summer afternoons: a "phew" now and then.
+    if (this.season === "summer" && hourNow > 12 && hourNow < 16 && Math.floor(nowMs / 1000) % 23 === 5) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "phew");
     // Whistling while he works, when the day has not yet got to him.
     if (walkingHerder(world) && world.frustration < 18 && Math.floor(nowMs / 1000) % 11 < 3) drawEmote(ctx, sx(h.x + 0.5) + T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "♪");
 
