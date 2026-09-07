@@ -128,6 +128,11 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   repository.setActiveId(world.id);
+  // A fresh herder says his first words of the day.
+  if (world.tick === 0 && world.events[0]) {
+    const u = speakForEvent(world, map, world.events[0], [], BAND_CAP);
+    if (u) window.setTimeout(() => session && say(session, u.text, u.heat, u.seconds + 2, performance.now(), true, u), 600);
+  }
   // The previous herder's stone stands by the pen.
   const hall = await repository.hall();
   const prev = hall.find((r) => r.seed !== world.seed);

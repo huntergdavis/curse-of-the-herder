@@ -82,8 +82,22 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // First words of the day, said at the pen with the whole thing ahead of him.
+  ...R(0, "dawn", ["Right. Sheep.", "Morning. Sheep. Again.", "#interj.cap#. Day.", "Sixty. #interj.cap#.", "Up. Sheep. Go."]),
+  ...R(2, "dawn", [
+    "Sixty sheep. One me. One #dog#, who is asleep. Right.",
+    "Good morning, pasture. I see you have scattered my sheep again. Thank you.",
+    "A new day. The same sheep. The same hill. A different hat, at least. No. Same hat.",
+    "#dog.cap#, we are going to work. #dog.cap#… I am going to work.",
+  ]),
+  ...R(4, "dawn", [
+    "#pantheon.cap#, grant me sixty sheep that walk in straight lines. No? Fine. Grant me boots that hold.",
+    "#oath.cap#. Morning. The Curse has laid the table and I am the meal.",
+  ]),
+  ...R(8, "dawn", ["It was morning. There were sixty sheep. There was one of me. That was the arithmetic and it did not change."], { reg: ["hemingway"] }),
+  ...R(12, "dawn", ["Day one thousand, or day one. The sheep do not keep count, and neither, any more, do I. Sixty. Go."]),
   // The dog. He has a dog. The dog has never once helped.
-  ...R(1, "idle", ["#dog.cap#. Help. #dog.cap#!", "Good dog, #dog#. Useless dog.", "#dog.cap#. Sheep. That way. ...No.", "Sit, #dog#. Good. That is all you do."], { weight: 0.6 }),
+  ...R(1, "idle", ["#dog.cap#. Help. #dog.cap#!", "Good dog, #dog#. Useless dog.", "#dog.cap#. Sheep. That way… No.", "Sit, #dog#. Good. That is all you do."], { weight: 0.6 }),
   ...R(3, "idle", [
     "#dog.cap# has the eyes of a working dog and the schedule of a cat.",
     "Somewhere there is a dog that herds sheep. I have #dog#, who herds shade.",
@@ -95,10 +109,10 @@ export const CALLBACK_RULES: Rule[] = [
     "#dog.cap#, that is a sheep. No, THAT. The white one. All of them are white. Never mind.",
     "The dog is supervising. The dog is very good at supervising.",
     "I have a sheepdog. His name is #dog#. Look at him. LOOK at him.",
-    "#dog.cap#, fetch the sheep. #dog.cap#. #dog.cap#. ...Fine. Fetch nothing. You are good at that.",
+    "#dog.cap#, fetch the sheep. #dog.cap#. #dog.cap#… Fine. Fetch nothing. You are good at that.",
     "The dog has lain down. The dog has read the situation correctly.",
   ]),
-  ...R(2, "flee", ["#dog.cap#! After it! ...No. Of course not."]),
+  ...R(2, "flee", ["#dog.cap#! After it!… No. Of course not."]),
   ...R(4, "idle", [
     "#oath.cap#, #dog#, you are a sheepdog. It is in the name. Both halves of the name.",
     "#pantheon.cap#, I have a dog who herds nothing and a flock that herds itself away from me.",

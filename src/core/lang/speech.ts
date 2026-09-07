@@ -124,6 +124,7 @@ const EVENT_MAP: Partial<Record<WorldEvent["kind"], RuleEvent>> = {
   fog: "fog",
   gaze: "gaze",
   mishap: "idle",
+  started: "dawn",
 };
 
 function holdSeconds(text: string, heat: number): number {
