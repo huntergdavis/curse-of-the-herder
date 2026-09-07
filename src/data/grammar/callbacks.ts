@@ -82,6 +82,14 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // The kitchen register.
+  ...R(5, "idle", [
+    "You #adj# #insult#, you would not pass at a wake.",
+    "If I served you, #vocative#, they would send you back. They would send ME back.",
+    "This #target# is #adj# as #simile#, and I have eaten worse, and I did not enjoy that either.",
+    "Consider the sheep: #adj#, #adj#, and best avoided after eight.",
+  ], { reg: ["culinary"] }),
+  ...R(5, "caught", ["Got you, you #adj# #insult#. You will not improve with cooking."], { reg: ["culinary"] }),
   // A sheep on a boulder. A black sheep. Counting.
   ...R(0, "boulder", ["Rock. Sheep. On.", "Boulder. Why.", "#oath.cap#. Up there."]),
   ...R(2, "boulder", ["You are on a boulder. You have no thumbs. Explain.", "A sheep on a rock, posing. Get down. You are not a monument.", "That boulder has been there since the ice. You have been on it since breakfast. Neither of you is leaving without me."]),

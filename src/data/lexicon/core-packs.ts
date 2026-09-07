@@ -217,4 +217,27 @@ export const stingers: LexPack = {
   ],
 };
 
-export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord];
+/** Kitchen abuse, from a book found on the road. */
+export const culinary: LexPack = {
+  id: "culinary",
+  title: "The Cook's Oracle",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 5,
+  entries: [
+    ins("suet pudding", { reg: ["culinary"] }), ins("lump of cold gristle", { reg: ["culinary"] }), ins("dripping-pot", { reg: ["culinary"] }), ins("burnt crust", { reg: ["culinary"] }),
+    ins("boiled cabbage", { reg: ["culinary"] }), ins("cold porridge", { reg: ["culinary"] }), ins("week-old loaf", { reg: ["culinary"] }), ins("dumpling", { reg: ["culinary"] }),
+    ins("rind", { reg: ["culinary"] }), ins("gizzard", { reg: ["culinary"] }), ins("tripe", { reg: ["culinary"], pl: "-" }), ins("offal", { reg: ["culinary"], pl: "-" }),
+    ins("stale bun", { reg: ["culinary"] }), ins("wet biscuit", { reg: ["culinary"] }), ins("failed soufflé", { reg: ["culinary"] }), ins("mutton chop", { reg: ["culinary"] }),
+    ins("bag of giblets", { reg: ["culinary"] }), ins("jellied eel", { reg: ["culinary"] }), ins("burnt sausage", { reg: ["culinary"] }), ins("pickled egg", { reg: ["culinary"] }),
+    adj("stodgy", { reg: ["culinary"] }), adj("lardy", { reg: ["culinary"] }), adj("overboiled", { reg: ["culinary"] }), adj("curdled", { reg: ["culinary"] }),
+    adj("rancid", { reg: ["culinary"] }), adj("gristly", { reg: ["culinary"] }), adj("underdone", { reg: ["culinary"] }), adj("lumpy", { reg: ["culinary"] }),
+    adj("half-chewed", { reg: ["culinary"] }), adj("greasy", { reg: ["culinary"] }), adj("congealed", { reg: ["culinary"] }), adj("tepid", { reg: ["culinary"] }),
+    adj("gone off", { reg: ["culinary"] }), adj("stale", { reg: ["culinary"] }), adj("indigestible", { reg: ["culinary"] }), adj("unseasoned", { reg: ["culinary"] }),
+    sim("a stew nobody stirred"), sim("gravy that has given up"), sim("a pudding left on the sill"), sim("a boiled egg with a grudge"), sim("dripping on a cold plate"),
+    threat("boil you slowly and season you badly"), threat("serve you at a wedding nobody attends"), threat("put you in a pie and label it turnip"),
+    n("gruel", { pl: "-" }), n("suet", { pl: "-" }), n("dripping", { pl: "-" }), n("gristle", { pl: "-" }), n("lard", { pl: "-" }),
+  ],
+};
+
+export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord, culinary];

@@ -559,10 +559,10 @@ function stepHerder(w: WorldState, map: GameMap): void {
           w.stats.absurds++;
           addFrustration(w, FRUSTRATION.absurdLocation);
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
-        } else if (s.temper === "dozy") {
-          pushEvent(w, { tick: w.tick, kind: "dozy", sheepId: s.id });
         } else if (s.black) {
           pushEvent(w, { tick: w.tick, kind: "black", sheepId: s.id });
+        } else if (s.temper === "dozy") {
+          pushEvent(w, { tick: w.tick, kind: "dozy", sheepId: s.id });
         } else {
           pushEvent(w, { tick: w.tick, kind: "caught", sheepId: s.id });
         }

@@ -94,6 +94,14 @@ export const BOOKS: Book[] = [
     excerpts: ["...you ninny lobcocks, you gaping changelings, you codsheads, you loggerheads, you noddy-peaks, you bloated wind-bags...", "He that hath patience may compass anything. (Rabelais did not herd sheep.)", "The appetite grows by eating. So does the list.", "A list of nine insults is a list of nine insults. Rabelais would have made it forty."],
   },
   {
+    id: "cooks-oracle", title: "The Cook's Oracle", author: "William Kitchiner, 1817 (spirit of)", pack: "culinary", register: "culinary", when: 0.47, colour: "#a0522d",
+    excerpts: ["A pudding boiled too long is a pudding with regrets. So is a herder.", "Gristle: that which the cook forgot and the guest remembers. See also: sheep.", "Never serve a thing tepid. Anger, soup, or sheep.", "The secret of good gravy is patience, which I have used up on the sheep."],
+  },
+  {
+    id: "geology", title: "Principles of Geology", author: "after Charles Lyell, 1830 (original excerpts)", pack: "baroque-latinate", register: "baroque", when: 0.66, colour: "#6e6a60",
+    excerpts: ["The present is the key to the past. The hill was here yesterday. It will be here tomorrow. So, I fear, will the sheep.", "Sedimentary: laid down in layers. Like mud on a boot.", "Igneous rock is born of fire. So is my opinion of this boulder.", "Erosion: the slow wearing-away of the land by wind and water. See also: herders."],
+  },
+  {
     id: "burns", title: "Poems, Chiefly in the Scottish Dialect", author: "Robert Burns, 1786 (genuine lines)", pack: "yiddish-scots-aussie", register: "sco", when: 0.75, colour: "#3b5b8c",
     excerpts: ["Wee, sleekit, cow'rin, tim'rous beastie, / O, what a panic's in thy breastie! (To a Mouse)", "The best-laid schemes o' mice an' men / Gang aft agley. (To a Mouse. Also: of herders and sheep.)", "O wad some Pow'r the giftie gie us / To see oursels as ithers see us! (To a Louse)", "Nae man can tether time or tide. (Tam o' Shanter. Nor sheep.)"],
   },
