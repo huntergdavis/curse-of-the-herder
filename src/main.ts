@@ -337,7 +337,7 @@ function handleEvents(s: Session, nowMs: number): void {
       }
     }
     if (e.kind === "finished") onFinished(s);
-    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || (e.kind === "mishap" && e.detail === "crook")) {
+    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || (e.kind === "mishap" && e.detail === "crook")) {
       maybeCurseRemarks(s, e.kind === "mishap" ? "crook" : e.kind, nowMs);
     }
   }
@@ -417,6 +417,7 @@ const CURSE_LINES: Record<string, string[]> = {
   rant: ["Noted.", "The Curse has heard this one before. In 1487.", "Shouting is permitted. It is not, historically, effective.", "The sky is not a party to your arrangement. I am."],
   jailbreak: ["The Curse did not do that. The Curse admires it.", "Sixty is a courtesy figure.", "Fences are a suggestion. I thought you knew."],
   milestone: ["Halfway is a word. It has never once been a place.", "You are counting. I find that touching.", "One left. You will remember this one. You always do."],
+  streak: ["Enjoy it.", "Five. The Curse is generous in small amounts.", "I did that. You are welcome. It ends now."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
   book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],

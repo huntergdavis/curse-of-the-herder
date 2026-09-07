@@ -97,6 +97,26 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "idle", ["Spring. Everything is growing, including the distance between me and the sheep.", "Lambs, somewhere, are being sweet. These are not lambs. These are opinions with wool.", "The flowers are out. The sheep are eating them. Nature is a circle and I am walking round it."], { season: "spring", weight: 0.7 }),
   ...R(2, "idle", ["Summer. The sun is a cowpat in the sky and I am the boot.", "Hot. The sheep are wearing wool in this. By choice. I have questions.", "Midsummer, and the sheep have found the one patch of shade and are not sharing."], { season: "summer", weight: 0.7 }),
   ...R(4, "idle", ["#oath.cap#, the heat! I am a stew and the sheep are the dumplings and none of us asked to be lunch."], { season: "summer", weight: 0.7 }),
+  // A streak of luck, which he does not trust for one second.
+  ...R(0, "streak", ["Five. In a row. Hm.", "Easy. Too easy.", "Suspicious."]),
+  ...R(2, "streak", ["Five in a row. Something is wrong. I can feel it in my #bodypart#.", "That is five without a single one running. I do not like it. This is how the bad ones start.", "Five sheep, no trouble. #dog.cap#, are you seeing this? #dog.cap#. You are asleep. Of course."]),
+  ...R(4, "streak", ["#pantheon.cap#, five in a row. I know what this is. This is the quiet before the sheep.", "Eight. EIGHT in a row. I am not going to say anything. I am not going to say ANYTHING. …Eight."]),
+  ...R(8, "streak", ["Five went in and none of them ran. I did not trust it. I was right not to."], { reg: ["hemingway"] }),
+  ...R(12, "streak", ["A run of luck, O Curse, is your favourite joke, and I have laughed at it every time, and I am laughing now, and I hate you."]),
+  // The library hands him a book he has already read.
+  ...R(0, "reread", ["Read it. Reading again.", "Same book. Fine.", "Hm. This one."]),
+  ...R(2, "reread", ["I have read this one. I am going to read it again, because the alternative is the sheep.", "This book again. It was wrong the first time. Let us see if it has improved.", "Somebody keeps putting this book in the box. I suspect the sheep."]),
+  ...R(4, "reread", ["#pantheon.cap#, the same book. The valley has one book and passes it round like a cold.", "Again? Fine. A man may reread. A sheep cannot even read once."]),
+  ...R(8, "reread", ["I had read it. I read it again. It said the same things. So did the sheep."], { reg: ["hemingway"] }),
+  // Weather lifting.
+  ...R(0, "rainStops", ["Rain gone. Wet stays.", "Stopped. Good.", "Dry. Ish."]),
+  ...R(2, "rainStops", ["The rain has stopped. It will be back. It has my address.", "Dry, at last, apart from every part of me.", "The rain has gone to bother someone else. Good. Take the sheep with you."]),
+  ...R(4, "rainStops", ["#pantheon.cap#, the rain has stopped, and there is a rainbow, and the sheep are looking at ME as if I arranged it."]),
+  ...R(8, "rainStops", ["The rain stopped. The wet did not. That is how it is with rain."], { reg: ["hemingway"] }),
+  ...R(2, "fogLifts", ["The fog has lifted. Oh good. Now I can see how far away they are.", "Fog gone. There they are. All of them. Everywhere I am not."]),
+  ...R(4, "fogLifts", ["#oath.cap#, the fog lifts, and the view is sixty small disappointments on a hill."]),
+  ...R(2, "windDrops", ["The wind has dropped. My hat and I would like an apology.", "Still, at last. The sheep are still too. That is the only time they are."]),
+  ...R(4, "windDrops", ["#pantheon.cap#, the wind has gone, and taken nothing I will miss, except my hat, twice."]),
   // The wind has the hat.
   ...R(0, "hat", ["Hat! HAT!", "My hat. Wind. HAT.", "#oath.cap#! Hat!"]),
   ...R(2, "hat", ["My hat! Come back! You are the only thing that has stayed on all day!", "The wind has my hat. The wind does not need a hat. The wind has never needed anything.", "That is my hat. That WAS my hat. It is the wind's hat now, and the wind is welcome to it, and I want it back."]),

@@ -43,6 +43,7 @@ function startMishap(w: WorldState, kind: string, anger: number, ticks: number, 
   const h = w.herder;
   w.lastMishapTick = w.tick;
   w.stats.mishaps = (w.stats.mishaps ?? 0) + 1;
+  w.streak = 0;
   addFrustration(w, anger);
   h.rantReturnMode = h.mode === "mishap" ? h.rantReturnMode : h.mode;
   h.mode = "mishap";
@@ -305,6 +306,7 @@ function startReading(w: WorldState, libIndex: number): void {
   const h = w.herder;
   const lib = w.libraries[libIndex]!;
   lib.bookId = nextBookId(w);
+  if (w.readingList.some((r) => r.bookId === lib.bookId)) pushEvent(w, { tick: w.tick, kind: "reread", sheepId: -1, bookId: lib.bookId });
   const len = READ_TICKS_MIN + Math.floor(keyedUnit(w.seed, "read-len", libIndex) * (READ_TICKS_MAX - READ_TICKS_MIN));
   w.reading = { bookId: lib.bookId, startTick: w.tick, untilTick: w.tick + len };
   h.mode = "reading";
@@ -543,6 +545,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
       if (s.flees < MAX_FLEES && keyedUnit(w.seed, "flee", s.id, s.flees, w.tick) < s.skittish * 0.5 * hourFactor) {
         s.flees++;
         w.stats.flees++;
+        w.streak = 0;
         fleeTo(w, map, s);
         if (s.flees >= 2) {
           addFrustration(w, FRUSTRATION.repeatEscape);
@@ -625,6 +628,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
         s.ty = s.y;
         w.sheepPenned++;
         pushEvent(w, { tick: w.tick, kind: "penned", sheepId: s.id });
+        w.streak = s.absurd ? 0 : w.streak + 1;
+        if (w.streak === 5 || w.streak === 8) pushEvent(w, { tick: w.tick, kind: "streak", sheepId: -1, detail: String(w.streak) });
         if (w.sheepPenned === Math.floor(w.sheep.length / 2)) pushEvent(w, { tick: w.tick, kind: "milestone", sheepId: -1, detail: "halfway" });
         else if (w.sheepPenned === w.sheep.length - 10) pushEvent(w, { tick: w.tick, kind: "milestone", sheepId: -1, detail: "tentogo" });
         else if (w.sheepPenned === w.sheep.length - 1) pushEvent(w, { tick: w.tick, kind: "milestone", sheepId: -1, detail: "lastone" });

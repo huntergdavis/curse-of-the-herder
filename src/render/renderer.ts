@@ -30,7 +30,7 @@ export class Renderer {
 
   private houses: { x: number; y: number }[] = [];
   /** Villagers stand by their wells; each remembers when it last heard something. */
-  private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string }[] = [];
+  private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }[] = [];
 
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
@@ -51,7 +51,7 @@ export class Renderer {
     for (let i = 0; i < n * n; i++) {
       const d = this.map.deco[i];
       if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
-      if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3 });
+      if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3, offences: 0 });
     }
   }
 
@@ -63,7 +63,9 @@ export class Renderer {
     for (const v of this.villagers) {
       if (Math.hypot(v.x - x, v.y - y) < 11) {
         v.shockedUntil = nowMs + 2600;
-        v.line = Renderer.VILLAGER_LINES[(v.x * 7 + v.y * 13 + Math.floor(nowMs / 1000)) % Renderer.VILLAGER_LINES.length] ?? "Language!";
+        v.offences++;
+        // After the third time they fetch the broom.
+        v.line = v.offences >= 3 ? (["OUT!", "Not here!", "I have a broom!", "Take it to the hill!"][v.offences % 4] ?? "OUT!") : Renderer.VILLAGER_LINES[(v.x * 7 + v.y * 13 + Math.floor(nowMs / 1000)) % Renderer.VILLAGER_LINES.length] ?? "Language!";
       }
     }
   }
@@ -149,7 +151,7 @@ export class Renderer {
     else if (beat === 21 || beat === 22) drawEmote(ctx, px + T * 0.5, py - T * 0.75, T * 0.9, Renderer.DOG_THOUGHTS[Math.floor(nowMs / 29000) % Renderer.DOG_THOUGHTS.length] ?? "hm.");
   }
 
-  private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number; line?: string }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
+  private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
     const ctx = this.ctx;
     const px = sx(v.x + 0.5);
     const py = sy(v.y + 0.95);
@@ -176,7 +178,31 @@ export class Renderer {
     ctx.strokeStyle = "#e8b98a";
     ctx.lineWidth = Math.max(2, T * 0.07);
     ctx.beginPath();
-    if (shocked) {
+    if (shocked && v.offences >= 3) {
+      // Broom raised and shaken.
+      const shake = Math.sin(nowMs / 90) * T * 0.06;
+      ctx.moveTo(px - T * 0.16, py - T * 0.55 - bob);
+      ctx.lineTo(px - T * 0.22, py - T * 0.35 - bob);
+      ctx.moveTo(px + T * 0.16, py - T * 0.55 - bob);
+      ctx.lineTo(px + T * 0.3 + shake, py - T * 0.9 - bob);
+      ctx.stroke();
+      ctx.strokeStyle = "#8a6238";
+      ctx.lineWidth = Math.max(1.5, T * 0.05);
+      ctx.beginPath();
+      ctx.moveTo(px + T * 0.3 + shake, py - T * 0.55 - bob);
+      ctx.lineTo(px + T * 0.3 + shake, py - T * 1.25 - bob);
+      ctx.stroke();
+      ctx.fillStyle = "#d9b25a";
+      ctx.beginPath();
+      ctx.moveTo(px + T * 0.3 + shake, py - T * 0.55 - bob);
+      ctx.lineTo(px + T * 0.18 + shake, py - T * 0.32 - bob);
+      ctx.lineTo(px + T * 0.42 + shake, py - T * 0.32 - bob);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#e8b98a";
+      ctx.lineWidth = Math.max(2, T * 0.07);
+      ctx.beginPath();
+    } else if (shocked) {
       ctx.moveTo(px - T * 0.14, py - T * 0.5 - bob);
       ctx.lineTo(px - T * 0.03, py - T * 0.7 - bob);
       ctx.moveTo(px + T * 0.14, py - T * 0.5 - bob);
