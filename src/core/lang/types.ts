@@ -91,6 +91,8 @@ export interface Context {
   recent: string[];
   /** Ids of the rules behind recent lines; the caller keeps this so generation stays a pure function of the context. */
   recentRules?: string[];
+  /** Every rule used so far today; slot-free one-liners are held back once said. */
+  rulesToday?: ReadonlySet<string> | undefined;
   /** Words the herder has learned from books, in addition to level-unlocked packs. */
   knownPacks: string[];
   villageName: string;

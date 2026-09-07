@@ -16,7 +16,8 @@ const map = generateMap(seed, { size: 512 });
 const w = createWorld(seed, map, 0);
 const recent: string[] = [];
 const recentRules: string[] = [];
-const mem = { lines: recent, rules: recentRules };
+const rulesToday = new Set<string>();
+const mem = { lines: recent, rules: recentRules, rulesToday };
 let nextIdle = nextIdleCurseTicks(w);
 let seenSeq = w.eventCount - 1;
 const clock = (): string => {
@@ -27,10 +28,11 @@ const lvl = (): string => `L${levelFor(erudition(w.booksRead, w.sheepPenned, hou
 const say = (kind: string, text: string, ruleId?: string): void => {
   console.log(`${clock()} ${lvl()} f${String(Math.round(w.frustration)).padStart(3)} [${kind.padEnd(12)}] ${text}`);
   recent.push(text);
-  if (recent.length > 32) recent.shift();
+  if (recent.length > 120) recent.shift();
   if (ruleId) {
     recentRules.push(ruleId);
-    if (recentRules.length > 12) recentRules.shift();
+    rulesToday.add(ruleId);
+    if (recentRules.length > 40) recentRules.shift();
   }
 };
 console.log(`# ${w.name} — seed ${seed} — ${w.sheep.length} sheep — ${w.libraries.length} libraries`);

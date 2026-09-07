@@ -152,6 +152,8 @@ export class Grammar {
       w *= gap <= 0 ? 3 : gap === 1 ? 2 : gap === 2 ? 1 : gap === 3 ? 0.5 : 0.15;
       if (r.reg && ctx.registers.length && r.reg.some((x) => ctx.registers.includes(x))) w *= 3;
       if (ctx.recentRules?.includes(r.id)) w *= 0.12;
+      // A line with no slots reads the same every time; once is plenty for one day.
+      else if (ctx.rulesToday?.has(r.id)) w *= r.template.includes("#") ? 0.7 : 0.04;
       return w;
     });
     return rules[pickIndex(weights, rnd)]!;

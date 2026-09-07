@@ -71,6 +71,8 @@ function pickTarget(w: WorldState, map: GameMap, e: WorldEvent | null): Context[
 export interface RecentMemory {
   lines: string[];
   rules: string[];
+  /** Rule ids used at any point today. */
+  rulesToday?: Set<string>;
 }
 
 export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, recent: string[] | RecentMemory, bandCap: Band = 4): Context {
@@ -96,6 +98,7 @@ export function buildContext(w: WorldState, map: GameMap, e: WorldEvent | null, 
     booksRead: w.booksRead,
     recent: mem.lines,
     recentRules: mem.rules,
+    rulesToday: mem.rulesToday,
     knownPacks: w.knownPacks,
     villageName: nearest.name,
     stats: w.stats,
