@@ -137,7 +137,7 @@ export function speakIdle(w: WorldState, map: GameMap, recent: string[], bandCap
   let ev: RuleEvent = "idle";
   const u = keyedUnit(w.seed, "idle-kind", w.tick);
   if (hour >= 16.5 && u < 0.3) ev = "dusk";
-  else if (u > 0.92 && (w.stats.flees + w.stats.rains + w.stats.shames + w.stats.absurds) >= 2) ev = "callback";
+  else if (u > 0.92 && w.stats.flees >= 2 && w.stats.rains >= 1 && w.stats.shames >= 1) ev = "callback";
   const r = grammar.generate(ev, ctx) ?? grammar.generate("idle", ctx);
   if (!r) return null;
   const out: Utterance = { text: r.text, heat: ctx.heat, seconds: holdSeconds(r.text, ctx.heat), ruleId: r.ruleId };

@@ -9,6 +9,7 @@ import { BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
 import { makeHallRecord, type HallRecord } from "./core/hall";
 import { catchUpPlan, shouldRecover } from "./runtime/liveness";
+import { startUpdatePolling } from "./update/automatic-update";
 import { Bubbles } from "./render/bubbles";
 import { Camera } from "./render/camera";
 import { Minimap } from "./render/minimap";
@@ -485,6 +486,13 @@ function installQuietMode(): void {
 
 async function boot(): Promise<void> {
   installQuietMode();
+  startUpdatePolling({
+    currentVersion: __APP_VERSION__,
+    versionUrl: `${import.meta.env.BASE_URL}version.json`,
+    beforeReload: async () => {
+      if (session) await repository.save(session.world);
+    },
+  });
   window.addEventListener("resize", () => session?.renderer.resize());
   $("btn-pause").addEventListener("click", () => {
     paused = !paused;

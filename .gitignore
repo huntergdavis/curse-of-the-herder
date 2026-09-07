@@ -5,3 +5,4 @@ test-results/
 *.tsbuildinfo
 .DS_Store
 ._*
+public/version.json

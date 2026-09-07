@@ -62,7 +62,7 @@ export const NON_TERMINALS_5_8: NonTerminal[] = [
     options: [
       { t: "#oath.cap#! #oath.cap#!", weight: 3 },
       { t: "#oath.cap#, #oath#, #oath#!", weight: 2 },
-      { t: "#oath.cap# and, while I am at it, #oath#", weight: 2 },
+      { t: "#oath.cap# and, while I am at it, #oath#.", weight: 2 },
       { t: "#oath.cap#. Also #oath#.", weight: 1 },
     ],
   },
@@ -95,7 +95,7 @@ export const RULES_5_8: Rule[] = [
     "#vocative.cap#, I would call you #insult_np.a# but I have standards, and they are #adj#.", "One could say, #vocative#, that you are #adj#. One would be understating it.",
   ], GROSE),
   ...R(5, "flee", [
-    "Stop, #vocative#, you #insult#, you #insult#, you #intensifier# #insult#!", "#oath.cap#! Come back here #aside# and be caught like a sensible #noun#!",
+    "Stop, #vocative#, you #insult#, you #insult#, you #intensifier# #adj# #insult#!", "#oath.cap#! Come back here #aside# and be caught like a sensible #noun#!",
     "#triad.cap#! Running! From me!", "Where does #insult_np.a# even go, #vocative#? There is nothing over there but #noun#!",
     "Oh, that is #adj#, #vocative#. That is #intensifier# #adj#. Run, then.", "#oath.cap#, the #adj# #insult# has legs after all.",
   ], GROSE),
@@ -168,19 +168,19 @@ export const RULES_5_8: Rule[] = [
 
   // ---------------------------------------------------------------- Tier 7: Polyglot
   ...R(7, "idle", [
-    "#oath.cap#, #clause#.", "#poly_oaths# #clause.cap#.", "You absolute #insult# of a #target#.", "#oath.cap#! You #intensifier# #insult#!",
+    "#oath.cap#, #clause#.", "#poly_oaths# #clause.cap#.", "You absolute #insult# of a #target#.", "#oath.cap#! You #intensifier# #adj# #insult#!",
     "#oath.cap#, #oath#, #oath#. There. Three languages, one #target#.", "#vocative.cap#, you #insult#. You #insult#. You, in a word, #insult#.",
     "I have words in four tongues for you, #vocative#, and the kindest is #insult#.", "#oath.cap#, #clause#, and #oath#, #clause#.",
     "Every language has a word for you, #vocative#. Today's is #insult#.", "#oath.cap#. #interj.cap#. #oath.cap#. I have run out of English.",
     "A #target# like this deserves a foreign oath: #oath#.", "#clause.cap#. #oath.cap#. #clause.cap#. #oath.cap#. It is a rhythm now.",
-    "#vocative.cap#, espèce de #insult#, #clause#.", "Herr #target.cap#, you #intensifier# #insult#, #clause#.",
+    "#vocative.cap#, espèce de #insult#, #clause#.", "Herr #target.cap#, you #intensifier# #adj# #insult#, #clause#.",
     "#oath.cap#! The #target# is #adj#, the sky is #adj#, and I am #adj# in several languages.", "You #insult#, #vocative#. You #adj#, #adj# #insult#. #oath.cap#.",
     "#interj.cap#. #oath.cap#. #remaining.cap# sheep, and no word in any tongue for how #adj# I am.", "#oath.cap#, and I mean that in the original.",
     "Signor #target.cap#, #clause#; #oath#.", "#poly_oaths# That is what I think of this #target#.",
   ], POLY),
   ...R(7, "flee", [
     "#oath.cap#! Come back, you #insult#!", "#poly_oaths# It runs!", "#oath.cap#, #vocative#! Arrêtez! Halt! Stop, you #adj# #insult#!",
-    "Run, you #insult#! I have oaths in four languages and legs in none!", "#oath.cap#! #oath.cap#! You #intensifier# #insult#, stand still!",
+    "Run, you #insult#! I have oaths in four languages and legs in none!", "#oath.cap#! #oath.cap#! You #intensifier# #adj# #insult#, stand still!",
   ], POLY),
   ...R(7, "caught", [
     "#oath.cap#, got you, you #insult#.", "There, you #adj# #insult#. #oath.cap#. Up.", "#poly_oaths# You weigh like #simile#, #vocative#.",
@@ -195,7 +195,7 @@ export const RULES_5_8: Rule[] = [
     "#oath.cap#, a sheep on #noun.a#. I need a word for this and I have several.",
   ], POLY),
   ...R(7, "repeatEscape", [
-    "#oath.cap#, #vocative#! Again! You #intensifier# #insult#!", "#poly_oaths# #vocative.cap#. Of course.", "#vocative.cap#, you #insult#, you #insult#, you #insult#. Twice.",
+    "#oath.cap#, #vocative#! Again! You #intensifier# #adj# #insult#!", "#poly_oaths# #vocative.cap#. Of course.", "#vocative.cap#, you #insult#, you #insult#, you #insult#. Twice.",
     "#oath.cap#, it is #vocative#. Every language I know has a word for you, and they are all #insult#.",
   ], POLY),
   ...R(7, "book", ["#oath.cap#, a book! More words! More languages to be #adj# in!", "A book. #interj.cap#. I shall learn to swear in a fifth tongue.", "Words, #oath#. I collect them like burrs."], POLY),

@@ -72,7 +72,12 @@ export class Grammar {
 
   private entryWeight(e: LexEntry, ctx: Context): number {
     let w = 1;
-    if (e.reg && ctx.registers.length && e.reg.some((r) => ctx.registers.includes(r))) w *= 3;
+    const active = !!e.reg && ctx.registers.length > 0 && e.reg.some((r) => ctx.registers.includes(r));
+    if (active) w *= 3;
+    // Foreign words and rhyme-pack fillers read as broken in ordinary English slots;
+    // keep them mostly for the ten minutes after the book that taught them.
+    if (!active && e.lang && e.lang !== "en") w *= 0.25;
+    if (!active && e.reg?.some((r) => r === "verse" || r.startsWith("rhyme:"))) w *= 0.3;
     if (e.w === ctx.signatureWord) w *= 4;
     // Prefer words from the newest levels a little, so learning shows.
     if (e.level >= ctx.level - 1 && e.level > 0) w *= 1.6;

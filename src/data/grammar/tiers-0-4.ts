@@ -17,7 +17,6 @@ export const NON_TERMINALS: NonTerminal[] = [
       { t: "#insult# of #abstract#", weight: 2, minLevel: 3 },
       { t: "#adj# #insult# of #abstract#", weight: 2, minLevel: 3 },
       { t: "#intensifier# #adj# #insult#", weight: 3, minLevel: 4 },
-      { t: "#intensifier# #insult#", weight: 2, minLevel: 4 },
       { t: "#adj#, #adj#, #adj# #insult#", weight: 1, minLevel: 4 },
       { t: "#intensifier# #adj#, #adj# #insult# of #abstract#", weight: 1, minLevel: 4 },
     ],
