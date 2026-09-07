@@ -151,7 +151,7 @@ export const CALLBACK_RULES: Rule[] = [
   // The law.
   ...R(6, "idle", [
     "Let the record show that the #target#, hereinafter the #insult#, did wilfully and with malice aforethought be #adj.own#.",
-    "The party of the first part, hereinafter The Sheep, is in #abstract# of its duties. The party of the second part, hereinafter Me, is #selfadj#.",
+    "The party of the first part, hereinafter The Sheep, is in #abstract.own# of its duties. The party of the second part, hereinafter Me, is #selfadj#.",
     "Objection! The #target# is leading the witness. The witness is me. I am being led up a hill.",
     "I find the #target# guilty of being #adj#, and sentence it to be carried. By me. Which is also my sentence.",
     "#vocative.cap#, you are hereby served. With what, I have not decided. Something #adj#.",
