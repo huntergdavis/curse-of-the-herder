@@ -103,6 +103,11 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "streak", ["#pantheon.cap#, five in a row. I know what this is. This is the quiet before the sheep.", "Eight. EIGHT in a row. I am not going to say anything. I am not going to say ANYTHING. …Eight."]),
   ...R(8, "streak", ["Five went in and none of them ran. I did not trust it. I was right not to."], { reg: ["hemingway"] }),
   ...R(12, "streak", ["A run of luck, O Curse, is your favourite joke, and I have laughed at it every time, and I am laughing now, and I hate you."]),
+  // The old counting, as his grandfather did it.
+  ...R(1, "penned", ["#yantancount.cap#. Old counting. Grandfather did it. Grandfather also miserable."], { weight: 0.5 }),
+  ...R(2, "penned", ["#yantan.cap#. That is what the old shepherds would have called you, #vocative#. It means #penned#. It also means get IN.", "#yantancount.cap#. That is the old counting. My grandfather did it, and it did not make him any happier either."], { weight: 0.6 }),
+  ...R(3, "penned", ["#yantancount.cap#… and there I lose the old count and the new one both, and you are in, so nobody needs to know.", "#yantan.cap#, they would have said on the fells, and then a word I cannot say near a village, and then #yantan# again because the sheep had moved."], { weight: 0.6 }),
+  ...R(6, "penned", ["#yantan.cap#. The old word for #penned#. Twenty words for counting sheep and none for what the sheep do to a man; the dales had their priorities."], { weight: 0.5 }),
   // The streak ends, as he said it would.
   ...R(0, "streakBroken", ["There. Knew it.", "And… gone.", "Told you. Told ME."]),
   ...R(2, "streakBroken", ["There it is. I KNEW it. Five in a row and then you, #vocative#. You could not let me have six.", "And the luck runs out, like everything else on this hill, downhill and away from me.", "I said it. I said this is how the bad ones start. Nobody listens to me. Least of all me."]),

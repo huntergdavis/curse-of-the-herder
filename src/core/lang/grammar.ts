@@ -345,6 +345,9 @@ function timePhrase(hour: number, rnd: () => number): string {
   return "today";
 }
 
+/** The old Northern sheep-scoring count, one to twenty, as the dales kept it. */
+const YAN_TAN = ["yan", "tan", "tethera", "methera", "pip", "sethera", "lethera", "hovera", "dovera", "dick", "yan-a-dick", "tan-a-dick", "tethera-dick", "methera-dick", "bumfit", "yan-a-bumfit", "tan-a-bumfit", "tethera-bumfit", "methera-bumfit", "jiggit"];
+
 const BIG_NUMBERS = ["ten thousand", "a hundred", "forty", "seven", "a thousand", "twelve", "ninety-nine", "a million", "eleven", "several hundred"];
 
 const NO_STATS = { flees: 0, absurds: 0, shames: 0, rains: 0, breathers: 0, books: 0 };
@@ -370,6 +373,13 @@ function contextSymbol(symbol: string, ctx: Context, rnd: () => number): string 
       return numberWord(ctx.sheepRemaining);
     case "penned":
       return numberWord(ctx.sheepPenned);
+    case "yantan":
+      return YAN_TAN[Math.min(YAN_TAN.length, Math.max(1, ctx.sheepPenned)) - 1]!;
+    case "yantancount": {
+      const n = Math.max(1, ctx.sheepPenned);
+      const words = YAN_TAN.slice(0, Math.min(n, 6));
+      return words.join(", ") + (n > 6 ? "…" : "");
+    }
     case "nth":
       return ordinalWord(Math.max(1, ctx.sheepPenned));
     case "books":
