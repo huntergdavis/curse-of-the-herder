@@ -392,7 +392,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
   if (h.mode === "resting") {
     // Halfway through lunch, a loose sheep within reach helps itself. The cheese does not survive.
     if (w.lunchTick !== undefined && w.lunchStolenTick === undefined && w.tick === w.lunchTick + 70 && keyedUnit(w.seed, "lunch-thief") < 0.75) {
-      const thief = w.sheep.find((s) => s.mode === "loose" && !s.absurd && Math.hypot(s.x - h.x, s.y - h.y) < 8);
+      // The nearest loose sheep has, it turns out, been closer than he thought.
+      const thief = w.sheep.filter((s) => s.mode === "loose" && !s.absurd).sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y))[0];
       const dx = [1, -1].find((d) => isWalkable(tileAt(map, Math.round(h.x) + d, Math.round(h.y))));
       if (thief && dx !== undefined) {
         thief.x = Math.round(h.x) + dx;
