@@ -212,7 +212,7 @@ async function startSession(world: WorldState): Promise<void> {
     window.setTimeout(() => {
       const cx = Math.round(w.herder.x);
       const ahead = w.herder.facing === 2 ? -1 : 1;
-      w.rival = { x: cx + ahead * 6, y: Math.round(w.herder.y) + 2, dx: -ahead * 0.16, ticksLeft: 138 };
+      w.rival = { x: cx + ahead * 4, y: Math.round(w.herder.y) + 2, dx: -ahead * 0.16, ticksLeft: 138 };
       // ?rival=3 makes this his third pass, so Also Prudence bolts partway across.
       const nth = Number(params.get("rival"));
       if (nth > 1) w.rivalsSeen = nth - 1;
