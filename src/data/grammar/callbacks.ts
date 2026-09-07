@@ -135,7 +135,7 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(5, "idle", [
     "You #adj# #insult#, you would not pass at a wake.",
     "If I served you, #vocative#, they would send you back. They would send ME back.",
-    "This #target# is #adj# as #simile#, and I have eaten worse, and I did not enjoy that either.",
+    "This #target# is as #adj# as #simile#, and I have eaten worse, and I did not enjoy that either.",
     "Consider the sheep: #adj#, #adj#, and best avoided after eight.",
     "Sheep: #adj#, #adj#, and impossible to season.",
     "I have carried #penned# of you and not one was fit for the table. Or the field. Or anywhere.",

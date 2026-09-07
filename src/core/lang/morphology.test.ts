@@ -17,6 +17,9 @@ describe("morphology", () => {
     expect(pluralize("bush")).toBe("bushes");
     expect(pluralize("wet blanket")).toBe("wet blankets");
     expect(pluralize("typhoons")).toBe("typhoons");
+    expect(pluralize("mushroom with legs")).toBe("mushrooms with legs");
+    expect(pluralize("truffle nobody wanted")).toBe("truffles nobody wanted");
+    expect(pluralize("party of the first part")).toBe("parties of the first part");
     expect(pluralize("boss")).toBe("bosses");
     expect(pluralize("bus")).toBe("buses");
   });

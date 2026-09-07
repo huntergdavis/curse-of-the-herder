@@ -103,7 +103,7 @@ export const BOOKS: Book[] = [
   },
   {
     id: "blacks-law", title: "Black's Law Dictionary", author: "1st edition, 1891 (spirit of)", pack: "legal", register: "legal", when: 0.52, colour: "#2b2b2b",
-    excerpts: ["ESTRAY. A wandering animal whose owner is unknown. The owner is known. The owner is me.", "NUISANCE. That which annoyeth. See: sheep, all.", "The party of the first part (hereinafter The Sheep) shall be carried by the party of the second part (hereinafter The Idiot).", "OBJECTION. Overruled. The hill is not a party to these proceedings and yet."],
+    excerpts: ["ESTRAY. A wandering animal whose owner is unknown. The owner is known. The owner is me.", "NUISANCE. That which annoyeth. See: sheep, all.", "The party of the first part (hereinafter The Sheep) shall be carried by the party of the second part (hereinafter The Herder), who did not read the contract.", "OBJECTION. Overruled. The hill is not a party to these proceedings and yet."],
   },
   {
     id: "knitting", title: "A Treatise on Knitting", author: "a Lady, 1840 (spirit of)", pack: "knitting", register: "knitting", when: 0.28, colour: "#c97c9c",

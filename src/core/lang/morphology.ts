@@ -55,11 +55,16 @@ const IRREGULAR_PLURALS: Record<string, string> = {
 export function pluralize(word: string, override?: string): string {
   if (override === "-") return word;
   if (override) return override;
-  // Pluralise only the head of a multi-word phrase ("lump of regret" -> "lumps of regret").
-  const ofIdx = word.indexOf(" of ");
-  if (ofIdx > 0) return pluralize(word.slice(0, ofIdx)) + word.slice(ofIdx);
+  // Pluralise only the head of a multi-word phrase: the word before the first
+  // preposition or relative ("lump of regret" -> "lumps of regret", "mushroom with
+  // legs" -> "mushrooms with legs", "truffle nobody wanted" -> "truffles nobody wanted").
   const parts = word.split(" ");
-  if (parts.length > 1) return parts.slice(0, -1).join(" ") + " " + pluralize(parts[parts.length - 1]!);
+  if (parts.length > 1) {
+    const STOP = new Set(["of", "with", "that", "who", "which", "nobody", "in", "on", "at", "for", "from", "without", "under", "over", "by", "to"]);
+    const idx = parts.findIndex((t, i) => i > 0 && STOP.has(t.toLowerCase()));
+    if (idx > 0) return [...parts.slice(0, idx - 1), pluralize(parts[idx - 1]!), ...parts.slice(idx)].join(" ");
+    return parts.slice(0, -1).join(" ") + " " + pluralize(parts[parts.length - 1]!);
+  }
   const lower = word.toLowerCase();
   const irr = IRREGULAR_PLURALS[lower];
   if (irr) return matchCase(word, irr);
