@@ -680,7 +680,7 @@ export class Renderer {
     // A rainbow for a minute after the rain stops.
     {
       const age = (nowMs - this.rainbowFromMs) / 60_000;
-      if (age >= 0 && age < 1 && !isRaining(world)) {
+      if (age >= 0 && age < 1 && !isRaining(world) && hourNow < 17.4) {
         const alpha = age < 0.15 ? age / 0.15 : age > 0.7 ? (1 - age) / 0.3 : 1;
         const cx0 = W * 0.5;
         const cy0 = H * 1.05;
