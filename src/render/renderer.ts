@@ -450,6 +450,20 @@ export class Renderer {
       }
     }
 
+    // Cloud shadows drift slowly across the land (not at night, not in fog, not in reduced motion).
+    if (!this.reducedMotion && hourNow < 18 && !isFoggy(world)) {
+      ctx.fillStyle = isRaining(world) ? "rgba(20, 30, 60, 0.10)" : "rgba(20, 40, 30, 0.07)";
+      for (let i = 0; i < 4; i++) {
+        const drift = (nowMs / 40000 + i * 0.37) % 1.3 - 0.15;
+        const cxp = W * drift + Math.sin(i * 2.1) * W * 0.1;
+        const cyp = H * ((i * 0.29 + 0.15) % 1) + Math.sin(nowMs / 23000 + i) * H * 0.05;
+        ctx.beginPath();
+        ctx.ellipse(cxp, cyp, T * (5 + (i % 3) * 2), T * (2.5 + (i % 2)), 0.2, 0, Math.PI * 2);
+        ctx.ellipse(cxp + T * 3, cyp - T * 0.8, T * 3.5, T * 2, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
