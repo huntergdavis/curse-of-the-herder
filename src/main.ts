@@ -479,6 +479,8 @@ const CURSE_EARLY = [
   "There are libraries. He will find them. Then it gets worse.",
 ];
 
+const recentCurseLines: string[] = [];
+
 function maybeCurseRemarks(s: Session, kind: string, nowMs: number): void {
   const w = s.world;
   const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
@@ -488,7 +490,12 @@ function maybeCurseRemarks(s: Session, kind: string, nowMs: number): void {
   const pool = level < 4 && keyedUnit(w.seed, "curse-early", w.tick) < 0.6 ? CURSE_EARLY : CURSE_LINES[kind];
   if (!pool || keyedUnit(w.seed, "curse-remark", w.tick) > 0.45) return;
   lastCurseMs = nowMs;
-  const line = pool[Math.floor(keyedUnit(w.seed, "curse-remark-line", w.tick) * pool.length)] ?? pool[0]!;
+  // Not the same jibe twice in a row; the Curse has standards.
+  const fresh = pool.filter((l) => !recentCurseLines.includes(l));
+  const from = fresh.length ? fresh : pool;
+  const line = from[Math.floor(keyedUnit(w.seed, "curse-remark-line", w.tick) * from.length)] ?? pool[0]!;
+  recentCurseLines.push(line);
+  if (recentCurseLines.length > 6) recentCurseLines.shift();
   // He hears it, and about half the time he answers back.
   if (kind !== "finished" && keyedUnit(w.seed, "curse-reply", w.tick) < 0.55) {
     const reply = speakKind(w, s.map, "curseReply", { lines: s.recent, rules: s.recentRules, rulesToday: s.rulesToday }, BAND_CAP, 0.35);
