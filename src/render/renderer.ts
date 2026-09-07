@@ -277,6 +277,9 @@ export class Renderer {
     this.rainbowFromMs = nowMs;
   }
 
+  /** When the day ended, for the neighbour's last pass. */
+  private finaleStartMs = -1;
+
   /** The sheepdog: follows him about, sits when he sits, helps with nothing. */
   private dog = { x: 0, y: 0, vx: 0, vy: 0, facing: 0, init: false, lastIdleMs: 0, reactUntil: 0, react: "" };
 
@@ -867,14 +870,21 @@ export class Renderer {
     if (!herderDrawn) this.drawHerder(world, sx, sy, T, phase, nowMs);
 
     // The neighbour and his three well-behaved sheep, strolling past.
-    if (world.rival) {
-      const r = world.rival;
+    // At the end of the day he passes once more, in the dusk, and for once he is the one looking.
+    if (world.finished && this.finaleStartMs < 0) this.finaleStartMs = nowMs;
+    const finaleT = world.finished ? (nowMs - this.finaleStartMs - 4000) / 26000 : -1;
+    const finaleRival = finaleT >= 0 && finaleT <= 1 ? { x: h.x - 12 + finaleT * 24, y: h.y + 3.5, dx: 0.11, finale: true } : undefined;
+    const rivalNow = world.rival ?? finaleRival;
+    if (rivalNow) {
+      const r = rivalNow;
       const facing: 0 | 2 = r.dx > 0 ? 0 : 2;
       const back = r.dx > 0 ? -1 : 1;
       for (let k = 3; k >= 1; k--) drawSheep(ctx, sx(r.x + 0.5 + back * k * 1.15), sy(r.y + 0.5), T * 0.85, "walk", facing, phase + k * 0.7, false, false, false);
       drawHerder(ctx, sx(r.x + 0.5), sy(r.y + 0.95), T, { facing, walking: true, carrying: false, phase, fury: 0, resting: false, coat: "#4a6a8a" });
       const beat = Math.floor(nowMs / 1000) % 9;
-      if (beat < 2) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "hullo!");
+      if ("finale" in r) {
+        if (Math.abs(r.x - h.x) < 3) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "sixty?");
+      } else if (beat < 2) drawEmote(ctx, sx(r.x + 0.5) + T * 0.35, sy(r.y) - T * 0.45, T * 0.85, "hullo!");
       else if (beat === 5) drawEmote(ctx, sx(r.x + 0.5 + back * 1.15) + T * 0.3, sy(r.y) - T * 0.2, T * 0.7, "baa");
     }
 

@@ -60,6 +60,8 @@ long soak.
 - Jailbreaks are plotted first: the sheep whispers "psst" to its neighbours for half a minute before it goes, called off if the herder wanders back
 - The Curse heckles from the start, rarely and dryly ("That was a sentence. Technically."), and every eight minutes once he is eloquent
 - Loose sheep within earshot drift over to listen while he reads aloud, then stand there
+- At dusk on the last sheep the neighbour passes once more and, for once, asks "sixty?"
+- Language quality: day-long rule memory (slot-free one-liners said once a day, ~96% distinct lines), longer recent-line window, no predicate "fucking", the Curse capitalised as a vocative, mismatched-noun rule fixed
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish
