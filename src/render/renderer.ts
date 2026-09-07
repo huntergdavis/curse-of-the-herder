@@ -393,6 +393,16 @@ export class Renderer {
             ctx.fill();
             ctx.fillStyle = "#e0b33c";
             ctx.fillRect(px + (Math.cos(a) < 0 ? -1 : 1) * T * 0.16 - T * 0.02, py - T * 0.1, T * 0.05, T * 0.025);
+            // Two ducklings paddle behind, a little out of line.
+            for (let k = 1; k <= 2; k++) {
+              const a2 = a - k * 0.45;
+              const qx = sx(x + 0.5 + Math.cos(a2) * 0.35);
+              const qy = sy(y + 0.5 + Math.sin(a2) * 0.2 + Math.sin(nowMs / 300 + k) * 0.03);
+              ctx.fillStyle = "#e0c060";
+              ctx.beginPath();
+              ctx.ellipse(qx, qy, T * 0.06, T * 0.045, 0, 0, Math.PI * 2);
+              ctx.fill();
+            }
             ctx.strokeStyle = "rgba(255,255,255,0.35)";
             ctx.lineWidth = Math.max(1, T * 0.02);
             ctx.beginPath();

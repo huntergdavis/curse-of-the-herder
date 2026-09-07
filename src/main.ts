@@ -289,6 +289,10 @@ function handleEvents(s: Session, nowMs: number): void {
         toast(`Read <em>${b.title}</em>${sample.length ? `: ${sample.map(escapeHtml).join(", ")}…` : ""} Vocabulary: ${grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP))} words.`);
       }
       if (e.bookId) s.lastBook = { id: e.bookId, tick: w.tick, quoted: false };
+      const vocabEl = $("hud-vocab");
+      vocabEl.classList.remove("pop");
+      void vocabEl.offsetWidth;
+      vocabEl.classList.add("pop");
     }
     // A notorious sheep, finally caught, gets a proper telling-off: a short flyting.
     if (e.kind === "caught" && w.sheep[e.sheepId]?.named && u) {
