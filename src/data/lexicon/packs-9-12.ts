@@ -35,8 +35,8 @@ export const baroqueLatinate: LexPack = {
     b(adj("lachrymose", 3), "tearful"), b(adj("recalcitrant", 4), "kicking against the heels; obstinately disobedient"), b(adj("obstreperous", 4), "noisily unruly"),
     b(adj("pertinacious", 4), "holding on stubbornly"), b(adj("pusillanimous", 5), "cowardly; of tiny spirit"), b(adj("vacuous", 3), "empty"), b(adj("otiose", 3), "idle; serving no purpose"),
     b(adj("insalubrious", 5), "unwholesome"), b(adj("mephitic", 3), "foul-smelling"), b(adj("crapulous", 3), "sick from excess; also just sick of it"), b(adj("torpid", 2), "sluggish"),
-    b(adj("somnolent", 3), "sleepy"), b(adj("bovine", 2), "cow-like"), b(adj("ovine", 2), "sheep-like; the highest insult available to a sheep"), b(adj("ruminant", 3), "cud-chewing"),
-    b(adj("ungulate", 3), "hoofed"), b(adj("ponderous", 3), "heavy and slow"), b(adj("egregious", 3), "outstandingly bad"), b(adj("execrable", 4), "utterly detestable"),
+    b(adj("somnolent", 3), "sleepy"), b(adj("bovine", 2), "cow-like"), b(adj("ovine", 2, { targets: ["sheep"] }), "sheep-like; the highest insult available to a sheep"), b(adj("ruminant", 3, { targets: ["sheep"] }), "cud-chewing"),
+    b(adj("ungulate", 3, { targets: ["sheep"] }), "hoofed"), b(adj("ponderous", 3), "heavy and slow"), b(adj("egregious", 3), "outstandingly bad"), b(adj("execrable", 4), "utterly detestable"),
     b(adj("abominable", 5)), b(adj("deplorable", 4)), b(adj("lamentable", 4)), b(adj("insufferable", 5)), b(adj("interminable", 5)), b(adj("incorrigible", 5)),
     b(adj("indefatigable", 6), "never tiring; said of sheep who run"), b(adj("inexorable", 5), "unstoppable"), b(adj("irredeemable", 5)), b(adj("unconscionable", 5)),
     b(adj("preposterous", 4)), b(adj("ludicrous", 3)), b(adj("farcical", 3)), b(adj("calamitous", 4)), b(adj("catastrophic", 4)), b(adj("cataclysmic", 4)),
@@ -45,13 +45,13 @@ export const baroqueLatinate: LexPack = {
     b(adj("choleric", 3), "hot-tempered"), b(adj("atrabilious", 5), "melancholy, ill-natured"), b(adj("sanctimonious", 5)), b(adj("supercilious", 5), "haughty"), b(adj("obsequious", 4), "fawning"),
     b(adj("perfidious", 4), "treacherous"), b(adj("mendacious", 3), "lying"), b(adj("fatuous", 3), "silly and self-satisfied"), b(adj("inane", 2)), b(adj("jejune", 2), "naive; unsatisfying"),
     b(adj("vapid", 2)), b(adj("insipid", 3)), b(adj("banal", 2)), b(adj("tedious", 3)), b(adj("soporific", 4), "sleep-inducing"), b(adj("stultifying", 4)), b(adj("obtuse", 2)),
-    b(adj("impenetrable", 5)), b(adj("impervious", 4)), b(adj("immovable", 4)), b(adj("inert", 2)), b(adj("sedentary", 4)), b(adj("quadrupedal", 4)), b(adj("lanate", 2), "woolly (Latin lana, wool)"),
-    b(adj("lanuginous", 4), "covered in soft down"), b(adj("gregarious", 4), "of the flock"), b(adj("herbivorous", 4)), b(adj("capricious", 3), "goat-like in temper"), b(adj("hircine", 2), "goatish"),
-    b(adj("vermiform", 3), "worm-shaped"), b(adj("invertebrate", 4), "spineless"), b(adj("cretaceous", 3), "chalky"), b(adj("sedimentary", 5), "settled in layers, like this sheep"), b(adj("metamorphic", 4)),
-    b(adj("igneous", 3)), b(adj("glacial", 2)), b(adj("tectonic", 3), "moving at the pace of continents"), b(adj("bucolic", 3), "of the pasture"), b(adj("agrarian", 4)), b(adj("antediluvian", 6), "from before the Flood"),
+    b(adj("impenetrable", 5)), b(adj("impervious", 4)), b(adj("immovable", 4)), b(adj("inert", 2)), b(adj("sedentary", 4)), b(adj("quadrupedal", 4, { targets: ["sheep"] })), b(adj("lanate", 2, { targets: ["sheep"] }), "woolly (Latin lana, wool)"),
+    b(adj("lanuginous", 4, { targets: ["sheep"] }), "covered in soft down"), b(adj("gregarious", 4, { targets: ["sheep"] }), "of the flock"), b(adj("herbivorous", 4, { targets: ["sheep"] })), b(adj("capricious", 3), "goat-like in temper"), b(adj("hircine", 2, { targets: ["sheep"] }), "goatish"),
+    b(adj("vermiform", 3), "worm-shaped"), b(adj("invertebrate", 4), "spineless"), b(adj("cretaceous", 3, { targets: ["terrain"] }), "chalky"), b(adj("sedimentary", 5, { targets: ["terrain", "sheep"] }), "settled in layers, like this sheep"), b(adj("metamorphic", 4, { targets: ["terrain"] })),
+    b(adj("igneous", 3, { targets: ["terrain"] })), b(adj("glacial", 2)), b(adj("tectonic", 3), "moving at the pace of continents"), b(adj("bucolic", 3, { targets: ["terrain", "day"] }), "of the pasture"), b(adj("agrarian", 4, { targets: ["terrain", "day"] })), b(adj("antediluvian", 6), "from before the Flood"),
     b(adj("primordial", 4)), b(adj("vestigial", 4), "left over and useless"), b(adj("superfluous", 4)), b(adj("gratuitous", 4)), b(adj("ineffable", 4), "beyond words; not for lack of trying"),
     b(adj("unutterable", 5)), b(adj("labyrinthine", 4)), b(adj("byzantine", 3)), b(adj("circumlocutory", 6), "talking round the point"), b(adj("peripatetic", 5), "wandering about"),
-    b(adj("ambulatory", 5)), b(adj("comestible", 4), "edible; said hopefully"), b(adj("truculent", 3), "aggressively defiant"), b(adj("querulous", 3), "complaining"), b(adj("cantankerous", 4)),
+    b(adj("ambulatory", 5, { targets: ["sheep", "self"] })), b(adj("comestible", 4, { targets: ["sheep"] }), "edible; said hopefully"), b(adj("truculent", 3), "aggressively defiant"), b(adj("querulous", 3), "complaining"), b(adj("cantankerous", 4)),
     // Insult nouns.
     b(ins("mountebank", 3), "a quack, a charlatan"), b(ins("poltroon", 2), "a coward"), b(ins("popinjay", 3), "a vain chatterer; a parrot"), b(ins("quidnunc", 2), "a gossip ('what now?')"),
     b(ins("jackanapes", 3, { pl: "jackanapes" }), "an impertinent monkey of a fellow"), b(ins("malingerer", 4), "one who feigns illness to avoid work"), b(ins("dilettante", 3), "a dabbler"),
@@ -60,8 +60,8 @@ export const baroqueLatinate: LexPack = {
     b(ins("protuberance", 4)), b(ins("appendage", 3)), b(ins("afterthought", 3)), b(ins("anachronism", 4)), b(ins("non sequitur", 4), "a thing that does not follow; a sheep"), b(ins("tautology", 4)),
     b(ins("oxymoron", 4)), b(ins("paradox", 3)), b(ins("conundrum", 3)), b(ins("quandary", 3)), b(ins("contretemps", 3), "an awkward mishap"), b(ins("debacle", 3)), b(ins("fiasco", 3)),
     b(ins("boondoggle", 3), "wasteful, pointless work"), b(ins("imbroglio", 4), "a confused entanglement"), b(ins("kerfuffle", 3)), b(ins("brouhaha", 3)), b(ins("hullabaloo", 4)), b(ins("rigmarole", 3)),
-    b(ins("farrago", 3), "a confused mixture"), b(ins("gallimaufry", 4), "a hodgepodge"), b(ins("mishmash", 2)), b(ins("hodgepodge", 2)), b(ins("omnishambles", 4)), b(ins("quadruped", 3)),
-    b(ins("herbivore", 3)), b(ins("ovoid", 2), "egg-shaped"), b(ins("cumulus", 3), "a heaped cloud"), b(ins("cumulonimbus", 5), "a thundercloud, and I mean you"), b(ins("ambulatory mattress", 6)),
+    b(ins("farrago", 3), "a confused mixture"), b(ins("gallimaufry", 4), "a hodgepodge"), b(ins("mishmash", 2)), b(ins("hodgepodge", 2)), b(ins("omnishambles", 4)), b(ins("quadruped", 3, { targets: ["sheep"] })),
+    b(ins("herbivore", 3, { targets: ["sheep"] })), b(ins("ovoid", 2, { targets: ["sheep"] }), "egg-shaped"), b(ins("cumulus", 3, { targets: ["sheep"] }), "a heaped cloud"), b(ins("cumulonimbus", 5), "a thundercloud, and I mean you"), b(ins("ambulatory mattress", 6)),
     b(ins("perambulating cushion", 7)), b(ins("sesquipedalian nuisance", 8)), b(ins("cloud in the shape of a grievance", 9)), b(ins("footnote to a bog", 5)), b(ins("monument to inertia", 6)),
     b(ins("study in reluctance", 5)), b(ins("essay on dampness", 5)), b(ins("treatise on stubbornness", 6)), b(ins("compendium of burrs", 5)), b(ins("encyclopaedia of mud", 7)),
     // Abstract nouns.
@@ -99,7 +99,7 @@ export const verseRhymes: LexPack = {
   level: 11,
   entries: [
     // -eep
-    rh("eep", n("heap", 1)), rh("eep", adj("steep", 1)), rh("eep", adj("deep", 1)), rh("eep", adj("cheap", 1)), rh("eep", verb("creep", 1)), rh("eep", verb("weep", 1)), rh("eep", verb("sleep", 1)),
+    rh("eep", n("heap", 1)), rh("eep", adj("steep", 1, { targets: ["terrain"] })), rh("eep", adj("deep", 1, { targets: ["terrain"] })), rh("eep", adj("cheap", 1)), rh("eep", verb("creep", 1)), rh("eep", verb("weep", 1)), rh("eep", verb("sleep", 1)),
     rh("eep", verb("leap", 1)), rh("eep", verb("keep", 1)), rh("eep", verb("seep", 1)), rh("eep", verb("sweep", 1)), rh("eep", verb("peep", 1)), rh("eep", n("sheep", 1, { pl: "sheep" })),
     // -ill
     rh("ill", adj("ill", 1)), rh("ill", adj("still", 1)), rh("ill", adj("shrill", 1)), rh("ill", n("chill", 1)), rh("ill", n("swill", 1, { pl: "-" })), rh("ill", n("mill", 1)), rh("ill", n("quill", 1)),
@@ -109,7 +109,7 @@ export const verseRhymes: LexPack = {
     rh("ain", n("chain", 1)), rh("ain", n("lane", 1)), rh("ain", n("cane", 1)), rh("ain", n("mane", 1)), rh("ain", n("bane", 1)), rh("ain", verb("wane", 1)), rh("ain", verb("complain", 2)),
     rh("ain", verb("refrain", 2)), rh("ain", abs("disdain", 2)), rh("ain", adj("mundane", 2)), rh("ain", adj("profane", 2)), rh("ain", adj("arcane", 2)), rh("ain", adj("inane", 2)),
     // -ool
-    rh("ool", ins("fool", 1)), rh("ool", n("pool", 1)), rh("ool", n("drool", 1, { pl: "-" })), rh("ool", n("stool", 1)), rh("ool", adj("cool", 1)), rh("ool", n("tool", 1)), rh("ool", n("spool", 1)),
+    rh("ool", ins("fool", 1)), rh("ool", n("pool", 1)), rh("ool", n("drool", 1, { pl: "-" })), rh("ool", n("stool", 1)), rh("ool", adj("cruel", 2)), rh("ool", n("tool", 1)), rh("ool", n("spool", 1)),
     rh("ool", n("school", 1)), rh("ool", n("rule", 1)), rh("ool", ins("mule", 1)), rh("ool", ins("ghoul", 1)), rh("ool", n("gruel", 2, { pl: "-" })), rh("ool", verb("ridicule", 3)), rh("ool", verb("drool", 1)),
     // -ud
     rh("ud", n("thud", 1)), rh("ud", ins("dud", 1)), rh("ud", n("spud", 1)), rh("ud", n("cud", 1, { pl: "-" })), rh("ud", n("blood", 1, { pl: "-" })), rh("ud", n("bud", 1)), rh("ud", n("flood", 1)),
@@ -122,11 +122,11 @@ export const verseRhymes: LexPack = {
     rh("ock", n("frock", 1)), rh("ock", verb("mock", 1)), rh("ock", n("stock", 1, { pl: "-" })), rh("ock", n("crock", 1)), rh("ock", n("hock", 1)), rh("ock", n("gridlock", 2, { pl: "-" })),
     rh("ock", n("padlock", 2)), rh("ock", ins("laughingstock", 3)), rh("ock", n("rock", 1)),
     // -ay
-    rh("ay", n("hay", 1, { pl: "-" })), rh("ay", verb("stray", 1)), rh("ay", adj("grey", 1)), rh("ay", abs("dismay", 2)), rh("ay", verb("pray", 1)), rh("ay", verb("bray", 1)), rh("ay", n("delay", 2)),
+    rh("ay", n("hay", 1, { pl: "-" })), rh("ay", verb("stray", 1)), rh("ay", adj("grey", 1, { targets: ["weather", "day", "terrain"] })), rh("ay", abs("dismay", 2)), rh("ay", verb("pray", 1)), rh("ay", verb("bray", 1)), rh("ay", n("delay", 2)),
     rh("ay", n("clay", 1, { pl: "-" })), rh("ay", n("fray", 1)), rh("ay", verb("sway", 1)), rh("ay", n("tray", 1)), rh("ay", n("bay", 1)), rh("ay", abs("decay", 2)), rh("ay", verb("betray", 2)),
     rh("ay", n("array", 2)), rh("ay", adj("astray", 2)), rh("ay", abs("disarray", 3)), rh("ay", interj("hooray", 2)), rh("ay", n("day", 1, { targets: ["day", "curse"] })),
     // -it
-    rh("it", adj("fit", 1)), rh("it", n("bit", 1)), rh("it", verb("spit", 1)), rh("it", n("grit", 1, { pl: "-" })), rh("it", n("wit", 1, { pl: "-" })), rh("it", verb("flit", 1)), rh("it", verb("knit", 1)),
+    rh("it", n("bit", 1)), rh("it", verb("spit", 1)), rh("it", n("grit", 1, { pl: "-" })), rh("it", n("wit", 1, { pl: "-" })), rh("it", verb("flit", 1)), rh("it", verb("knit", 1)),
     rh("it", verb("quit", 1)), rh("it", verb("split", 1)), rh("it", n("pit", 1)), rh("it", ins("misfit", 2)), rh("it", adj("counterfeit", 3)), rh("it", adj("unfit", 2)), rh("it", ins("nitwit", 2)),
     // -uck
     rh("uck", n("luck", 1, { pl: "-" })), rh("uck", n("muck", 1, { pl: "-" })), rh("uck", adj("stuck", 1)), rh("uck", n("truck", 1)), rh("uck", n("pluck", 1, { pl: "-" })), rh("uck", n("duck", 1)),
@@ -136,7 +136,7 @@ export const verseRhymes: LexPack = {
     rh("ass", n("class", 1)), rh("ass", n("sass", 1, { pl: "-" })), rh("ass", verb("trespass", 2)), rh("ass", ins("jackass", 2, { band: 2 })), rh("ass", n("grass", 1, { pl: "-" })),
     // -eat
     rh("eat", n("wheat", 1, { pl: "-" })), rh("eat", n("heat", 1, { pl: "-" })), rh("eat", n("meat", 1, { pl: "-" })), rh("eat", n("seat", 1)), rh("eat", n("treat", 1)), rh("eat", verb("beat", 1)),
-    rh("eat", ins("cheat", 1)), rh("eat", abs("defeat", 2)), rh("eat", n("retreat", 2)), rh("eat", verb("repeat", 2)), rh("eat", n("sheet", 1)), rh("eat", adj("fleet", 1)), rh("eat", verb("greet", 1)),
+    rh("eat", ins("cheat", 1)), rh("eat", abs("defeat", 2)), rh("eat", n("retreat", 2)), rh("eat", verb("repeat", 2)), rh("eat", n("sheet", 1)), rh("eat", adj("effete", 2)), rh("eat", verb("greet", 1)),
     rh("eat", n("peat", 1, { pl: "-" })), rh("eat", n("teat", 1, { band: 1 })), rh("eat", abs("deceit", 2)), rh("eat", abs("conceit", 2)), rh("eat", verb("bleat", 1)),
     // -oat
     rh("oat", n("goat", 1)), rh("oat", n("coat", 1)), rh("oat", n("boat", 1)), rh("oat", n("moat", 1)), rh("oat", verb("bloat", 1)), rh("oat", verb("gloat", 1)), rh("oat", verb("float", 1)),
@@ -145,17 +145,17 @@ export const verseRhymes: LexPack = {
     rh("ump", n("bump", 1)), rh("ump", n("dump", 1)), rh("ump", n("hump", 1)), rh("ump", n("rump", 1, { band: 1 })), rh("ump", n("thump", 1)), rh("ump", n("clump", 1)), rh("ump", ins("grump", 1)),
     rh("ump", n("slump", 1)), rh("ump", ins("chump", 1)), rh("ump", ins("mugwump", 2)), rh("ump", n("stump", 1)), rh("ump", ins("lump", 1)),
     // -ew
-    rh("ew", adj("few", 1)), rh("ew", adj("new", 1)), rh("ew", n("stew", 1)), rh("ew", verb("chew", 1)), rh("ew", verb("spew", 1)), rh("ew", n("brew", 1)), rh("ew", n("crew", 1)), rh("ew", adj("askew", 2)),
+    rh("ew", n("stew", 1)), rh("ew", verb("chew", 1)), rh("ew", verb("spew", 1)), rh("ew", n("brew", 1)), rh("ew", n("crew", 1)), rh("ew", adj("askew", 2)),
     rh("ew", n("curfew", 2)), rh("ew", n("mildew", 2, { pl: "-" })), rh("ew", n("residue", 3)), rh("ew", n("to-do", 2)), rh("ew", abs("ado", 2)), rh("ew", n("ewe", 1)), rh("ew", n("dew", 1, { pl: "-" })),
     // -ug
-    rh("ug", n("bug", 1)), rh("ug", ins("mug", 1)), rh("ug", n("rug", 1)), rh("ug", ins("slug", 1)), rh("ug", adj("smug", 1)), rh("ug", adj("snug", 1)), rh("ug", n("jug", 1)), rh("ug", n("plug", 1)),
+    rh("ug", n("bug", 1)), rh("ug", ins("mug", 1)), rh("ug", n("rug", 1)), rh("ug", ins("slug", 1)), rh("ug", adj("smug", 1)), rh("ug", n("jug", 1)), rh("ug", n("plug", 1)),
     rh("ug", verb("chug", 1)), rh("ug", verb("shrug", 1)), rh("ug", oath("humbug", 0, 2)), rh("ug", n("bedbug", 2)), rh("ug", n("ladybug", 3)), rh("ug", verb("lug", 1)),
     // -own / -ound / -air
-    rh("own", adj("down", 1)), rh("own", n("frown", 1)), rh("own", n("gown", 1)), rh("own", ins("clown", 1)), rh("own", n("crown", 1)), rh("own", n("town", 1)), rh("own", abs("renown", 2)), rh("own", n("hand-me-down", 3)),
-    rh("ound", n("ground", 1, { pl: "-" })), rh("ound", n("hound", 1)), rh("ound", n("pound", 1)), rh("ound", n("mound", 1)), rh("ound", adj("round", 1)), rh("ound", n("sound", 1)), rh("ound", adj("bound", 1)),
+    rh("own", n("frown", 1)), rh("own", n("gown", 1)), rh("own", ins("clown", 1)), rh("own", n("crown", 1)), rh("own", n("town", 1)), rh("own", abs("renown", 2)), rh("own", n("hand-me-down", 3)),
+    rh("ound", n("ground", 1, { pl: "-" })), rh("ound", n("hound", 1)), rh("ound", n("pound", 1)), rh("ound", n("mound", 1)), rh("ound", adj("round", 1, { targets: ["sheep"] })), rh("ound", n("sound", 1)),
     rh("ound", verb("astound", 2)), rh("ound", verb("confound", 2)), rh("ound", verb("surround", 2)),
-    rh("air", n("chair", 1)), rh("air", adj("fair", 1)), rh("air", n("affair", 2)), rh("air", n("nightmare", 2)), rh("air", verb("repair", 2)), rh("air", verb("beware", 2)), rh("air", adj("threadbare", 2)),
-    rh("air", adj("unaware", 3)), rh("air", adj("debonair", 3)), rh("air", n("solitaire", 3)), rh("air", n("hair", 1, { pl: "-" })), rh("air", n("lair", 1)),
+    rh("air", n("chair", 1)), rh("air", n("affair", 2)), rh("air", n("nightmare", 2)), rh("air", verb("repair", 2)), rh("air", verb("beware", 2)), rh("air", adj("threadbare", 2)),
+    rh("air", adj("unaware", 3)), rh("air", n("solitaire", 3)), rh("air", n("hair", 1, { pl: "-" })), rh("air", n("lair", 1)),
     // Verse-flavoured similes.
     rh("none", sim("a sonnet with no last line")), rh("none", sim("a limerick about a funeral")), rh("none", sim("a rhyme for orange")), rh("none", sim("a haiku that runs long")),
     rh("none", sim("a hymn hummed into a bucket")), rh("none", sim("a lullaby sung at a sheep")),

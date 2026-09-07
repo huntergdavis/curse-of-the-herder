@@ -584,8 +584,8 @@ export class Renderer {
     // Day tint over the world, under the bubble.
     const hour = this.hourOverride ?? dayHour(world);
     const tint = dayTint(hour);
-    if (!tint.endsWith("0)") && !tint.endsWith("0.000)")) {
-      ctx.fillStyle = tint;
+    if (tint.a > 0.002) {
+      ctx.fillStyle = `rgba(${tint.r}, ${tint.g}, ${tint.b}, ${tint.a.toFixed(4)})`;
       ctx.fillRect(0, 0, W, H);
     }
     // A moon rises with the stars.

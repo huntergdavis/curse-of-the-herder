@@ -27,7 +27,15 @@ const TINT_KEYS: [number, [number, number, number, number]][] = [
   [19.5, [20, 24, 70, 0.55]],
 ];
 
-export function dayTint(hour: number): string {
+export interface Tint {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+/** The sky's colour cast at a given hour; alpha 0 means none. Interpolated smoothly. */
+export function dayTint(hour: number): Tint {
   const h = Math.max(TINT_KEYS[0]![0], Math.min(TINT_KEYS[TINT_KEYS.length - 1]![0], hour));
   for (let i = 0; i < TINT_KEYS.length - 1; i++) {
     const [h0, a] = TINT_KEYS[i]!;
@@ -35,10 +43,10 @@ export function dayTint(hour: number): string {
     if (h >= h0 && h <= h1) {
       const t = (h - h0) / (h1 - h0);
       const mix = (k: 0 | 1 | 2 | 3): number => a[k] + (b[k] - a[k]) * t;
-      return `rgba(${mix(0) | 0}, ${mix(1) | 0}, ${mix(2) | 0}, ${mix(3).toFixed(3)})`;
+      return { r: mix(0) | 0, g: mix(1) | 0, b: mix(2) | 0, a: mix(3) };
     }
   }
-  return "rgba(0,0,0,0)";
+  return { r: 0, g: 0, b: 0, a: 0 };
 }
 
 export function shade(hex: string, amount: number): string {
