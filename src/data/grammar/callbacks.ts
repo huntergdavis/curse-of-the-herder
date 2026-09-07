@@ -82,6 +82,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "molehill", ["A molehill. I have made a mountain of it, with my ankle.", "Somewhere under here a mole is very pleased with itself.", "#oath.cap#, the ground has a hole in it and my foot found it first."]),
   ...R(4, "molehill", ["#oath_phrase#! A mole, a hole, and my #intensifier# #adj# ankle in that order!"]),
   ...R(8, "molehill", ["The mole had dug the hole. My foot had found it. Both had done their jobs."], { reg: ["hemingway"] }),
+  // The scarecrow has the better job.
+  ...R(0, "scarecrow", ["Scarecrow. Lucky.", "Stands. All day. Lucky.", "Hat. Nice hat."]),
+  ...R(2, "scarecrow", ["The scarecrow has the better job. He stands in one place and nothing runs from him.", "Evening, scarecrow. No? Fine. You and the sheep can not-talk together.", "I envy the scarecrow. Nobody expects him to catch anything."]),
+  ...R(4, "scarecrow", ["#pantheon.cap#, look at him. Straw for brains and a better hat than mine, and not one sheep to his name.", "Scarecrow, you #adj# bundle, you have never carried a thing in your life, and you look happier than I have ever been."]),
+  ...R(8, "scarecrow", ["The scarecrow stood in the field. He had stood there all day. He did not have to carry anything. I looked at him for a while."], { reg: ["hemingway"] }),
+  ...R(11, "scarecrow", ["O scarecrow, thou stuffed and steadfast man, / Thou dost thy job the way that I never can."], { reg: ["verse"] }),
   // Milestones: halfway, ten to go, one to go.
   ...R(0, "halfway", ["Half.", "Thirty. Half.", "Half. #interj.cap#."]),
   ...R(2, "halfway", ["Thirty. Halfway. The other half are the ones that run.", "Half the flock is in. The half that was near. I know how this goes.", "Halfway, #dog#. Halfway. Do not get up. You never do."]),

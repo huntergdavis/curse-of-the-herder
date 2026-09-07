@@ -244,7 +244,8 @@ export function generateMap(seed: string, opts: GenerateOptions = {}): GameMap {
       if (Math.max(Math.abs(x - pen.x), Math.abs(y - pen.y)) <= 3) continue; // keep the pen and gate clear
       const t = terrain[i];
       const u = keyedUnit(seed, "deco", x, y);
-      if (t === Terrain.Forest) deco[i] = u < 0.3 ? Deco.Tree : u < 0.5 ? Deco.Tree2 : u < 0.53 ? Deco.Stump : u < 0.56 ? Deco.Boulder : Deco.None;
+      if (t === Terrain.Farm && u < 0.02) deco[i] = Deco.Scarecrow;
+      else if (t === Terrain.Forest) deco[i] = u < 0.3 ? Deco.Tree : u < 0.5 ? Deco.Tree2 : u < 0.53 ? Deco.Stump : u < 0.56 ? Deco.Boulder : Deco.None;
       else if (t === Terrain.Rock) deco[i] = u < 0.3 ? Deco.Boulder : Deco.None;
       else if (t === Terrain.Grass) deco[i] = u < 0.05 ? Deco.Tuft : u < 0.07 ? Deco.Tree : Deco.None;
       else if (t === Terrain.Meadow) deco[i] = u < 0.08 ? Deco.Flowers : u < 0.1 ? Deco.Tuft : Deco.None;

@@ -303,6 +303,40 @@ export class ChunkCache {
         ctx.strokeRect(cxp - T * 0.09, cyp - T * 0.3, T * 0.18, T * 0.6);
         break;
       }
+      case Deco.Scarecrow: {
+        const cxp = px + T * 0.5;
+        ctx.strokeStyle = "#6b4a2b";
+        ctx.lineWidth = Math.max(1.5, T * 0.07);
+        ctx.beginPath();
+        ctx.moveTo(cxp, py + T * 0.95);
+        ctx.lineTo(cxp, py + T * 0.2);
+        ctx.moveTo(cxp - T * 0.32, py + T * 0.42);
+        ctx.lineTo(cxp + T * 0.32, py + T * 0.42);
+        ctx.stroke();
+        ctx.fillStyle = "#8c6a3a";
+        ctx.beginPath();
+        ctx.roundRect(cxp - T * 0.16, py + T * 0.36, T * 0.32, T * 0.36, T * 0.05);
+        ctx.fill();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = Math.max(1, T * 0.04);
+        ctx.stroke();
+        ctx.fillStyle = "#e0b33c";
+        ctx.beginPath();
+        ctx.arc(cxp, py + T * 0.26, T * 0.13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#5b7a3a";
+        ctx.beginPath();
+        ctx.ellipse(cxp, py + T * 0.15, T * 0.24, T * 0.06, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = INK;
+        ctx.beginPath();
+        ctx.arc(cxp - T * 0.04, py + T * 0.25, T * 0.02, 0, Math.PI * 2);
+        ctx.arc(cxp + T * 0.05, py + T * 0.25, T * 0.02, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
       case Deco.Signpost:
         ctx.fillStyle = "#8a6238";
         ctx.fillRect(px + T * 0.46, py + T * 0.3, T * 0.08, T * 0.6);

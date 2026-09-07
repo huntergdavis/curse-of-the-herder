@@ -496,6 +496,31 @@ export class Renderer {
       }
     }
 
+    // Owls hoot from the trees after dark.
+    if (hourNow > 18.4 && !this.reducedMotion) {
+      const x0 = Math.max(0, Math.floor(cam.x - W / (2 * T)));
+      const x1 = Math.min(this.map.size - 1, Math.ceil(cam.x + W / (2 * T)));
+      const y0 = Math.max(0, Math.floor(cam.y - H / (2 * T)));
+      const y1 = Math.min(this.map.size - 1, Math.ceil(cam.y + H / (2 * T)));
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        const i = y * this.map.size + x;
+        if (this.map.deco[i] !== Deco.Tree || ((x * 53 + y * 29) % 37) !== 11) continue;
+        const px = sx(x + 0.5);
+        const py = sy(y + 0.3);
+        ctx.fillStyle = "#5a4634";
+        ctx.beginPath();
+        ctx.ellipse(px, py, T * 0.09, T * 0.12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        const blink = Math.floor(nowMs / 700 + x) % 9 === 0;
+        ctx.fillStyle = blink ? "#5a4634" : "#ffe27a";
+        ctx.beginPath();
+        ctx.arc(px - T * 0.035, py - T * 0.04, T * 0.028, 0, Math.PI * 2);
+        ctx.arc(px + T * 0.035, py - T * 0.04, T * 0.028, 0, Math.PI * 2);
+        ctx.fill();
+        if (Math.floor(nowMs / 1000 + x * 3) % 19 === 0) drawEmote(ctx, px + T * 0.25, py - T * 0.4, T * 0.6, "hoo");
+      }
+    }
+
     // A hedgehog trundles along the road at dusk, near enough to notice.
     if (hourNow > 16.8 && hourNow < 19 && !this.reducedMotion) {
       const period = 90_000;

@@ -77,5 +77,6 @@ export const Deco = {
   Library: 11,
   Stump: 12,
   Signpost: 13,
+  Scarecrow: 14,
 } as const;
 export type DecoId = (typeof Deco)[keyof typeof Deco];
