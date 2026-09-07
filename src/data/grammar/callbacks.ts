@@ -114,8 +114,8 @@ export const CALLBACK_RULES: Rule[] = [
     "I will #threat.own#, #vocative#. I have the needles. I have the time. I do not have the sheep, but I will.",
     "Every one of you is a jumper waiting for a reason, and #vocative#, you are giving me reasons.",
     "#vocative.cap#, you #adj# #insult#, I shall #threat.own#, and I shall enjoy the purling.",
-    "Hold still, you #adj.own# #insult.own#. I am counting stitches and you are most of them.",
   ], { reg: ["knitting"] }),
+  ...R(3, "idle", ["Hold still, you #adj.own# #insult.own#. I am counting stitches and you are most of them."], { reg: ["knitting"], weight: 0.35 }),
   ...R(3, "caught", ["Got you. Hold still. I am measuring you for a tea cosy in my head."], { reg: ["knitting"] }),
   // The kitchen register.
   ...R(5, "idle", [
