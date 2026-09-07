@@ -31,6 +31,9 @@ export class Renderer {
   private houses: { x: number; y: number }[] = [];
   /** Villagers stand by their wells; each remembers when it last heard something. */
   private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string; offences: number }[] = [];
+  /** One house per village is the inn, with a sign. He is not going in. Yet. */
+  private inns: { x: number; y: number; lastTick: number }[] = [];
+  onInnNear: (() => void) | null = null;
   /** Hens by the houses: peck, scatter when he stomps through, come back. */
   private hens: { hx: number; hy: number; x: number; y: number; fleeUntil: number; fx: number; fy: number }[] = [];
   /** Cows: one per village and one by the pen, chewing, explaining the cowpats. */
@@ -56,6 +59,11 @@ export class Renderer {
       const d = this.map.deco[i];
       if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
       if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3, offences: 0 });
+    }
+    this.inns = [];
+    for (const v of this.villagers) {
+      const house = [...this.houses].sort((p, q) => Math.hypot(p.x - v.x, p.y - v.y) - Math.hypot(q.x - v.x, q.y - v.y))[0];
+      if (house && !this.inns.some((i) => i.x === house.x && i.y === house.y)) this.inns.push({ x: house.x, y: house.y, lastTick: -1e9 });
     }
     this.hens = [];
     this.houses.forEach((hs, k) => {
@@ -971,6 +979,34 @@ export class Renderer {
     // Villagers by their wells.
     const greeted = this.greetings(world, nowMs);
     if (greeted && Math.floor(nowMs / 1000) % 2 === 0) drawEmote(ctx, sx(h.x + 0.5) - T * 0.45, sy(h.y + 0.95) - T * 1.7, T * 0.8, "hullo");
+    for (const inn of this.inns) {
+      if (Math.abs(inn.x - cam.x) * T > W + T || Math.abs(inn.y - cam.y) * T > H + T) continue;
+      // A hanging sign on a bracket beside the door: a pale ram's head on a dark board.
+      const px = sx(inn.x + 0.5) + T * 0.55;
+      const py = sy(inn.y + 0.5) - T * 0.1;
+      const swing = Math.sin(nowMs / 900 + inn.x) * T * 0.02;
+      ctx.strokeStyle = "#2b2620";
+      ctx.lineWidth = Math.max(1, T * 0.04);
+      ctx.beginPath();
+      ctx.moveTo(px - T * 0.15, py - T * 0.22);
+      ctx.lineTo(px + T * 0.15, py - T * 0.22);
+      ctx.stroke();
+      ctx.fillStyle = "#4a3a2a";
+      ctx.fillRect(px - T * 0.14 + swing, py - T * 0.2, T * 0.28, T * 0.22);
+      ctx.strokeRect(px - T * 0.14 + swing, py - T * 0.2, T * 0.28, T * 0.22);
+      ctx.fillStyle = "#f2eee4";
+      ctx.beginPath();
+      ctx.arc(px + swing, py - T * 0.09, T * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px - T * 0.06 + swing, py - T * 0.13, T * 0.025, 0, Math.PI * 2);
+      ctx.arc(px + T * 0.06 + swing, py - T * 0.13, T * 0.025, 0, Math.PI * 2);
+      ctx.fill();
+      if (Math.hypot(inn.x - h.x, inn.y - h.y) < 3 && !world.finished && world.tick - inn.lastTick > 7200 && (h.mode === "toSheep" || h.mode === "toPen")) {
+        inn.lastTick = world.tick;
+        this.onInnNear?.();
+      }
+    }
     for (const hen of this.hens) {
       if (Math.abs(hen.x - cam.x) * T > W + T || Math.abs(hen.y - cam.y) * T > H + T) continue;
       const d = Math.hypot(hen.x - h.x, hen.y - h.y);

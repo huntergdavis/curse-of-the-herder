@@ -136,6 +136,12 @@ async function startSession(world: WorldState): Promise<void> {
   };
   renderer.hourOverride = null;
   renderer.setSeason(world.season);
+  renderer.onInnNear = () => {
+    if (!session) return;
+    const u = speakKind(session.world, session.map, "inn", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.3);
+    if (u) say(session, u.text, u.heat, u.seconds, performance.now(), false, u);
+    if (u) maybeCurseRemarks(session, "inn", performance.now());
+  };
   renderer.onHensScatter = () => {
     if (!session || keyedUnit(session.world.seed, "hens-say", session.world.tick) > 0.5) return;
     const u = speakKind(session.world, session.map, "hens", { lines: session.recent, rules: session.recentRules, rulesToday: session.rulesToday }, BAND_CAP, 0.3);
@@ -476,6 +482,7 @@ const CURSE_LINES: Record<string, string[]> = {
   streakBroken: ["Told you.", "There. Better.", "Balance restored."],
   nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   rival: ["He is not cursed. He is simply good at it.", "I offered him the job first.", "His sheep like him. Imagine."],
+  inn: ["He is not allowed in. I checked.", "The Cursed Ram. Named after me, in a way.", "Sixty sheep, then ale. Those are the terms."],
   cow: ["He is talking to a cow now.", "The cow is not listening either.", "Sixty sheep and he stops for a cow."],
   dogHelps: ["I did not authorise that.", "Do not get used to it.", "Even I am surprised."],
   lunchStolen: ["That was the good cheese, too.", "I did not arrange that. I would have, but I did not.", "Lunch is for the uncursed."],

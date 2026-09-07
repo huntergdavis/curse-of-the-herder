@@ -138,6 +138,12 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "hens", ["Even the hens. Even the HENS run from me. I have never so much as looked at a hen.", "Go on, scatter. Everything on this hill scatters. I could scatter a rock.", "Hens. Sixty sheep to find and the hens think it is about THEM."]),
   ...R(4, "hens", ["#oath_phrase#, hens, out of my way, I have no quarrel with poultry and no time for one either!", "Scatter, then, you #adj# feather dusters; at least you do not have to be carried."]),
   ...R(8, "hens", ["The hens ran. Everything ran. I was used to it. That was the worst part."], { reg: ["hemingway"] }),
+  // The inn. Not yet.
+  ...R(0, "inn", ["Ale. Later. Sheep.", "Inn. No. Sheep first.", "Door. Warm. NO."]),
+  ...R(2, "inn", ["The Cursed Ram. Not yet. Not YET. Sixty sheep and then you may have me, and you will not enjoy it.", "Look at it. A door. A fire. Not one sheep inside it. I could weep. I will, later, in there.", "Walk past the inn. Walk PAST the inn. Good. That was the hardest thing I have done today and it is not yet noon."]),
+  ...R(4, "inn", ["#oath_phrase#, the inn, with its door and its ale and its total absence of sheep; I shall be back, and I shall be INSUFFERABLE.", "#pantheon.cap#, lead me not past the Cursed Ram, for I am weak, and the sheep are #adj#, and the ale is not."]),
+  ...R(6, "inn", ["Mark it, #vocative#: there is a room in that building where nobody has ever said the word sheep, and I am walking away from it for you."]),
+  ...R(8, "inn", ["The inn was there. I walked past it. That was the hardest thing I did all day and nobody saw."], { reg: ["hemingway"] }),
   // A cow. Not his. Good.
   ...R(0, "cow", ["Cow. Not mine. Good.", "Moo yourself.", "Big. Not sheep. Fine."]),
   ...R(2, "cow", ["Not you. You are not my problem. Stay that way, you great ambling milk cupboard.", "Look at it. Nobody is trying to carry it anywhere. It has no idea how good it has it.", "Yes, hello, cow. No, I do not want to talk about it. You did the pats, did you? Thought so."]),
