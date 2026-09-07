@@ -147,6 +147,11 @@ async function newHerder(): Promise<void> {
   const map = generateMap(seed, { size: BOARD_SIZE });
   const world = createWorld(seed, map, Date.now());
   if (START_BOOKS > 0) world.booksRead = START_BOOKS;
+  // `?weather=rain|fog|wind` pins a weather for the whole day (development screenshots).
+  const weather = params.get("weather");
+  if (weather === "rain") world.rainUntilTick = 1e9;
+  if (weather === "fog") world.fogUntilTick = 1e9;
+  if (weather === "wind") world.windUntilTick = 1e9;
   await repository.save(world);
   await startSession(world);
 }

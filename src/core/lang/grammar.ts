@@ -73,6 +73,8 @@ export class Grammar {
 
   private entryAllowed(e: LexEntry, ctx: Context, bandCap: Band): boolean {
     if (e.band > Math.min(ctx.band, bandCap)) return false;
+    // Foreign verbs would take English endings ("traînered"); keep verb slots English.
+    if (e.pos === "verb" && e.lang && e.lang !== "en") return false;
     if (!this.entryKnown(e, ctx)) return false;
     if (e.targets && !e.targets.includes(ctx.target.kind)) return false;
     return true;

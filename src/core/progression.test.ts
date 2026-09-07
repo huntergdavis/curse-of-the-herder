@@ -28,10 +28,11 @@ describe("progression", () => {
     expect(curseIntervalSeconds(12, 100)).toBeLessThan(curseIntervalSeconds(0, 0));
   });
   it("frustration baseline rises through the day and the meter drifts toward it", () => {
-    expect(frustrationBaseline(0)).toBe(12);
-    expect(frustrationBaseline(4)).toBeGreaterThan(40);
-    expect(frustrationBaseline(9)).toBe(78);
-    expect(frustrationDrift(80, 40, 10)).toBe(75);
+    expect(frustrationBaseline(0)).toBe(10);
+    expect(frustrationBaseline(4)).toBeGreaterThan(38);
+    expect(frustrationBaseline(9)).toBe(74);
+    expect(frustrationDrift(80, 40, 10)).toBeLessThan(75);
+    expect(frustrationDrift(80, 40, 10)).toBeGreaterThan(40);
     expect(frustrationDrift(10, 40, 10)).toBe(30);
     expect(frustrationDrift(39.9, 40, 10)).toBe(40);
   });

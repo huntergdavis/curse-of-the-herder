@@ -105,7 +105,7 @@ export const RULES_5_8: Rule[] = [
     "Caught. #triad.cap#. Caught.",
   ], GROSE),
   ...R(5, "penned", [
-    "In you go, #vocative#, and may the pen improve you.", "#nth.cap# sheep penned #aside#. #remaining.cap# remain, each #adj#er than the last.",
+    "In you go, #vocative#, and may the pen improve you.", "#nth.cap# sheep penned #aside#. #remaining.cap# remain, each more #adj# than the last.",
     "#oath.cap#, that is #penned#. I am told there are #remaining# more. I am told this by my #bodypart#.", "Stay in, you #insult#. The gate is not a suggestion.",
     "#penned.cap# in. My #bodypart# lodge a complaint, and I have signed it.",
   ], GROSE),
@@ -130,13 +130,13 @@ export const RULES_5_8: Rule[] = [
     "#bard_np.cap#!", "#oath.cap#! #bard_np.cap#!", "Would that #target# were #adj#, for then #clause#.", "Thou art #insult_np.a#, and I am weary of thee.",
     "#bard_clause.cap#, and #bard_clause#.", "Hie thee hence, #bard_np#, ere I #threat#.", "A plague upon this #target#, and upon thee, #bard_np#.",
     "#vocative.cap#, thou #adj#, #adj# #insult#, hear me: #bard_clause#.", "Out, #adj# #target#! Out, I say! #bard_clause.cap#.",
-    "I would thou wert #adj#er, that I might curse thee the more.", "#oath.cap#, what #insult# is this that stands before me, #adj# and #adj#?",
+    "I would thou wert more #adj#, that I might curse thee the more.", "#oath.cap#, what #insult# is this that stands before me, #adj# and #adj#?",
     "Thou #insult#, thou #insult#, thou #intensifier# #adj# #insult#, get thee to #noun.a#!", "#bard_clause.cap#; I have said it, and I shall say it again to the #target#.",
     "Marry, #vocative#, thou art as #adj# as #simile#, and the day is #adj# with thee.", "What #abstract# is this, that I should #verb# #remaining# sheep #time#?",
     "#oath.cap#! Get thee to #noun.a#, #bard_np#.", "Thou #adj# #insult#, thy wool is #adj# and thy purpose #adj#er still.",
     "Peace, #target#! Thou art #adj#, and I would have quiet from thee.", "I do beshrew this #target#, and this #noun#, and thee, #bard_np#.",
     "Hear me, ye #noun.pl#: #bard_clause#, and I am past caring.", "#bard_np.cap#, thou wert made of #abstract# and left out in the rain.",
-    "Sirrah #target#, I have carried #penned# of thy kind, and each was #adj#er than the last.", "Fie! #bard_clause.cap#! Fie again!",
+    "Sirrah #target#, I have carried #penned# of thy kind, and each was more #adj# than the last.", "Fie! #bard_clause.cap#! Fie again!",
   ], BARD),
   ...R(6, "flee", [
     "Stay, #bard_np#! Stay, I say, ere I #threat#!", "#oath.cap#! It flies! #bard_np.cap#, come hither!", "Hold, thou #adj# #insult#! Thy legs are #adj# and thy cause is lost!",
@@ -216,7 +216,7 @@ export const RULES_5_8: Rule[] = [
     "#remaining.cap# sheep. #penned.cap# in. The #noun# does not count them and neither should I.", "It was #adj# and it was #time# and I was tired in the way that is not tiredness.",
     "The #noun# did not help. Nothing helps. You carry the sheep or you do not.", "I said nothing to the #target#. The #target# had said nothing to me. We understood each other.",
     "The rain came and the #noun# was #adj# with it and I walked in it because that was what there was.", "I wanted #noun.a#. There was no #noun#. There was a #target#.",
-    "The #target# was #adj#. I had known #adj# #target.pl# before. This one was #adj#er, but not by much.", "You do not talk to a sheep. You carry it. Talking is for the #noun#.",
+    "The #target# was #adj#. I had known #adj# #target.pl# before. This one was more #adj#, but not by much.", "You do not talk to a sheep. You carry it. Talking is for the #noun#.",
     "I had #verb.ed# all morning. The morning was #adj#. It had not asked me.", "The #noun# was good. It was the only good thing. I did not tell it so.",
   ], HEM),
   ...R(8, "flee", [

@@ -272,7 +272,7 @@ export function createWorld(seed: string, map: GameMap, wallMs: number, opts: Fl
       tripTiles: 0,
     },
     sheep,
-    frustration: 12,
+    frustration: 10,
     booksRead: 0,
     sheepPenned: 0,
     totalCurses: 0,

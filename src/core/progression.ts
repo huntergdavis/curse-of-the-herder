@@ -63,11 +63,12 @@ export function clampFrustration(v: number): number {
  */
 export function frustrationBaseline(hoursElapsed: number): number {
   // He wakes up already a little sore about it.
-  return Math.max(0, Math.min(78, 12 + hoursElapsed * 9));
+  return Math.max(0, Math.min(74, 10 + hoursElapsed * 7.5));
 }
 
 /** Per-tick drift toward the baseline: slow relief above it, steady simmer below it. */
 export function frustrationDrift(current: number, baseline: number, dtMinutes: number): number {
-  if (current > baseline) return Math.max(baseline, current + FRUSTRATION.decayPerMinute * dtMinutes);
+  // Spikes above the baseline fade at about a point a minute, faster the higher they are.
+  if (current > baseline) return Math.max(baseline, current - (0.8 + (current - baseline) / 40) * dtMinutes);
   return Math.min(baseline, current + 2.0 * dtMinutes);
 }
