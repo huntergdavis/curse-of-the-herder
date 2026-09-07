@@ -22,6 +22,8 @@ export class Renderer {
   height = 0;
 
   private houses: { x: number; y: number }[] = [];
+  /** Villagers stand by their wells; each remembers when it last heard something. */
+  private villagers: { x: number; y: number; shockedUntil: number; variant: number }[] = [];
 
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
@@ -37,11 +39,59 @@ export class Renderer {
 
   private indexHouses(): void {
     this.houses = [];
+    this.villagers = [];
     const n = this.map.size;
     for (let i = 0; i < n * n; i++) {
       const d = this.map.deco[i];
       if (d === Deco.House || d === Deco.HouseRed) this.houses.push({ x: i % n, y: Math.floor(i / n) });
+      if (d === Deco.Well) this.villagers.push({ x: (i % n) + 1, y: Math.floor(i / n), shockedUntil: 0, variant: (i * 7) % 3 });
     }
+  }
+
+  /** A strong line was said at (x, y); villagers within earshot clutch their pearls. */
+  scandalise(x: number, y: number, nowMs: number): void {
+    for (const v of this.villagers) if (Math.hypot(v.x - x, v.y - y) < 11) v.shockedUntil = nowMs + 2600;
+  }
+
+  private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
+    const ctx = this.ctx;
+    const px = sx(v.x + 0.5);
+    const py = sy(v.y + 0.95);
+    const shocked = nowMs < v.shockedUntil;
+    const bob = Math.sin(nowMs / 900 + v.variant) * T * 0.01;
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.beginPath();
+    ctx.ellipse(px, py, T * 0.22, T * 0.07, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#2b2620";
+    ctx.lineWidth = Math.max(1, T * 0.04);
+    ctx.fillStyle = ["#7f9bd1", "#c97c7c", "#8fb07a"][v.variant]!;
+    ctx.beginPath();
+    ctx.roundRect(px - T * 0.16, py - T * 0.62 - bob, T * 0.32, T * 0.42, T * 0.08);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#e8b98a";
+    ctx.beginPath();
+    ctx.arc(px, py - T * 0.74 - bob, T * 0.14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Hands: on hips normally, over the mouth when scandalised.
+    ctx.strokeStyle = "#e8b98a";
+    ctx.lineWidth = Math.max(2, T * 0.07);
+    ctx.beginPath();
+    if (shocked) {
+      ctx.moveTo(px - T * 0.14, py - T * 0.5 - bob);
+      ctx.lineTo(px - T * 0.03, py - T * 0.7 - bob);
+      ctx.moveTo(px + T * 0.14, py - T * 0.5 - bob);
+      ctx.lineTo(px + T * 0.03, py - T * 0.7 - bob);
+    } else {
+      ctx.moveTo(px - T * 0.16, py - T * 0.55 - bob);
+      ctx.lineTo(px - T * 0.22, py - T * 0.35 - bob);
+      ctx.moveTo(px + T * 0.16, py - T * 0.55 - bob);
+      ctx.lineTo(px + T * 0.22, py - T * 0.35 - bob);
+    }
+    ctx.stroke();
+    if (shocked) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "!");
   }
 
   resize(): void {
@@ -101,6 +151,12 @@ export class Renderer {
         const surface = chunks.get(cx, cy);
         ctx.drawImage(surface as CanvasImageSource, sx(cx * chunkWorld), sy(cy * chunkWorld), chunkDraw + 0.5, chunkDraw + 0.5);
       }
+    }
+
+    // Villagers by their wells.
+    for (const v of this.villagers) {
+      if (Math.abs(v.x - cam.x) * T > W / 2 + T * 2 || Math.abs(v.y - cam.y) * T > H / 2 + T * 2) continue;
+      this.drawVillager(v, sx, sy, T, nowMs);
     }
 
     // Sheep, sorted by y for overlap.

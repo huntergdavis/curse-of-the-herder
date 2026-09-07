@@ -26,6 +26,8 @@ export interface HallRecord {
   longestLine: string;
   epitaph: string;
   signatureWord: string;
+  /** Most-used lexicon word and its favourite target. */
+  favouriteWord?: { w: string; n: number; mostly: string } | undefined;
   /** What he read, in order, and a taste of what each book gave him. */
   reading: { title: string; author: string; clock: string; taught: string[]; used?: { w: string; n: number; mostly: string }[] }[];
 }
@@ -68,6 +70,11 @@ export function makeHallRecord(w: WorldState, epitaph: string, vocabulary: numbe
     longestLine: w.longestLine,
     epitaph,
     signatureWord,
+    favouriteWord: (() => {
+      const top = Object.entries(w.wordUse).sort((a, b) => b[1].n - a[1].n)[0];
+      if (!top || top[1].n < 2) return undefined;
+      return { w: top[0], n: top[1].n, mostly: Object.entries(top[1].at).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "" };
+    })(),
     reading: w.readingList.map((r) => {
       const b = BOOK_BY_ID.get(r.bookId);
       const entries = b?.pack ? packEntries(b.pack) : [];

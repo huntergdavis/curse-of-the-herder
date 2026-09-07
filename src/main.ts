@@ -353,6 +353,8 @@ function say(s: Session, text: string, heat: number, seconds: number, nowMs: num
   if (!force && FAST > 1 && nowMs - lastSayMs < MIN_SAY_GAP_MS) return;
   lastSayMs = nowMs;
   if (u) tallyUse(s.world, u.used, u.targetLabel);
+  // Villagers within earshot are scandalised by strong language.
+  if (heat > 0.55) s.renderer.scandalise(s.world.herder.x, s.world.herder.y, nowMs);
   s.bubbles.say(text, heat, seconds, nowMs);
   s.world.totalCurses++;
   s.recent.push(text);
@@ -407,6 +409,7 @@ function showEndCard(r: HallRecord): void {
     `<h1>${escapeHtml(r.name)}</h1><p>penned the last of ${r.sheep} sheep at ${r.finishedClock} and was retired to the Hall of Herders.</p>` +
       stoneHtml(r) +
       `<p>${r.totalCurses} curses · ${r.booksRead} books · ${r.vocabulary} words · Level ${r.level}, ${escapeHtml(r.levelName)}</p>` +
+      (r.favouriteWord ? `<p>Favourite word: <strong>${escapeHtml(r.favouriteWord.w)}</strong> (${r.favouriteWord.n}×${r.favouriteWord.mostly ? `, mostly at ${escapeHtml(r.favouriteWord.mostly)}` : ""})</p>` : "") +
       (r.longestLine ? `<p class="epitaph" style="font-size:15px;opacity:.8">Longest outburst: “${escapeHtml(r.longestLine)}”</p>` : "") +
       readingHtml(r, true) +
       `<p>${next}</p>`,
@@ -423,7 +426,7 @@ async function showHall(): Promise<void> {
     .slice(0, 64)
     .map(
       (r) =>
-        `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd></dl>` +
+        `<article class="hall-card">${stoneHtml(r)}<dl><dt>Sheep</dt><dd>${r.sheep}</dd><dt>Books</dt><dd>${r.booksRead}</dd><dt>Curses</dt><dd>${r.totalCurses}</dd><dt>Vocabulary</dt><dd>${r.vocabulary}</dd><dt>Level</dt><dd>${r.level} · ${escapeHtml(r.levelName)}</dd><dt>Hours</dt><dd>${r.hoursOnTheJob}</dd>${r.favouriteWord ? `<dt>Favourite word</dt><dd>${escapeHtml(r.favouriteWord.w)} (${r.favouriteWord.n}×)</dd>` : ""}</dl>` +
         (r.longestLine ? `<div class="longest">“${escapeHtml(r.longestLine)}”</div>` : "") +
         readingHtml(r, true) +
         `</article>`,
