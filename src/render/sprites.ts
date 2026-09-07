@@ -250,19 +250,19 @@ export function drawHerder(ctx: Ctx, x: number, y: number, T: number, p: HerderP
     ctx.lineTo(-T * 0.28, -T * 1.2 - bob);
     ctx.moveTo(T * 0.2, -T * 0.85 - bob);
     ctx.lineTo(T * 0.28, -T * 1.2 - bob);
+  } else if (p.wave) {
+    // A stiff wave: one arm up and wagging a little, the other where it was. He lets go of the hat for it.
+    const wag = Math.sin(p.phase * Math.PI * 6) * T * 0.05;
+    ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(-T * 0.3, -T * 0.5 - bob);
+    ctx.moveTo(T * 0.2, -T * 0.85 - bob);
+    ctx.lineTo(T * 0.34 + wag, -T * 1.24 - bob);
   } else if (p.windy) {
     // One hand clamped on the hat, the other out for balance.
     ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
     ctx.lineTo(-T * 0.34, -T * 0.6 - bob);
     ctx.moveTo(T * 0.2, -T * 0.85 - bob);
     ctx.lineTo(T * 0.14, -T * 1.22 - bob);
-  } else if (p.wave) {
-    // A stiff wave: one arm up and wagging a little, the other where it was.
-    const wag = Math.sin(p.phase * Math.PI * 6) * T * 0.05;
-    ctx.moveTo(-T * 0.2, -T * 0.85 - bob);
-    ctx.lineTo(-T * 0.3, -T * 0.5 - bob);
-    ctx.moveTo(T * 0.2, -T * 0.85 - bob);
-    ctx.lineTo(T * 0.34 + wag, -T * 1.24 - bob);
   } else if (p.fury > 0.6 && !p.walking) {
     // Fists shaking at the sky.
     const shake = Math.sin(p.phase * Math.PI * 8) * T * 0.04;
