@@ -545,6 +545,7 @@ function stepHerder(w: WorldState, map: GameMap): void {
         s.flees++;
         w.stats.flees++;
         if (w.streak >= 5) pushEvent(w, { tick: w.tick, kind: "streakBroken", sheepId: s.id, detail: String(w.streak) });
+        if (s.flees === 3 && !w.sheep.some((o) => o.id !== s.id && o.flees >= 3)) pushEvent(w, { tick: w.tick, kind: "nemesis", sheepId: s.id });
         w.streak = 0;
         fleeTo(w, map, s);
         if (s.flees >= 2) {
@@ -573,6 +574,8 @@ function stepHerder(w: WorldState, map: GameMap): void {
           w.stats.absurds++;
           addFrustration(w, FRUSTRATION.absurdLocation);
           pushEvent(w, { tick: w.tick, kind: "absurd", sheepId: s.id });
+        } else if (s.flees >= 3) {
+          pushEvent(w, { tick: w.tick, kind: "nemesisCaught", sheepId: s.id, detail: String(s.flees) });
         } else if (s.escapee) {
           pushEvent(w, { tick: w.tick, kind: "recaptured", sheepId: s.id });
         } else if (s.black) {

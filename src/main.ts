@@ -337,7 +337,7 @@ function handleEvents(s: Session, nowMs: number): void {
       }
     }
     if (e.kind === "finished") onFinished(s);
-    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || (e.kind === "mishap" && e.detail === "crook")) {
+    if (e.kind === "rant" || e.kind === "jailbreak" || e.kind === "milestone" || e.kind === "book" || e.kind === "finished" || e.kind === "streak" || e.kind === "streakBroken" || e.kind === "nemesisCaught" || (e.kind === "mishap" && e.detail === "crook")) {
       maybeCurseRemarks(s, e.kind === "mishap" ? "crook" : e.kind, nowMs);
     }
   }
@@ -384,6 +384,10 @@ function hourlyDiary(s: Session): void {
     w.stats.flees ? `${w.stats.flees} bolted` : "",
     w.stats.absurds ? `${w.stats.absurds} found somewhere absurd` : "",
     w.stats.rains ? `${w.stats.rains} rain${w.stats.rains === 1 ? "" : "s"}` : "",
+    (() => {
+      const top = [...w.sheep].sort((a, b) => b.flees - a.flees)[0];
+      return top && top.flees >= 3 ? `nemesis: ${sheepName(w.seed, top.id)} (${top.flees} flights${top.mode === "penned" ? ", penned" : ""})` : "";
+    })(),
   ].filter(Boolean).join(", ");
   toast(`<strong>${String(hour).padStart(2, "0")}:00</strong> · ${w.sheepPenned}/${w.sheep.length} sheep in · ${w.booksRead} book${w.booksRead === 1 ? "" : "s"} · level ${level} · ${mood}${notes ? ` · ${notes}` : ""}`);
 }
@@ -419,6 +423,7 @@ const CURSE_LINES: Record<string, string[]> = {
   milestone: ["Halfway is a word. It has never once been a place.", "You are counting. I find that touching.", "One left. You will remember this one. You always do."],
   streak: ["Enjoy it.", "Five. The Curse is generous in small amounts.", "I did that. You are welcome. It ends now."],
   streakBroken: ["Told you.", "There. Better.", "Balance restored."],
+  nemesisCaught: ["Congratulations. It is a sheep.", "Savour it. There are more.", "I let you have that one."],
   crook: ["The crook was never the point.", "Everything breaks. You are the exception, so far."],
   finished: ["Sleep. Tomorrow you will not remember the words. That is the part I enjoy.", "Well done. Sincerely. Now: sixty."],
   book: ["Learn all the words you like. The sheep have heard them.", "That book was mine. They all were.", "You will be eloquent at nobody. It suits you."],

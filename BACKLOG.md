@@ -55,6 +55,7 @@ long soak.
 - The Curse's dry remarks from level 10, hat lines, bats after dark, French miscounting
 - Streaks he does not trust, rereads, weather-lifting lines, villagers with brooms, toasts visible in quiet mode
 - Streak-broken payoff line when a run of five or more ends, with a Curse remark; escapees get a "recaptured" line when caught again and an "(again)" name tag while loose; jailbreak count on the Hall card
+- Nemesis arc: the first sheep to bolt three times is declared the enemy ("Everyone else is a sheep. You are a project."), gets a triumph line and a Curse remark when finally caught, and is named in the hourly diary
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

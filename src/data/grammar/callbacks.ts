@@ -108,6 +108,18 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(2, "streakBroken", ["There it is. I KNEW it. Five in a row and then you, #vocative#. You could not let me have six.", "And the luck runs out, like everything else on this hill, downhill and away from me.", "I said it. I said this is how the bad ones start. Nobody listens to me. Least of all me."]),
   ...R(4, "streakBroken", ["#oath_phrase#! I called it! I called it at five and here it is at #vocative#!", "#pantheon.cap#, thank you for the run of luck; I see you have taken it back with interest."]),
   ...R(8, "streakBroken", ["The run ended. I had known it would. Knowing did not make the sheep slower."], { reg: ["hemingway"] }),
+  // Three flights. He has an enemy now.
+  ...R(0, "nemesis", ["THREE. You. Enemy.", "You. I see you.", "Three times. Remember face."]),
+  ...R(2, "nemesis", ["Three times, #vocative#. Three. That is not luck any more, that is a decision, and I have made one too.", "Right. You have a name now and I am going to use it in a tone of voice.", "Everyone else is a sheep. You are a project."]),
+  ...R(4, "nemesis", ["#oath_phrase#! Three flights! Hear me, #vocative#: of sixty sheep on this hill you are the only one I would describe as PERSONAL.", "#pantheon.cap#, mark this one. Not for me. I want it marked for later."]),
+  ...R(6, "nemesis", ["I have herded sheep for a lifetime and I have never before hated one by name. Congratulations, #vocative#. You are a first."]),
+  ...R(8, "nemesis", ["Three times it ran. I stopped counting sheep and started counting that one."], { reg: ["hemingway"] }),
+  // The enemy, on his shoulders at last.
+  ...R(0, "nemesisCaught", ["GOT. YOU.", "Mine. MINE.", "Ha. HA."]),
+  ...R(2, "nemesisCaught", ["Got you. GOT you. #nth# time is the charm, #vocative#, and I am going to enjoy every step of this walk.", "You are heavier than you look and I hope that is guilt.", "Say goodbye to the hill, #vocative#. Say it. I will wait."]),
+  ...R(4, "nemesisCaught", ["#oath_phrase#, I have you at LAST, you #adj# #insult#, and if you so much as twitch I will carry you in a manner I cannot describe near a village!", "#pantheon.cap#, witness: the #adj# one, caught, by ME, with a #body_part# that is barely working."]),
+  ...R(6, "nemesisCaught", ["Caught. Hold still, #vocative#; I want to remember the exact weight of you for when I am old and need something to smile about."]),
+  ...R(8, "nemesisCaught", ["I had it. It did not struggle. It knew, the way they know."], { reg: ["hemingway"] }),
   // The escapee, recaptured.
   ...R(0, "recaptured", ["Back. In. AGAIN.", "You. Back.", "Got you. Twice."]),
   ...R(2, "recaptured", ["Back you go, #vocative#. Back you GO. And this time I am tying the gate with my own belt.", "Recaptured. I want that on the record. I want a plaque.", "You got out once, #vocative#. Everyone gets out once. Nobody gets out twice. That is not a rule, it is a threat."]),
