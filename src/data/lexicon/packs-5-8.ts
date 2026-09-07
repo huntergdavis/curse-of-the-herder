@@ -376,7 +376,7 @@ export const crawler: LexPack = {
   reviewedAt: "2026-09-07",
   level: 6,
   entries: [
-    cr(oath("Goddamnit, Donut!", 2)), cr(oath("Goddamnit, Donut!", 2)), cr(oath("goddamnit", 2)), cr(oath("oh, for the love of", 1)), cr(oath("not again, Donut", 1)),
+    cr(oath("Goddamnit, Donut!", 2)), cr(oath("Goddamnit, Donut!", 2)), cr(oath("goddamnit", 2)), cr(oath("oh, for the love of", 1)),
     cr(interj("New achievement!")), cr(interj("Loot box!")), cr(interj("Level up!")), cr(interj("Achievement unlocked!")),
     cr(n("loot box", { pl: "loot boxes" })), cr(n("achievement")), cr(n("dungeon")), cr(n("staircase")), cr(n("boss")), cr(n("tiara")), cr(n("hairball")), cr(n("announcer")),
     cr(n("crawler")), cr(n("level")), cr(n("cat")), cr(n("trousers", { pl: "-" })), cr(n("floor")), cr(n("goblin")), cr(n("tutorial")), cr(n("respawn")),
