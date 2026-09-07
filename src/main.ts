@@ -117,13 +117,32 @@ if (params.has("debug")) {
   (window as unknown as { __curse: unknown }).__curse = {
     camera: () => (session ? { x: session.camera.x, y: session.camera.y } : null),
     chunkAt: () => (session ? session.renderer.debugChunkAt(Math.round(session.world.herder.x), Math.round(session.world.herder.y)) : null),
+    memorial: (name: string, epitaph: string) => { if (session) session.renderer.memorial = { name, epitaph }; },
+    mapRow: (y: number, x0: number, x1: number) => {
+      if (!session) return "";
+      let out = "";
+      for (let x = x0; x <= x1; x++) {
+        const t = session.map.terrain[y * session.map.size + x];
+        out += t === 0 ? "W" : t === 9 ? "R" : t === 2 || t === 3 ? "g" : String(t);
+      }
+      return out;
+    },
+    teleportToPen: () => {
+      if (!session) return;
+      const w = session.world;
+      w.herder.x = session.map.pen.x + 1;
+      w.herder.y = session.map.pen.y + 3;
+      w.herder.mode = "idle";
+      w.herder.path = [];
+      session.camera.snap(w.herder.x, w.herder.y);
+    },
     diag: () => {
       if (!session) return null;
       const w = session.world;
       const hx = Math.round(w.herder.x);
       const hy = Math.round(w.herder.y);
       return {
-        name: w.name, seed: w.seed, size: w.size, herder: { x: w.herder.x, y: w.herder.y }, camera: { x: session.camera.x, y: session.camera.y },
+        name: w.name, seed: w.seed, size: w.size, herder: { x: w.herder.x, y: w.herder.y, mode: w.herder.mode }, pen: session.map.pen, camera: { x: session.camera.x, y: session.camera.y }, memorial: session.renderer.memorial,
         simTerrainAtHerder: session.map.terrain[hy * session.map.size + hx], sameMapObject: session.renderer.debugMap() === session.map,
         renderTerrainAtHerder: session.renderer.debugMap().terrain[hy * session.renderer.debugMap().size + hx], renderMapSize: session.renderer.debugMap().size,
         chunk: session.renderer.debugChunks(), tilePx: session.renderer.tilePx, dpr: window.devicePixelRatio,

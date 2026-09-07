@@ -44,7 +44,7 @@ One tick is 250 ms of wall time at 1×, so the sim clock runs at real speed: 09:
  P0  Must be right for a screensaver that runs all day
      [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (the fix is deployed)
      [ ] Frame time on real hardware: open with ?stats=1, note frame ms at 1x and 100x (Orion is fine; Chrome also shows heap)
-     [ ] Memorial stone text stays on the stone (fixed; verified headless — a glance in the real thing when a second herder wakes)
+     [x] Memorial stone text stays on the stone (fixed and verified at ratio 3 with a long epitaph)
  P1  Things a viewer will notice
      [ ] Language: cut the weakest templates from a transcript read each release; `self` target facet for "I am #adj#"
      [ ] Flyting as a real duel (escalating sheep emotes, herder reacting) — the "..." indicator is gone, so this needs a new shape

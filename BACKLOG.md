@@ -97,7 +97,7 @@ long soak.
 
 - [ ] Confirm on the MacBook Air: a full day, then a second herder, no sea over the island (fix deployed 2026-09-07).
 - [ ] Frame time on real hardware via `?stats=1` (frame ms, draw ms, heap) at 1× and 100×.
-- [ ] Memorial stone text stays on the stone: fixed with a measured wrap and clip; glance at it when a second herder wakes.
+- [x] Memorial stone text stays on the stone: fixed with a measured wrap and clip; verified at ratio 3 with a long epitaph (`node scripts/shot-memorial.mjs`).
 
 ## P1 — Things a viewer will notice
 

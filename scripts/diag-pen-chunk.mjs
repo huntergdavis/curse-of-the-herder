@@ -1,0 +1,14 @@
+import { chromium } from "@playwright/test";
+import { writeFileSync } from "node:fs";
+const [url, out] = process.argv.slice(2);
+const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 3 });
+await p.goto(url);
+await p.waitForSelector("#overlay", { state: "hidden", timeout: 60000 });
+await p.evaluate(() => { window.__curse.teleportToPen(); });
+await p.waitForTimeout(500);
+const r = await p.evaluate(async () => { const d = window.__curse.diag(); const ch = await window.__curse.chunkAt(); return { herder: d.herder, cam: d.camera, cx: ch.cx, cy: ch.cy, rows: ch.rows, png: ch.png }; });
+console.log(JSON.stringify({ herder: r.herder, cam: r.cam, cx: r.cx, cy: r.cy }));
+console.log(r.rows.join("\n"));
+if (r.png) writeFileSync(`${out}.png`, Buffer.from(r.png.split(",")[1], "base64"));
+await p.screenshot({ path: `${out}-screen.png` });
+await b.close();
