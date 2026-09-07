@@ -24,6 +24,10 @@ All terrain, sprites, UI and the tombstone are drawn procedurally in code.
   (CC BY-NC 3.0 for the edited text; we take only headwords, which are
   facts); Wiktionary category headwords (CC BY-SA 4.0; derived data
   files are marked CC BY-SA); CMU Pronouncing Dictionary (BSD-style).
+- Genuine excerpts quoted in the books, all public domain: Grose (1785),
+  Shakespeare, Rabelais, Molière, Cervantes, Burns, Marryat (*Jacob
+  Faithful*, 1834), Bierce (*The Devil's Dictionary*, 1911), Hemingway
+  (*In Our Time*, 1925), Jerome K. Jerome (*Three Men in a Boat*, 1889).
 
 ## Inspiration (nothing copied)
 
