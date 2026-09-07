@@ -41,6 +41,15 @@ export class Grammar {
     }
   }
 
+  /** Expand a one-off template with the current context (used for quotation frames). */
+  expandTemplate(template: string, ctx: Context, salt = 0): string | null {
+    const rnd = mulberry32(fnv1a(`${ctx.seed}|frame|${ctx.tick}|${salt}`));
+    const raw = this.expand(template, ctx, rnd, 0, ctx.band);
+    if (raw === null) return null;
+    const text = tidySentence(raw);
+    return findBanned(text) ? null : text;
+  }
+
   /** Words the herder can use right now (for HUD "vocabulary" stats). */
   knownWords(ctx: Context): number {
     let n = 0;

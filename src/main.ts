@@ -26,6 +26,13 @@ const FRAME_MIN_MS = 1000 / FPS_CAP;
 void TICKS_PER_HOUR;
 /** `?clean=1` caps filth at F1 for shared displays; the toolbar setting persists; `?filth=max` removes the frustration gate for testing. */
 let BAND_CAP: Band = params.get("clean") ? 1 : (Number(repository.getSetting("band", "4")) as Band);
+/** `?cam=x,y` pins the camera to a tile (development screenshots). */
+const CAM_PIN = (() => {
+  const v = params.get("cam");
+  if (!v) return null;
+  const [x, y] = v.split(",").map(Number);
+  return Number.isFinite(x) && Number.isFinite(y) ? { x: x!, y: y! } : null;
+})();
 /** `?books=N` starts a new herder as if he had already read N books (skip ahead). */
 const START_BOOKS = Math.max(0, Math.min(30, Number(params.get("books") ?? 0) || 0));
 const FILTH_MAX = params.get("filth") === "max";
@@ -49,6 +56,10 @@ interface Session {
   recent: string[];
   /** Which excerpt of the current book is showing. */
   excerptShown: number;
+  /** Lines waiting to be delivered after the current bubble (flyting, quotations). */
+  queue: { text: string; heat: number; seconds: number; sheepId?: number; emote?: string; atMs: number }[];
+  /** The last book finished, for quoting later. */
+  lastBook: { id: string; tick: number; quoted: boolean } | null;
   /** Wall ms when the last sheep was penned; drives the dusk fade. */
   finishedAtMs: number;
   endHandled: boolean;
@@ -102,6 +113,8 @@ async function startSession(world: WorldState): Promise<void> {
     seenSeq: world.eventCount - 1,
     recent: [],
     excerptShown: -1,
+    queue: [],
+    lastBook: null,
     finishedAtMs: 0,
     endHandled: false,
     napNoted: false,
@@ -211,8 +224,59 @@ function handleEvents(s: Session, nowMs: number): void {
     if (e.kind === "book") {
       const b = e.bookId ? BOOK_BY_ID.get(e.bookId) : undefined;
       if (b) toast(`Read <em>${b.title}</em>. Vocabulary: ${grammar.knownWords(buildContext(w, s.map, null, [], BAND_CAP))} words.`);
+      if (e.bookId) s.lastBook = { id: e.bookId, tick: w.tick, quoted: false };
+    }
+    // A notorious sheep, finally caught, gets a proper telling-off: a short flyting.
+    if (e.kind === "caught" && w.sheep[e.sheepId]?.named && u) {
+      const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
+      if (level >= 2) {
+        const salts = [101, 202];
+        let at = nowMs + u.seconds * 1000 + 400;
+        for (const salt of salts) {
+          const line = speakForEvent(w, s.map, { ...e, kind: "repeatEscape", seq: e.seq * 10 + salt }, s.recent, BAND_CAP);
+          if (!line) continue;
+          s.queue.push({ text: line.text, heat: Math.min(1, line.heat + 0.15), seconds: line.seconds, sheepId: e.sheepId, emote: salt === 101 ? "!" : "…", atMs: at });
+          at += line.seconds * 1000 + 400;
+        }
+      }
     }
     if (e.kind === "finished") onFinished(s);
+  }
+}
+
+const QUOTE_FRAMES: [number, string[]][] = [
+  [0, ["The book said: {q} It was right.", "{q} That is from a book. The book had not met this sheep.", "A book told me: {q} I believed it."]],
+  [4, ["{q} So says the book, and I say #oath#.", "As the book has it: {q} As I have it: #insult_np#.", "I read {q} this morning. I have since revised it."]],
+  [8, ["{q} I read that. I carried a sheep afterwards. Both are true.", "The book said {q} The book did not have to carry anything."]],
+  [10, ["{q} — thus the volume; thus, too, the afternoon, which has annotated it in mud.", "One reads {q} and one carries a sheep regardless. The two activities are not in conversation."]],
+];
+
+/** Ten-odd minutes after a book, he quotes it back at the day. */
+function maybeQuoteBook(s: Session, nowMs: number): void {
+  const w = s.world;
+  const lb = s.lastBook;
+  if (!lb || lb.quoted || w.tick - lb.tick < 8 * 60 * 4 || w.tick - lb.tick > 25 * 60 * 4) return;
+  if (w.herder.mode !== "toSheep" && w.herder.mode !== "toPen") return;
+  lb.quoted = true;
+  const book = BOOK_BY_ID.get(lb.id);
+  if (!book) return;
+  const level = levelFor(erudition(w.booksRead, w.sheepPenned, hoursElapsed(w)));
+  const frames = [...QUOTE_FRAMES].reverse().find(([min]) => level >= min)?.[1] ?? QUOTE_FRAMES[0]![1];
+  const frame = frames[(w.tick + lb.id.length) % frames.length]!;
+  const excerpt = book.excerpts[(w.tick >> 3) % book.excerpts.length] ?? "";
+  // Let the grammar fill any slots in the frame, then drop the quotation in.
+  const ctx = buildContext(w, s.map, null, s.recent, BAND_CAP);
+  const filled = grammar.expandTemplate(frame.replace("{q}", "QUOTEHERE"), ctx) ?? frame.replace("{q}", "QUOTEHERE");
+  const text = filled.replace("QUOTEHERE", `“${excerpt}”`);
+  say(s, text, Math.min(0.6, w.frustration / 100), 5 + text.length * 0.04, nowMs);
+}
+
+/** Deliver queued follow-up lines when their time comes. */
+function flushQueue(s: Session, nowMs: number): void {
+  while (s.queue.length && s.queue[0]!.atMs <= nowMs) {
+    const q = s.queue.shift()!;
+    say(s, q.text, q.heat, q.seconds, nowMs);
+    if (q.sheepId !== undefined && q.emote) s.bubbles.emote(q.sheepId, q.emote, Math.min(3, q.seconds), nowMs + 500);
   }
 }
 
@@ -357,7 +421,9 @@ function frame(nowMs: number): void {
       }
       handleEvents(s, nowMs);
       showExcerpts(s, nowMs);
+      if (!catchingUp && w.tick % 40 === 0) maybeQuoteBook(s, nowMs);
     }
+    flushQueue(s, nowMs);
     if (nowMs - s.lastSaveMs > SAVE_EVERY_MS) {
       s.lastSaveMs = nowMs;
       void repository.save(w);
@@ -377,8 +443,11 @@ function frame(nowMs: number): void {
   const lx = next ? (next.x - h.x) * 0.25 : 0;
   const ly = next ? (next.y - h.y) * 0.25 : 0;
   // At high fast-forward the herder outruns an eased camera; scale the easing and snap if he gets away.
-  s.camera.follow(h.x + lx, h.y + ly, dt * Math.min(FAST, 12));
-  if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) > 8) s.camera.snap(h.x, h.y);
+  if (CAM_PIN) s.camera.snap(CAM_PIN.x, CAM_PIN.y);
+  else {
+    s.camera.follow(h.x + lx, h.y + ly, dt * Math.min(FAST, 12));
+    if (Math.hypot(s.camera.x - h.x, s.camera.y - h.y) > 8) s.camera.snap(h.x, h.y);
+  }
   s.bubbles.prune(nowMs);
   if (!document.hidden && nowMs - lastDrawMs >= FRAME_MIN_MS - 1) {
     lastDrawMs = nowMs;
