@@ -121,6 +121,11 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(6, "curseReply", ["Yes, thank you, I am aware that I am cursed. The reminders are not, on the whole, helping with the cursing.", "Heckled by my own affliction. There is a word for that and I will find it in a book and I will use it at you."]),
   ...R(8, "curseReply", ["The curse spoke. I did not answer. Then I did. It was not a good answer."], { reg: ["hemingway"] }),
   ...R(10, "curseReply", ["Speak up, O Curse; my #adj# hearing is the one faculty you have not yet ruined, and I should hate for you to feel you had left a job unfinished."]),
+  // The hens scatter. Everything scatters.
+  ...R(0, "hens", ["Hens. Even hens. Run.", "Not you too.", "Cluck off."]),
+  ...R(2, "hens", ["Even the hens. Even the HENS run from me. I have never so much as looked at a hen.", "Go on, scatter. Everything on this hill scatters. I could scatter a rock.", "Hens. Sixty sheep to find and the hens think it is about THEM."]),
+  ...R(4, "hens", ["#oath_phrase#, hens, out of my way, I have no quarrel with poultry and no time for one either!", "Scatter, then, you #adj# feather dusters; at least you do not have to be carried."]),
+  ...R(8, "hens", ["The hens ran. Everything ran. I was used to it. That was the worst part."], { reg: ["hemingway"] }),
   // A cow. Not his. Good.
   ...R(0, "cow", ["Cow. Not mine. Good.", "Moo yourself.", "Big. Not sheep. Fine."]),
   ...R(2, "cow", ["Not you. You are not my problem. Stay that way, you great ambling milk cupboard.", "Look at it. Nobody is trying to carry it anywhere. It has no idea how good it has it.", "Yes, hello, cow. No, I do not want to talk about it. You did the pats, did you? Thought so."]),

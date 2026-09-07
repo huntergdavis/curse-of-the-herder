@@ -69,6 +69,7 @@ long soak.
 - Lunch theft: three times in four a loose sheep within reach eats his bread and cheese halfway through lunch, chewing "nom" at him; a big frustration spike, lines at every level ("a creature with four stomachs and NO SHAME"), a toast and a Curse remark
 - The thief is caught with its own lines ("You. Cheese breath. Up you come.") and named on the end card
 - Hens by every third house: peck, scatter with a "!" when he comes within two tiles, drift back
+- He takes the hens personally ("Even the HENS run from me. I have never so much as looked at a hen."), at most every fifteen sim-minutes; `npx tsx scripts/village-of.ts <seed>` prints village coordinates for camera screenshots
 - Pacing CLI, transcript CLI, Playwright smoke test in the deploy workflow
 
 ## P0 — Language polish

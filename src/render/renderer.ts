@@ -454,6 +454,9 @@ export class Renderer {
   onHatLost: (() => void) | null = null;
   /** He has walked up to a cow; the caller may have him say something about it. */
   onCowNear: (() => void) | null = null;
+  /** The hens have just scattered in front of him. */
+  onHensScatter: (() => void) | null = null;
+  private lastHenTick = -1e9;
   /** Recently penned sheep, for the arrival hop and the neighbours' cheer. */
   private arrivals: { id: number; atMs: number }[] = [];
   /** The herder's signature word, drawn in colour when it appears in a bubble. */
@@ -952,6 +955,10 @@ export class Renderer {
       const d = Math.hypot(hen.x - h.x, hen.y - h.y);
       if (d < 2.2 && nowMs > hen.fleeUntil) {
         hen.fleeUntil = nowMs + 2600;
+        if (world.tick - this.lastHenTick > 3600 && !world.finished) {
+          this.lastHenTick = world.tick;
+          this.onHensScatter?.();
+        }
         const ang = Math.atan2(hen.y - h.y, hen.x - h.x) + (Math.random() - 0.5) * 0.8;
         hen.fx = hen.hx + Math.cos(ang) * 2.4;
         hen.fy = hen.hy + Math.sin(ang) * 1.6;
