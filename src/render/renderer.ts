@@ -296,12 +296,6 @@ export class Renderer {
     ctx.moveTo(-T * 0.28, bodyY - T * 0.02);
     ctx.lineTo(-T * 0.42, bodyY - T * 0.18 + (lying ? Math.sin(nowMs / 200) * T * 0.06 : Math.sin(nowMs / 300) * T * 0.03));
     ctx.stroke();
-    // Collar: a dog, not a cat.
-    ctx.strokeStyle = "#c0392b";
-    ctx.lineWidth = Math.max(1.5, T * 0.05);
-    ctx.beginPath();
-    ctx.arc(T * 0.2, bodyY - T * 0.05, T * 0.1, -0.9, 1.4);
-    ctx.stroke();
     // Head, with a proper snout.
     ctx.fillStyle = "#2b2620";
     ctx.beginPath();
