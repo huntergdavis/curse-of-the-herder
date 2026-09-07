@@ -30,7 +30,7 @@ export class Renderer {
 
   private houses: { x: number; y: number }[] = [];
   /** Villagers stand by their wells; each remembers when it last heard something. */
-  private villagers: { x: number; y: number; shockedUntil: number; variant: number }[] = [];
+  private villagers: { x: number; y: number; shockedUntil: number; variant: number; line?: string }[] = [];
 
   constructor(private canvas: HTMLCanvasElement, private map: GameMap) {
     this.ctx = canvas.getContext("2d")!;
@@ -55,9 +55,17 @@ export class Renderer {
     }
   }
 
+  private static VILLAGER_LINES = ["Language!", "Well I never.", "There are children!", "We heard that.", "Not in front of the well.", "Charming.", "My mother is in.", "Say it again, I am writing it down.", "The vicar is about!", "Honestly."];
+  private static DOG_THOUGHTS = ["butterfly.", "stick?", "sheep? no.", "shade.", "is it lunch.", "good spot.", "bird.", "later.", "hm.", "nap."];
+
   /** A strong line was said at (x, y); villagers within earshot clutch their pearls. */
   scandalise(x: number, y: number, nowMs: number): void {
-    for (const v of this.villagers) if (Math.hypot(v.x - x, v.y - y) < 11) v.shockedUntil = nowMs + 2600;
+    for (const v of this.villagers) {
+      if (Math.hypot(v.x - x, v.y - y) < 11) {
+        v.shockedUntil = nowMs + 2600;
+        v.line = Renderer.VILLAGER_LINES[(v.x * 7 + v.y * 13 + Math.floor(nowMs / 1000)) % Renderer.VILLAGER_LINES.length] ?? "Language!";
+      }
+    }
   }
 
   /** A calm herder passing close by gets a wave, and gives one back. */
@@ -138,9 +146,10 @@ export class Renderer {
     const beat = Math.floor(nowMs / 1000) % 29;
     if (beat === 0) drawEmote(ctx, px + T * 0.45, py - T * 0.75, T * 0.8, lying ? "z" : "?");
     else if (beat === 14 && !lying) drawEmote(ctx, px + T * 0.45, py - T * 0.75, T * 0.8, "woof");
+    else if (beat === 21 || beat === 22) drawEmote(ctx, px + T * 0.5, py - T * 0.75, T * 0.9, Renderer.DOG_THOUGHTS[Math.floor(nowMs / 29000) % Renderer.DOG_THOUGHTS.length] ?? "hm.");
   }
 
-  private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
+  private drawVillager(v: { x: number; y: number; shockedUntil: number; variant: number; line?: string }, sx: (x: number) => number, sy: (y: number) => number, T: number, nowMs: number): void {
     const ctx = this.ctx;
     const px = sx(v.x + 0.5);
     const py = sy(v.y + 0.95);
@@ -184,8 +193,11 @@ export class Renderer {
       ctx.lineTo(px + T * 0.22, py - T * 0.35 - bob);
     }
     ctx.stroke();
-    if (shocked) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "!");
-    else if (waving) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "hullo");
+    if (shocked) {
+      // Hands over the mouth for the first second, then the reply.
+      if (v.shockedUntil - nowMs > 1600 || !v.line) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "!");
+      else drawEmote(ctx, px + T * 0.5, py - T * 1.15, T * 1.1, v.line);
+    } else if (waving) drawEmote(ctx, px + T * 0.3, py - T * 1.15, T, "hullo");
   }
 
   resize(): void {

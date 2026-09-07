@@ -450,7 +450,8 @@ export function drawEmote(ctx: Ctx, x: number, y: number, T: number, glyph: stri
   ctx.strokeStyle = INK;
   ctx.lineWidth = Math.max(1, T * 0.05);
   ctx.beginPath();
-  ctx.ellipse(x, y, T * 0.28, T * 0.24, 0, 0, Math.PI * 2);
+  const rx = glyph.length > 4 ? Math.max(T * 0.28, glyph.length * T * 0.062) : T * 0.28;
+  ctx.ellipse(x, y, rx, T * 0.24, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = INK;

@@ -9,6 +9,7 @@ import { BOOK_BY_ID } from "./data/books";
 import { grammar, buildContext, signatureWord } from "./core/lang/speech";
 import { makeHallRecord, tasteOfPack, type HallRecord } from "./core/hall";
 import { sheepName } from "./core/names";
+import { keyedUnit } from "./core/rng";
 import { catchUpPlan, shouldRecover } from "./runtime/liveness";
 import { startUpdatePolling } from "./update/automatic-update";
 import { Bubbles } from "./render/bubbles";
@@ -136,6 +137,13 @@ async function startSession(world: WorldState): Promise<void> {
   renderer.fontScale = textScale;
   renderer.highContrast = contrastSetting;
   repository.setActiveId(world.id);
+  // The Sad Almanac's forecast for the day, from the seed.
+  if (world.tick === 0) {
+    const skies = ["overcast, with opinions", "bright, then not", "changeable, like the sheep", "fair, which the sheep will not honour", "grey, with grey later", "sunny spells, mostly on the sheep"];
+    const later = ["rain by lunch", "a wind that knows your name", "fog where the sheep are", "a bog that has been waiting", "one wasp, personal", "dusk, eventually"];
+    const pick = (arr: string[], salt: string): string => arr[Math.floor(keyedUnit(world.seed, salt) * arr.length)] ?? arr[0]!;
+    window.setTimeout(() => toast(`<strong>Forecast</strong> (The Sad Almanac): ${pick(skies, "sky")}; ${pick(later, "later")}. Outlook: sheep.`), 3500);
+  }
   // A fresh herder says his first words of the day.
   if (world.tick === 0 && world.events[0]) {
     const u = speakForEvent(world, map, world.events[0], [], BAND_CAP);

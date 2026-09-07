@@ -110,6 +110,14 @@ export const BOOKS: Book[] = [
     excerpts: ["Cast on loosely; the sheep did not.", "A dropped stitch, like a dropped sheep, must be gone back for.", "Wool remembers everything you do to it. So, I find, does the sheep.", "Every sheep is a cardigan waiting for a reason."],
   },
   {
+    id: "grays", title: "Gray's Anatomy, Abridged", author: "after Henry Gray, 1858", pack: "anatomy", register: "anatomy", when: 0.6, colour: "#7a1f2b",
+    excerpts: ["The clavicle: a strut. The sheep is not a strut. The sheep is a load.", "The appendix serves no purpose that has yet been discovered. Compare: the sheep.", "The spleen was once thought the seat of ill temper. The seat of mine is a hill.", "Ligaments hold the body together. Something similar holds the flock together, and I have not found it."],
+  },
+  {
+    id: "fungi", title: "A Field Guide to Fungi", author: "after M. C. Cooke, 1871", pack: "fungi", register: "fungi", when: 0.42, colour: "#8b7355",
+    excerpts: ["The puffball, when trodden, releases a cloud of spores and a small sense of achievement.", "Stinkhorn: named honestly, which is more than can be said for 'sheep'.", "Fungi thrive on the damp and the dead. They would do well on this hill.", "Never eat a mushroom you cannot name. Never carry a sheep you have."],
+  },
+  {
     id: "burns", title: "Poems, Chiefly in the Scottish Dialect", author: "Robert Burns, 1786 (genuine lines)", pack: "yiddish-scots-aussie", register: "sco", when: 0.75, colour: "#3b5b8c",
     excerpts: ["Wee, sleekit, cow'rin, tim'rous beastie, / O, what a panic's in thy breastie! (To a Mouse)", "The best-laid schemes o' mice an' men / Gang aft agley. (To a Mouse. Also: of herders and sheep.)", "O wad some Pow'r the giftie gie us / To see oursels as ithers see us! (To a Louse)", "Nae man can tether time or tide. (Tam o' Shanter. Nor sheep.)"],
   },

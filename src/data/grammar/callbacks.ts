@@ -97,6 +97,20 @@ export const CALLBACK_RULES: Rule[] = [
   ...R(4, "lastone", ["#pantheon.cap#, one. ONE. Let it be near. Let it be slow. Let it be ASLEEP.", "#oath_phrase#, one left, and the day is nearly done, and my #bodypart# are nearly done, and so, nearly, am I."]),
   ...R(8, "lastone", ["One left. I went to get it. That is all there is to say about the last one until it is in."], { reg: ["hemingway"] }),
   ...R(12, "lastone", ["One sheep between me and the stone. I have never wanted a sheep so much, or a stone."]),
+  // Anatomy and fungi registers.
+  ...R(7, "idle", [
+    "You are the #noun.own# of this valley, #vocative#: nobody knows what you are for and everybody wishes you would stop.",
+    "This #target# is #adj.own#. I say that clinically. I also say it with feeling.",
+    "#vocative.cap#, you #adj.own# #insult.own#, I have a pain in my #noun.own# and it is shaped like you.",
+    "Anatomically speaking, #vocative#, you are #adj.own#, and I speak as a man whose #noun.own# has had enough.",
+  ], { reg: ["anatomy"] }),
+  ...R(4, "idle", [
+    "You #adj.own# #insult.own#, you would not be picked by a man who was starving.",
+    "This #target# is as #adj.own# as #simile.own#.",
+    "#vocative.cap#, you grow on rot and you know it. You are a #insult.own# with a face.",
+    "Sixty #insult.own.pl# on a hill, and not one of them edible.",
+  ], { reg: ["fungi"] }),
+  ...R(4, "caught", ["Got you, you #adj.own# #insult.own#. You come off like a puffball and you smell worse."], { reg: ["fungi"] }),
   // The law.
   ...R(6, "idle", [
     "Let the record show that the #target#, hereinafter the #insult#, did wilfully and with malice aforethought be #adj#.",

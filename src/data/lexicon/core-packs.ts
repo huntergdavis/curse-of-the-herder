@@ -282,4 +282,41 @@ export const knitting: LexPack = {
   ],
 };
 
-export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord, culinary, legal, knitting];
+/** Clinical anatomy, applied where it does not belong. */
+export const anatomy: LexPack = {
+  id: "anatomy",
+  title: "Gray's Anatomy, Abridged",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 7,
+  entries: [
+    n("clavicle", { reg: ["anatomy"] }), n("patella", { reg: ["anatomy"] }), n("spleen", { reg: ["anatomy"] }), n("uvula", { reg: ["anatomy"] }), n("gall bladder", { reg: ["anatomy"] }),
+    n("epiglottis", { reg: ["anatomy"] }), n("femur", { reg: ["anatomy"] }), n("vertebra", { reg: ["anatomy"], pl: "vertebrae" }), n("duodenum", { reg: ["anatomy"] }), n("sternum", { reg: ["anatomy"] }),
+    n("cartilage", { reg: ["anatomy"], pl: "-" }), n("ligament", { reg: ["anatomy"] }), n("tendon", { reg: ["anatomy"] }), n("appendix", { reg: ["anatomy"], pl: "appendices" }), n("earlobe", { reg: ["anatomy"] }),
+    ins("appendix", { reg: ["anatomy"], pl: "appendices", gloss: "vestigial, and yet" }), ins("spleen with legs", { reg: ["anatomy"] }), ins("ambulatory gall bladder", { reg: ["anatomy"] }),
+    ins("walking uvula", { reg: ["anatomy"] }), ins("vestigial organ", { reg: ["anatomy"] }), ins("sack of ligaments", { reg: ["anatomy"] }), ins("loose vertebra", { reg: ["anatomy"], pl: "loose vertebrae" }),
+    adj("vestigial", { reg: ["anatomy"] }), adj("vermiform", { reg: ["anatomy"], gloss: "worm-shaped" }), adj("flatulent", { reg: ["anatomy"] }), adj("bilious", { reg: ["anatomy"] }),
+    adj("dyspeptic", { reg: ["anatomy"] }), adj("phlegmatic", { reg: ["anatomy"] }), adj("splenetic", { reg: ["anatomy"] }), adj("cartilaginous", { reg: ["anatomy"] }),
+    adj("gangly", { reg: ["anatomy"] }), adj("knock-kneed", { reg: ["anatomy"], targets: ["sheep"] }),
+    sim("a spleen on a Sunday"), sim("a gall bladder with ambitions"), sim("an appendix that means well"),
+  ],
+};
+
+/** Fungi: damp, low, and thriving on rot. Very sheep. */
+export const fungi: LexPack = {
+  id: "fungi",
+  title: "A Field Guide to Fungi",
+  curator: "hunter",
+  reviewedAt: "2026-09-07",
+  level: 4,
+  entries: [
+    ins("puffball", { reg: ["fungi"] }), ins("stinkhorn", { reg: ["fungi"] }), ins("toadstool", { reg: ["fungi"] }), ins("slime mould", { reg: ["fungi"] }), ins("bracket fungus", { reg: ["fungi"], pl: "bracket fungi" }),
+    ins("damp puffball", { reg: ["fungi"] }), ins("mildew", { reg: ["fungi"], pl: "-" }), ins("mushroom with legs", { reg: ["fungi"] }), ins("truffle nobody wanted", { reg: ["fungi"] }), ins("dead man's fingers", { reg: ["fungi"], pl: "-", gloss: "a real black fungus, Xylaria" }),
+    ins("jelly ear", { reg: ["fungi"], gloss: "a real fungus, Auricularia" }), ins("sulphur tuft", { reg: ["fungi"] }), ins("shaggy inkcap", { reg: ["fungi"] }), ins("yellow brain", { reg: ["fungi"], gloss: "a real fungus, Tremella" }),
+    adj("spore-laden", { reg: ["fungi"] }), adj("mouldering", { reg: ["fungi"] }), adj("mildewed", { reg: ["fungi"] }), adj("saprophytic", { reg: ["fungi"], gloss: "living on rot" }),
+    adj("fruiting", { reg: ["fungi"] }), adj("gilled", { reg: ["fungi"] }), adj("musty", { reg: ["fungi"] }), adj("fungal", { reg: ["fungi"] }), adj("sporulating", { reg: ["fungi"] }),
+    sim("a puffball in the rain"), sim("a stinkhorn at a wedding"), sim("mildew with a grievance"), sim("a toadstool that has heard bad news"),
+  ],
+};
+
+export const CORE_PACKS: LexPack[] = [primer, stingers, farmyard, insultsClassic, similes, mincedOaths, mildProfanity, strongProfanity, fWord, culinary, legal, knitting, anatomy, fungi];
