@@ -385,8 +385,8 @@ function hourlyDiary(s: Session): void {
     w.stats.absurds ? `${w.stats.absurds} found somewhere absurd` : "",
     w.stats.rains ? `${w.stats.rains} rain${w.stats.rains === 1 ? "" : "s"}` : "",
     (() => {
-      const top = [...w.sheep].sort((a, b) => b.flees - a.flees)[0];
-      return top && top.flees >= 3 ? `nemesis: ${sheepName(w.seed, top.id)} (${top.flees} flights${top.mode === "penned" ? ", penned" : ""})` : "";
+      const top = w.sheep.find((o) => o.nemesis);
+      return top ? `nemesis: ${sheepName(w.seed, top.id)} (${top.flees} flights${top.mode === "penned" ? ", penned" : ""})` : "";
     })(),
   ].filter(Boolean).join(", ");
   toast(`<strong>${String(hour).padStart(2, "0")}:00</strong> · ${w.sheepPenned}/${w.sheep.length} sheep in · ${w.booksRead} book${w.booksRead === 1 ? "" : "s"} · level ${level} · ${mood}${notes ? ` · ${notes}` : ""}`);

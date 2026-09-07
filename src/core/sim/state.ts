@@ -42,6 +42,8 @@ export interface SheepState {
   black?: boolean;
   /** Got out of the pen once already. */
   escapee?: boolean;
+  /** Declared the herder's personal enemy after its third flight. */
+  nemesis?: boolean;
   /** Personality: plain | skittish | stubborn | dozy | curious */
   temper?: string;
   /** Curious sheep: has it already come up to say hello? */
